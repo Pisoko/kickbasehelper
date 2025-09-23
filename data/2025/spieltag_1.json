@@ -1,0 +1,1431 @@
+{
+  "updatedAt": "2025-09-23T05:55:59.702Z",
+  "players": [
+    {
+      "id": "mock-1-1",
+      "name": "FC Atlas GK 1",
+      "position": "GK",
+      "verein": "FC Atlas",
+      "kosten": 5360000,
+      "punkte_hist": [
+        72,
+        63,
+        68,
+        59,
+        64
+      ],
+      "punkte_avg": 65.2,
+      "punkte_sum": 326,
+      "minutes_hist": [
+        71,
+        74,
+        77,
+        80,
+        83
+      ]
+    },
+    {
+      "id": "mock-1-2",
+      "name": "FC Atlas DEF 1",
+      "position": "DEF",
+      "verein": "FC Atlas",
+      "kosten": 8220000,
+      "punkte_hist": [
+        88,
+        79,
+        84,
+        75,
+        80
+      ],
+      "punkte_avg": 81.2,
+      "punkte_sum": 406,
+      "minutes_hist": [
+        72,
+        75,
+        78,
+        81,
+        84
+      ]
+    },
+    {
+      "id": "mock-1-3",
+      "name": "FC Atlas DEF 2",
+      "position": "DEF",
+      "verein": "FC Atlas",
+      "kosten": 8670000,
+      "punkte_hist": [
+        91,
+        82,
+        87,
+        78,
+        83
+      ],
+      "punkte_avg": 84.2,
+      "punkte_sum": 421,
+      "minutes_hist": [
+        73,
+        76,
+        79,
+        82,
+        85
+      ]
+    },
+    {
+      "id": "mock-1-4",
+      "name": "FC Atlas DEF 3",
+      "position": "DEF",
+      "verein": "FC Atlas",
+      "kosten": 9120000,
+      "punkte_hist": [
+        94,
+        85,
+        90,
+        81,
+        86
+      ],
+      "punkte_avg": 87.2,
+      "punkte_sum": 436,
+      "minutes_hist": [
+        74,
+        77,
+        80,
+        83,
+        86
+      ]
+    },
+    {
+      "id": "mock-1-5",
+      "name": "FC Atlas DEF 4",
+      "position": "DEF",
+      "verein": "FC Atlas",
+      "kosten": 9570000,
+      "punkte_hist": [
+        97,
+        88,
+        93,
+        84,
+        89
+      ],
+      "punkte_avg": 90.2,
+      "punkte_sum": 451,
+      "minutes_hist": [
+        75,
+        78,
+        81,
+        84,
+        87
+      ]
+    },
+    {
+      "id": "mock-1-6",
+      "name": "FC Atlas MID 1",
+      "position": "MID",
+      "verein": "FC Atlas",
+      "kosten": 10660000,
+      "punkte_hist": [
+        117,
+        108,
+        113,
+        104,
+        109
+      ],
+      "punkte_avg": 110.2,
+      "punkte_sum": 551,
+      "minutes_hist": [
+        76,
+        79,
+        82,
+        85,
+        88
+      ]
+    },
+    {
+      "id": "mock-1-7",
+      "name": "FC Atlas MID 2",
+      "position": "MID",
+      "verein": "FC Atlas",
+      "kosten": 8590000,
+      "punkte_hist": [
+        99,
+        90,
+        95,
+        86,
+        91
+      ],
+      "punkte_avg": 92.2,
+      "punkte_sum": 461,
+      "minutes_hist": [
+        77,
+        80,
+        83,
+        86,
+        89
+      ]
+    },
+    {
+      "id": "mock-1-8",
+      "name": "FC Atlas MID 3",
+      "position": "MID",
+      "verein": "FC Atlas",
+      "kosten": 9040000,
+      "punkte_hist": [
+        102,
+        93,
+        98,
+        89,
+        94
+      ],
+      "punkte_avg": 95.2,
+      "punkte_sum": 476,
+      "minutes_hist": [
+        78,
+        81,
+        84,
+        87,
+        90
+      ]
+    },
+    {
+      "id": "mock-1-9",
+      "name": "FC Atlas FWD 1",
+      "position": "FWD",
+      "verein": "FC Atlas",
+      "kosten": 12720000,
+      "punkte_hist": [
+        120,
+        111,
+        116,
+        107,
+        112
+      ],
+      "punkte_avg": 113.2,
+      "punkte_sum": 566,
+      "minutes_hist": [
+        79,
+        82,
+        85,
+        88,
+        70
+      ]
+    },
+    {
+      "id": "mock-1-10",
+      "name": "FC Atlas FWD 2",
+      "position": "FWD",
+      "verein": "FC Atlas",
+      "kosten": 13170000,
+      "punkte_hist": [
+        123,
+        114,
+        119,
+        110,
+        115
+      ],
+      "punkte_avg": 116.2,
+      "punkte_sum": 581,
+      "minutes_hist": [
+        80,
+        83,
+        86,
+        89,
+        71
+      ]
+    },
+    {
+      "id": "mock-1-11",
+      "name": "SV Comet GK 1",
+      "position": "GK",
+      "verein": "SV Comet",
+      "kosten": 6440000,
+      "punkte_hist": [
+        81,
+        72,
+        77,
+        68,
+        73
+      ],
+      "punkte_avg": 74.2,
+      "punkte_sum": 371,
+      "minutes_hist": [
+        81,
+        84,
+        87,
+        90,
+        72
+      ]
+    },
+    {
+      "id": "mock-1-12",
+      "name": "SV Comet DEF 1",
+      "position": "DEF",
+      "verein": "SV Comet",
+      "kosten": 9300000,
+      "punkte_hist": [
+        97,
+        88,
+        93,
+        84,
+        89
+      ],
+      "punkte_avg": 90.2,
+      "punkte_sum": 451,
+      "minutes_hist": [
+        82,
+        85,
+        88,
+        70,
+        73
+      ]
+    },
+    {
+      "id": "mock-1-13",
+      "name": "SV Comet DEF 2",
+      "position": "DEF",
+      "verein": "SV Comet",
+      "kosten": 9750000,
+      "punkte_hist": [
+        100,
+        91,
+        96,
+        87,
+        92
+      ],
+      "punkte_avg": 93.2,
+      "punkte_sum": 466,
+      "minutes_hist": [
+        83,
+        86,
+        89,
+        71,
+        74
+      ]
+    },
+    {
+      "id": "mock-1-14",
+      "name": "SV Comet DEF 3",
+      "position": "DEF",
+      "verein": "SV Comet",
+      "kosten": 7680000,
+      "punkte_hist": [
+        82,
+        73,
+        78,
+        69,
+        74
+      ],
+      "punkte_avg": 75.2,
+      "punkte_sum": 376,
+      "minutes_hist": [
+        84,
+        87,
+        90,
+        72,
+        75
+      ]
+    },
+    {
+      "id": "mock-1-15",
+      "name": "SV Comet DEF 4",
+      "position": "DEF",
+      "verein": "SV Comet",
+      "kosten": 8130000,
+      "punkte_hist": [
+        85,
+        76,
+        81,
+        72,
+        77
+      ],
+      "punkte_avg": 78.2,
+      "punkte_sum": 391,
+      "minutes_hist": [
+        85,
+        88,
+        70,
+        73,
+        76
+      ]
+    },
+    {
+      "id": "mock-1-16",
+      "name": "SV Comet MID 1",
+      "position": "MID",
+      "verein": "SV Comet",
+      "kosten": 9220000,
+      "punkte_hist": [
+        105,
+        96,
+        101,
+        92,
+        97
+      ],
+      "punkte_avg": 98.2,
+      "punkte_sum": 491,
+      "minutes_hist": [
+        86,
+        89,
+        71,
+        74,
+        77
+      ]
+    },
+    {
+      "id": "mock-1-17",
+      "name": "SV Comet MID 2",
+      "position": "MID",
+      "verein": "SV Comet",
+      "kosten": 9670000,
+      "punkte_hist": [
+        108,
+        99,
+        104,
+        95,
+        100
+      ],
+      "punkte_avg": 101.2,
+      "punkte_sum": 506,
+      "minutes_hist": [
+        87,
+        90,
+        72,
+        75,
+        78
+      ]
+    },
+    {
+      "id": "mock-1-18",
+      "name": "SV Comet MID 3",
+      "position": "MID",
+      "verein": "SV Comet",
+      "kosten": 10120000,
+      "punkte_hist": [
+        111,
+        102,
+        107,
+        98,
+        103
+      ],
+      "punkte_avg": 104.2,
+      "punkte_sum": 521,
+      "minutes_hist": [
+        88,
+        70,
+        73,
+        76,
+        79
+      ]
+    },
+    {
+      "id": "mock-1-19",
+      "name": "SV Comet FWD 1",
+      "position": "FWD",
+      "verein": "SV Comet",
+      "kosten": 13800000,
+      "punkte_hist": [
+        129,
+        120,
+        125,
+        116,
+        121
+      ],
+      "punkte_avg": 122.2,
+      "punkte_sum": 611,
+      "minutes_hist": [
+        89,
+        71,
+        74,
+        77,
+        80
+      ]
+    },
+    {
+      "id": "mock-1-20",
+      "name": "SV Comet FWD 2",
+      "position": "FWD",
+      "verein": "SV Comet",
+      "kosten": 14250000,
+      "punkte_hist": [
+        132,
+        123,
+        128,
+        119,
+        124
+      ],
+      "punkte_avg": 125.2,
+      "punkte_sum": 626,
+      "minutes_hist": [
+        90,
+        72,
+        75,
+        78,
+        81
+      ]
+    },
+    {
+      "id": "mock-1-21",
+      "name": "Union Helios GK 1",
+      "position": "GK",
+      "verein": "Union Helios",
+      "kosten": 5000000,
+      "punkte_hist": [
+        69,
+        60,
+        65,
+        56,
+        61
+      ],
+      "punkte_avg": 62.2,
+      "punkte_sum": 311,
+      "minutes_hist": [
+        70,
+        73,
+        76,
+        79,
+        82
+      ]
+    },
+    {
+      "id": "mock-1-22",
+      "name": "Union Helios DEF 1",
+      "position": "DEF",
+      "verein": "Union Helios",
+      "kosten": 7860000,
+      "punkte_hist": [
+        85,
+        76,
+        81,
+        72,
+        77
+      ],
+      "punkte_avg": 78.2,
+      "punkte_sum": 391,
+      "minutes_hist": [
+        71,
+        74,
+        77,
+        80,
+        83
+      ]
+    },
+    {
+      "id": "mock-1-23",
+      "name": "Union Helios DEF 2",
+      "position": "DEF",
+      "verein": "Union Helios",
+      "kosten": 8310000,
+      "punkte_hist": [
+        88,
+        79,
+        84,
+        75,
+        80
+      ],
+      "punkte_avg": 81.2,
+      "punkte_sum": 406,
+      "minutes_hist": [
+        72,
+        75,
+        78,
+        81,
+        84
+      ]
+    },
+    {
+      "id": "mock-1-24",
+      "name": "Union Helios DEF 3",
+      "position": "DEF",
+      "verein": "Union Helios",
+      "kosten": 8760000,
+      "punkte_hist": [
+        91,
+        82,
+        87,
+        78,
+        83
+      ],
+      "punkte_avg": 84.2,
+      "punkte_sum": 421,
+      "minutes_hist": [
+        73,
+        76,
+        79,
+        82,
+        85
+      ]
+    },
+    {
+      "id": "mock-1-25",
+      "name": "Union Helios DEF 4",
+      "position": "DEF",
+      "verein": "Union Helios",
+      "kosten": 9210000,
+      "punkte_hist": [
+        94,
+        85,
+        90,
+        81,
+        86
+      ],
+      "punkte_avg": 87.2,
+      "punkte_sum": 436,
+      "minutes_hist": [
+        74,
+        77,
+        80,
+        83,
+        86
+      ]
+    },
+    {
+      "id": "mock-1-26",
+      "name": "Union Helios MID 1",
+      "position": "MID",
+      "verein": "Union Helios",
+      "kosten": 10300000,
+      "punkte_hist": [
+        114,
+        105,
+        110,
+        101,
+        106
+      ],
+      "punkte_avg": 107.2,
+      "punkte_sum": 536,
+      "minutes_hist": [
+        75,
+        78,
+        81,
+        84,
+        87
+      ]
+    },
+    {
+      "id": "mock-1-27",
+      "name": "Union Helios MID 2",
+      "position": "MID",
+      "verein": "Union Helios",
+      "kosten": 10750000,
+      "punkte_hist": [
+        117,
+        108,
+        113,
+        104,
+        109
+      ],
+      "punkte_avg": 110.2,
+      "punkte_sum": 551,
+      "minutes_hist": [
+        76,
+        79,
+        82,
+        85,
+        88
+      ]
+    },
+    {
+      "id": "mock-1-28",
+      "name": "Union Helios MID 3",
+      "position": "MID",
+      "verein": "Union Helios",
+      "kosten": 8680000,
+      "punkte_hist": [
+        99,
+        90,
+        95,
+        86,
+        91
+      ],
+      "punkte_avg": 92.2,
+      "punkte_sum": 461,
+      "minutes_hist": [
+        77,
+        80,
+        83,
+        86,
+        89
+      ]
+    },
+    {
+      "id": "mock-1-29",
+      "name": "Union Helios FWD 1",
+      "position": "FWD",
+      "verein": "Union Helios",
+      "kosten": 12360000,
+      "punkte_hist": [
+        117,
+        108,
+        113,
+        104,
+        109
+      ],
+      "punkte_avg": 110.2,
+      "punkte_sum": 551,
+      "minutes_hist": [
+        78,
+        81,
+        84,
+        87,
+        90
+      ]
+    },
+    {
+      "id": "mock-1-30",
+      "name": "Union Helios FWD 2",
+      "position": "FWD",
+      "verein": "Union Helios",
+      "kosten": 12810000,
+      "punkte_hist": [
+        120,
+        111,
+        116,
+        107,
+        112
+      ],
+      "punkte_avg": 113.2,
+      "punkte_sum": 566,
+      "minutes_hist": [
+        79,
+        82,
+        85,
+        88,
+        70
+      ]
+    },
+    {
+      "id": "mock-1-31",
+      "name": "Bayern Nova GK 1",
+      "position": "GK",
+      "verein": "Bayern Nova",
+      "kosten": 6080000,
+      "punkte_hist": [
+        78,
+        69,
+        74,
+        65,
+        70
+      ],
+      "punkte_avg": 71.2,
+      "punkte_sum": 356,
+      "minutes_hist": [
+        80,
+        83,
+        86,
+        89,
+        71
+      ]
+    },
+    {
+      "id": "mock-1-32",
+      "name": "Bayern Nova DEF 1",
+      "position": "DEF",
+      "verein": "Bayern Nova",
+      "kosten": 8940000,
+      "punkte_hist": [
+        94,
+        85,
+        90,
+        81,
+        86
+      ],
+      "punkte_avg": 87.2,
+      "punkte_sum": 436,
+      "minutes_hist": [
+        81,
+        84,
+        87,
+        90,
+        72
+      ]
+    },
+    {
+      "id": "mock-1-33",
+      "name": "Bayern Nova DEF 2",
+      "position": "DEF",
+      "verein": "Bayern Nova",
+      "kosten": 9390000,
+      "punkte_hist": [
+        97,
+        88,
+        93,
+        84,
+        89
+      ],
+      "punkte_avg": 90.2,
+      "punkte_sum": 451,
+      "minutes_hist": [
+        82,
+        85,
+        88,
+        70,
+        73
+      ]
+    },
+    {
+      "id": "mock-1-34",
+      "name": "Bayern Nova DEF 3",
+      "position": "DEF",
+      "verein": "Bayern Nova",
+      "kosten": 9840000,
+      "punkte_hist": [
+        100,
+        91,
+        96,
+        87,
+        92
+      ],
+      "punkte_avg": 93.2,
+      "punkte_sum": 466,
+      "minutes_hist": [
+        83,
+        86,
+        89,
+        71,
+        74
+      ]
+    },
+    {
+      "id": "mock-1-35",
+      "name": "Bayern Nova DEF 4",
+      "position": "DEF",
+      "verein": "Bayern Nova",
+      "kosten": 7770000,
+      "punkte_hist": [
+        82,
+        73,
+        78,
+        69,
+        74
+      ],
+      "punkte_avg": 75.2,
+      "punkte_sum": 376,
+      "minutes_hist": [
+        84,
+        87,
+        90,
+        72,
+        75
+      ]
+    },
+    {
+      "id": "mock-1-36",
+      "name": "Bayern Nova MID 1",
+      "position": "MID",
+      "verein": "Bayern Nova",
+      "kosten": 8860000,
+      "punkte_hist": [
+        102,
+        93,
+        98,
+        89,
+        94
+      ],
+      "punkte_avg": 95.2,
+      "punkte_sum": 476,
+      "minutes_hist": [
+        85,
+        88,
+        70,
+        73,
+        76
+      ]
+    },
+    {
+      "id": "mock-1-37",
+      "name": "Bayern Nova MID 2",
+      "position": "MID",
+      "verein": "Bayern Nova",
+      "kosten": 9310000,
+      "punkte_hist": [
+        105,
+        96,
+        101,
+        92,
+        97
+      ],
+      "punkte_avg": 98.2,
+      "punkte_sum": 491,
+      "minutes_hist": [
+        86,
+        89,
+        71,
+        74,
+        77
+      ]
+    },
+    {
+      "id": "mock-1-38",
+      "name": "Bayern Nova MID 3",
+      "position": "MID",
+      "verein": "Bayern Nova",
+      "kosten": 9760000,
+      "punkte_hist": [
+        108,
+        99,
+        104,
+        95,
+        100
+      ],
+      "punkte_avg": 101.2,
+      "punkte_sum": 506,
+      "minutes_hist": [
+        87,
+        90,
+        72,
+        75,
+        78
+      ]
+    },
+    {
+      "id": "mock-1-39",
+      "name": "Bayern Nova FWD 1",
+      "position": "FWD",
+      "verein": "Bayern Nova",
+      "kosten": 13440000,
+      "punkte_hist": [
+        126,
+        117,
+        122,
+        113,
+        118
+      ],
+      "punkte_avg": 119.2,
+      "punkte_sum": 596,
+      "minutes_hist": [
+        88,
+        70,
+        73,
+        76,
+        79
+      ]
+    },
+    {
+      "id": "mock-1-40",
+      "name": "Bayern Nova FWD 2",
+      "position": "FWD",
+      "verein": "Bayern Nova",
+      "kosten": 13890000,
+      "punkte_hist": [
+        129,
+        120,
+        125,
+        116,
+        121
+      ],
+      "punkte_avg": 122.2,
+      "punkte_sum": 611,
+      "minutes_hist": [
+        89,
+        71,
+        74,
+        77,
+        80
+      ]
+    },
+    {
+      "id": "mock-1-41",
+      "name": "SC Polaris GK 1",
+      "position": "GK",
+      "verein": "SC Polaris",
+      "kosten": 7160000,
+      "punkte_hist": [
+        87,
+        78,
+        83,
+        74,
+        79
+      ],
+      "punkte_avg": 80.2,
+      "punkte_sum": 401,
+      "minutes_hist": [
+        90,
+        72,
+        75,
+        78,
+        81
+      ]
+    },
+    {
+      "id": "mock-1-42",
+      "name": "SC Polaris DEF 1",
+      "position": "DEF",
+      "verein": "SC Polaris",
+      "kosten": 7500000,
+      "punkte_hist": [
+        82,
+        73,
+        78,
+        69,
+        74
+      ],
+      "punkte_avg": 75.2,
+      "punkte_sum": 376,
+      "minutes_hist": [
+        70,
+        73,
+        76,
+        79,
+        82
+      ]
+    },
+    {
+      "id": "mock-1-43",
+      "name": "SC Polaris DEF 2",
+      "position": "DEF",
+      "verein": "SC Polaris",
+      "kosten": 7950000,
+      "punkte_hist": [
+        85,
+        76,
+        81,
+        72,
+        77
+      ],
+      "punkte_avg": 78.2,
+      "punkte_sum": 391,
+      "minutes_hist": [
+        71,
+        74,
+        77,
+        80,
+        83
+      ]
+    },
+    {
+      "id": "mock-1-44",
+      "name": "SC Polaris DEF 3",
+      "position": "DEF",
+      "verein": "SC Polaris",
+      "kosten": 8400000,
+      "punkte_hist": [
+        88,
+        79,
+        84,
+        75,
+        80
+      ],
+      "punkte_avg": 81.2,
+      "punkte_sum": 406,
+      "minutes_hist": [
+        72,
+        75,
+        78,
+        81,
+        84
+      ]
+    },
+    {
+      "id": "mock-1-45",
+      "name": "SC Polaris DEF 4",
+      "position": "DEF",
+      "verein": "SC Polaris",
+      "kosten": 8850000,
+      "punkte_hist": [
+        91,
+        82,
+        87,
+        78,
+        83
+      ],
+      "punkte_avg": 84.2,
+      "punkte_sum": 421,
+      "minutes_hist": [
+        73,
+        76,
+        79,
+        82,
+        85
+      ]
+    },
+    {
+      "id": "mock-1-46",
+      "name": "SC Polaris MID 1",
+      "position": "MID",
+      "verein": "SC Polaris",
+      "kosten": 9940000,
+      "punkte_hist": [
+        111,
+        102,
+        107,
+        98,
+        103
+      ],
+      "punkte_avg": 104.2,
+      "punkte_sum": 521,
+      "minutes_hist": [
+        74,
+        77,
+        80,
+        83,
+        86
+      ]
+    },
+    {
+      "id": "mock-1-47",
+      "name": "SC Polaris MID 2",
+      "position": "MID",
+      "verein": "SC Polaris",
+      "kosten": 10390000,
+      "punkte_hist": [
+        114,
+        105,
+        110,
+        101,
+        106
+      ],
+      "punkte_avg": 107.2,
+      "punkte_sum": 536,
+      "minutes_hist": [
+        75,
+        78,
+        81,
+        84,
+        87
+      ]
+    },
+    {
+      "id": "mock-1-48",
+      "name": "SC Polaris MID 3",
+      "position": "MID",
+      "verein": "SC Polaris",
+      "kosten": 10840000,
+      "punkte_hist": [
+        117,
+        108,
+        113,
+        104,
+        109
+      ],
+      "punkte_avg": 110.2,
+      "punkte_sum": 551,
+      "minutes_hist": [
+        76,
+        79,
+        82,
+        85,
+        88
+      ]
+    },
+    {
+      "id": "mock-1-49",
+      "name": "SC Polaris FWD 1",
+      "position": "FWD",
+      "verein": "SC Polaris",
+      "kosten": 12000000,
+      "punkte_hist": [
+        114,
+        105,
+        110,
+        101,
+        106
+      ],
+      "punkte_avg": 107.2,
+      "punkte_sum": 536,
+      "minutes_hist": [
+        77,
+        80,
+        83,
+        86,
+        89
+      ]
+    },
+    {
+      "id": "mock-1-50",
+      "name": "SC Polaris FWD 2",
+      "position": "FWD",
+      "verein": "SC Polaris",
+      "kosten": 12450000,
+      "punkte_hist": [
+        117,
+        108,
+        113,
+        104,
+        109
+      ],
+      "punkte_avg": 110.2,
+      "punkte_sum": 551,
+      "minutes_hist": [
+        78,
+        81,
+        84,
+        87,
+        90
+      ]
+    },
+    {
+      "id": "mock-1-51",
+      "name": "Dynamo Eclipse GK 1",
+      "position": "GK",
+      "verein": "Dynamo Eclipse",
+      "kosten": 5720000,
+      "punkte_hist": [
+        75,
+        66,
+        71,
+        62,
+        67
+      ],
+      "punkte_avg": 68.2,
+      "punkte_sum": 341,
+      "minutes_hist": [
+        79,
+        82,
+        85,
+        88,
+        70
+      ]
+    },
+    {
+      "id": "mock-1-52",
+      "name": "Dynamo Eclipse DEF 1",
+      "position": "DEF",
+      "verein": "Dynamo Eclipse",
+      "kosten": 8580000,
+      "punkte_hist": [
+        91,
+        82,
+        87,
+        78,
+        83
+      ],
+      "punkte_avg": 84.2,
+      "punkte_sum": 421,
+      "minutes_hist": [
+        80,
+        83,
+        86,
+        89,
+        71
+      ]
+    },
+    {
+      "id": "mock-1-53",
+      "name": "Dynamo Eclipse DEF 2",
+      "position": "DEF",
+      "verein": "Dynamo Eclipse",
+      "kosten": 9030000,
+      "punkte_hist": [
+        94,
+        85,
+        90,
+        81,
+        86
+      ],
+      "punkte_avg": 87.2,
+      "punkte_sum": 436,
+      "minutes_hist": [
+        81,
+        84,
+        87,
+        90,
+        72
+      ]
+    },
+    {
+      "id": "mock-1-54",
+      "name": "Dynamo Eclipse DEF 3",
+      "position": "DEF",
+      "verein": "Dynamo Eclipse",
+      "kosten": 9480000,
+      "punkte_hist": [
+        97,
+        88,
+        93,
+        84,
+        89
+      ],
+      "punkte_avg": 90.2,
+      "punkte_sum": 451,
+      "minutes_hist": [
+        82,
+        85,
+        88,
+        70,
+        73
+      ]
+    },
+    {
+      "id": "mock-1-55",
+      "name": "Dynamo Eclipse DEF 4",
+      "position": "DEF",
+      "verein": "Dynamo Eclipse",
+      "kosten": 9930000,
+      "punkte_hist": [
+        100,
+        91,
+        96,
+        87,
+        92
+      ],
+      "punkte_avg": 93.2,
+      "punkte_sum": 466,
+      "minutes_hist": [
+        83,
+        86,
+        89,
+        71,
+        74
+      ]
+    },
+    {
+      "id": "mock-1-56",
+      "name": "Dynamo Eclipse MID 1",
+      "position": "MID",
+      "verein": "Dynamo Eclipse",
+      "kosten": 8500000,
+      "punkte_hist": [
+        99,
+        90,
+        95,
+        86,
+        91
+      ],
+      "punkte_avg": 92.2,
+      "punkte_sum": 461,
+      "minutes_hist": [
+        84,
+        87,
+        90,
+        72,
+        75
+      ]
+    },
+    {
+      "id": "mock-1-57",
+      "name": "Dynamo Eclipse MID 2",
+      "position": "MID",
+      "verein": "Dynamo Eclipse",
+      "kosten": 8950000,
+      "punkte_hist": [
+        102,
+        93,
+        98,
+        89,
+        94
+      ],
+      "punkte_avg": 95.2,
+      "punkte_sum": 476,
+      "minutes_hist": [
+        85,
+        88,
+        70,
+        73,
+        76
+      ]
+    },
+    {
+      "id": "mock-1-58",
+      "name": "Dynamo Eclipse MID 3",
+      "position": "MID",
+      "verein": "Dynamo Eclipse",
+      "kosten": 9400000,
+      "punkte_hist": [
+        105,
+        96,
+        101,
+        92,
+        97
+      ],
+      "punkte_avg": 98.2,
+      "punkte_sum": 491,
+      "minutes_hist": [
+        86,
+        89,
+        71,
+        74,
+        77
+      ]
+    },
+    {
+      "id": "mock-1-59",
+      "name": "Dynamo Eclipse FWD 1",
+      "position": "FWD",
+      "verein": "Dynamo Eclipse",
+      "kosten": 13080000,
+      "punkte_hist": [
+        123,
+        114,
+        119,
+        110,
+        115
+      ],
+      "punkte_avg": 116.2,
+      "punkte_sum": 581,
+      "minutes_hist": [
+        87,
+        90,
+        72,
+        75,
+        78
+      ]
+    },
+    {
+      "id": "mock-1-60",
+      "name": "Dynamo Eclipse FWD 2",
+      "position": "FWD",
+      "verein": "Dynamo Eclipse",
+      "kosten": 13530000,
+      "punkte_hist": [
+        126,
+        117,
+        122,
+        113,
+        118
+      ],
+      "punkte_avg": 119.2,
+      "punkte_sum": 596,
+      "minutes_hist": [
+        88,
+        70,
+        73,
+        76,
+        79
+      ]
+    }
+  ],
+  "matches": [
+    {
+      "id": "match-1-1",
+      "spieltag": 1,
+      "heim": "FC Atlas",
+      "auswaerts": "SV Comet",
+      "kickoff": "2025-09-23T06:55:59.702Z"
+    },
+    {
+      "id": "match-1-2",
+      "spieltag": 1,
+      "heim": "Union Helios",
+      "auswaerts": "Bayern Nova",
+      "kickoff": "2025-09-23T07:55:59.702Z"
+    },
+    {
+      "id": "match-1-3",
+      "spieltag": 1,
+      "heim": "SC Polaris",
+      "auswaerts": "Dynamo Eclipse",
+      "kickoff": "2025-09-23T08:55:59.702Z"
+    }
+  ],
+  "odds": [
+    {
+      "matchId": "match-1-1",
+      "heim": 2.1,
+      "unentschieden": 3.3,
+      "auswaerts": 3,
+      "format": "decimal"
+    },
+    {
+      "matchId": "match-1-2",
+      "heim": 2.2,
+      "unentschieden": 3.5,
+      "auswaerts": 3.15,
+      "format": "decimal"
+    },
+    {
+      "matchId": "match-1-3",
+      "heim": 2.3000000000000003,
+      "unentschieden": 3.6999999999999997,
+      "auswaerts": 3.3,
+      "format": "decimal"
+    }
+  ]
+}
