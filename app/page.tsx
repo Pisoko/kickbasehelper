@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { DEFAULT_PARAMS, FORMATION_LIST } from '../lib/constants';
 import { computeProjections } from '../lib/projection';
 import type { Formation, Match, Odds, OptimizationResult, Player, ProjectionParams } from '../lib/types';
+import PlayerDetailModal from '../components/PlayerDetailModal';
 
 interface CacheInfo {
   updatedAt?: string;
@@ -20,6 +21,17 @@ interface OptimizeState {
 const tabs = ['Dashboard', 'Spieler-Explorer', 'Ergebnis'] as const;
 
 const formatter = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+
+// Function to translate positions to German
+const translatePosition = (position: string): string => {
+  const positionMap: Record<string, string> = {
+    'FWD': 'ANG',
+    'MID': 'MIT', 
+    'DEF': 'VER',
+    'GK': 'TW'
+  };
+  return positionMap[position] || position;
+};
 
 export default function HomePage() {
   const [spieltag, setSpieltag] = useState(1);
@@ -41,6 +53,8 @@ export default function HomePage() {
   const [blacklist, setBlacklist] = useState<string[]>([]);
   const [blacklistInput, setBlacklistInput] = useState('');
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>('Dashboard');
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
   const hasMinutes = useMemo(
     () => players.some((player) => player.minutes_hist && player.minutes_hist.length > 0),
     [players]
@@ -75,6 +89,17 @@ export default function HomePage() {
     }
     loadData();
   }, [spieltag]);
+
+  // Modal handlers
+  const openPlayerModal = (player: Player) => {
+    setSelectedPlayer(player);
+    setIsPlayerModalOpen(true);
+  };
+
+  const closePlayerModal = () => {
+    setIsPlayerModalOpen(false);
+    setSelectedPlayer(null);
+  };
 
   const projections = useMemo(() => {
     if (players.length === 0) {
@@ -422,7 +447,13 @@ export default function HomePage() {
                   <th className="px-3 py-2">Name</th>
                   <th className="px-3 py-2">Verein</th>
                   <th className="px-3 py-2">Pos</th>
-                  <th className="px-3 py-2">Kosten</th>
+                  <th className="px-3 py-2">Marktwert</th>
+                  <th className="px-3 py-2">Gesamtpunkte</th>
+                  <th className="px-3 py-2">Ø Punkte</th>
+                  <th className="px-3 py-2">Tore</th>
+                  <th className="px-3 py-2">Vorlagen</th>
+                  <th className="px-3 py-2">Minuten</th>
+                  <th className="px-3 py-2">Status</th>
                   <th className="px-3 py-2">Pᵢ</th>
                   <th className="px-3 py-2">ValueScore</th>
                 </tr>
@@ -432,11 +463,58 @@ export default function HomePage() {
                   .slice()
                   .sort((a, b) => b.value - a.value)
                   .map((player) => (
-                    <tr key={player.id} className="border-t border-slate-800">
-                      <td className="px-3 py-2">{player.name}</td>
+                    <tr 
+                      key={player.id} 
+                      className="border-t border-slate-800 hover:bg-slate-800 cursor-pointer transition-colors"
+                      onClick={() => openPlayerModal(player)}
+                    >
+                      <td className="px-3 py-2">
+                        <div className="flex items-center gap-3">
+                          {player.playerImageUrl ? (
+                            <img 
+                              src={`https://kickbase.b-cdn.net/${player.playerImageUrl}`}
+                              alt={player.name}
+                              className="h-10 w-10 rounded-full object-cover border-2 border-slate-600"
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded-full bg-slate-600 flex items-center justify-center text-sm font-bold">
+                              {player.name.charAt(0)}
+                            </div>
+                          )}
+                          <div>
+                            <span className={player.isInjured ? 'text-red-400' : 'text-white font-medium'}>{player.name}</span>
+                            {player.isInjured && <span className="text-red-500 text-xs ml-1">🤕</span>}
+                          </div>
+                        </div>
+                      </td>
                       <td className="px-3 py-2 text-slate-400">{player.verein}</td>
-                      <td className="px-3 py-2">{player.position}</td>
-                      <td className="px-3 py-2">{formatter.format(player.kosten)}</td>
+                      <td className="px-3 py-2">{translatePosition(player.position)}</td>
+                      <td className="px-3 py-2">
+                        {player.kosten ? formatter.format(player.kosten) : '-'}
+                      </td>
+                      <td className="px-3 py-2 font-semibold text-emerald-400">
+                        {player.punkte_sum}
+                      </td>
+                      <td className="px-3 py-2">
+                        {player.punkte_avg.toFixed(1)}
+                      </td>
+                      <td className="px-3 py-2 text-center">
+                        <span className="inline-flex items-center justify-center w-6 h-6 bg-green-900/30 text-green-400 rounded-full text-xs">
+                          {player.goals_hist ? player.goals_hist.reduce((sum, goals) => sum + goals, 0) : (player.goals || 0)}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 text-center">
+                         <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-900/30 text-blue-400 rounded-full text-xs">
+                           {player.assists_hist ? player.assists_hist.reduce((sum, assists) => sum + assists, 0) : (player.assists || 0)}
+                         </span>
+                       </td>
+                       <td className="px-3 py-2 text-center text-slate-300">
+                         {player.minutes_hist ? `${player.minutes_hist.reduce((sum, min) => sum + min, 0)}'` : '-'}
+                       </td>
+                       <td className="px-3 py-2 text-xs text-slate-500">
+                         {player.status || '-'}
+                       </td>
                       <td className="px-3 py-2">{player.p_pred.toFixed(2)}</td>
                       <td className="px-3 py-2">{player.value.toExponential(2)}</td>
                     </tr>
@@ -511,6 +589,13 @@ export default function HomePage() {
           )}
         </section>
       )}
+      
+      {/* Player Detail Modal */}
+      <PlayerDetailModal
+        player={selectedPlayer}
+        isOpen={isPlayerModalOpen}
+        onClose={closePlayerModal}
+      />
     </div>
   );
 }

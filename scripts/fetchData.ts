@@ -1,6 +1,10 @@
 import { argv, exit } from 'node:process';
+import { config } from 'dotenv';
 
 import pino from 'pino';
+
+// Load environment variables from .env.local
+config({ path: '.env.local' });
 
 import { cacheAgeDays, readCache, writeCache } from '../lib/data';
 import { KickbaseAdapter } from '../lib/adapters/KickbaseAdapter';

@@ -10,7 +10,21 @@ export interface Player {
   punkte_avg: number;
   punkte_sum: number;
   minutes_hist?: number[];
+  goals_hist?: number[];          // Historical goals per matchday
+  assists_hist?: number[];        // Historical assists per matchday
   oddsModifier?: number;
+  // Enhanced player data from Kickbase API
+  marketValue?: number;           // Current market value (from API calls)
+  totalPoints?: number;           // Total season points
+  averagePoints?: number;         // Average points per game
+  goals?: number;                 // Goals scored (g field)
+  assists?: number;               // Assists (a field)
+  isInjured?: boolean;           // Injury status (il field)
+  status?: string;               // Player status (st field)
+  playerImageUrl?: string;       // Player image URL (pim field)
+  minutesPlayed?: number;        // Minutes played in last game (mt field)
+  recentPerformance?: number[];  // Points from last 3-5 games
+  marketValueHistory?: number[]; // Historical market values
 }
 
 export interface Match {
