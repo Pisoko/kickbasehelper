@@ -1,19 +1,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getKickbaseImageUrl, generateInitialsUrl, searchTheSportsDBImage } from '../lib/imageUtils';
+import { getKickbaseImageUrl, generateInitialsUrl, searchTheSportsDBImage, getBundesligaImageUrl } from '../lib/imageUtils';
 
 interface PlayerImageProps {
   playerImageUrl?: string;
   playerName: string;
   className?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
 const sizeClasses = {
   sm: 'h-8 w-8',
   md: 'h-12 w-12', 
-  lg: 'h-16 w-16'
+  lg: 'h-16 w-16',
+  xl: 'h-32 w-32'
 };
 
 export default function PlayerImage({ 
@@ -40,7 +41,18 @@ export default function PlayerImage({
         return;
       }
 
-      // If no Kickbase image, try TheSportsDB
+      // If no Kickbase image, try Bundesliga images
+      try {
+        const bundesligaUrl = await getBundesligaImageUrl(playerName);
+        if (bundesligaUrl && isMounted) {
+          setCurrentImageUrl(bundesligaUrl);
+          return;
+        }
+      } catch (error) {
+        console.warn('Bundesliga image search failed:', error);
+      }
+
+      // If no Bundesliga image, try TheSportsDB
       try {
         const theSportsDBUrl = await searchTheSportsDBImage(playerName);
         if (theSportsDBUrl && isMounted) {
@@ -73,8 +85,22 @@ export default function PlayerImage({
     
     setImageError(true);
     
-    // If Kickbase image failed, try TheSportsDB
+    // If Kickbase image failed, try Bundesliga images
     if (currentImageUrl?.includes('cdn.kickbase.com')) {
+      try {
+        const bundesligaUrl = await getBundesligaImageUrl(playerName);
+        if (bundesligaUrl) {
+          setCurrentImageUrl(bundesligaUrl);
+          setImageError(false);
+          return;
+        }
+      } catch (error) {
+        console.warn('Bundesliga fallback failed:', error);
+      }
+    }
+    
+    // If Bundesliga image failed, try TheSportsDB
+    if (currentImageUrl?.includes('/images/players/') || currentImageUrl?.includes('cdn.kickbase.com')) {
       try {
         const theSportsDBUrl = await searchTheSportsDBImage(playerName);
         if (theSportsDBUrl) {

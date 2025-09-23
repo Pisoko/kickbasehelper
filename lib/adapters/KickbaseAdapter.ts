@@ -1,5 +1,6 @@
 import pino from 'pino';
 import type { Match, Player } from '../types';
+import { normalizePlayerName, playerNamesMatch } from '../stringUtils';
 
 const logger = pino({ name: 'KickbaseAdapter' });
 
@@ -66,13 +67,18 @@ export class KickbaseAdapter {
       const mockPlayers = this.generateBundesligaPlayers(players.length);
       const allBundesligaPlayers = [...players, ...mockPlayers];
       
+      // Apply deduplication logic to remove duplicates between real and mock data
+      const deduplicatedPlayers = this.deduplicatePlayers(allBundesligaPlayers);
+      
       logger.info({ 
         realPlayers: players.length, 
         mockPlayers: mockPlayers.length, 
-        totalPlayers: allBundesligaPlayers.length 
-      }, 'Combined real and mock players for full Bundesliga');
+        totalPlayersBeforeDedup: allBundesligaPlayers.length,
+        totalPlayersAfterDedup: deduplicatedPlayers.length,
+        duplicatesRemoved: allBundesligaPlayers.length - deduplicatedPlayers.length
+      }, 'Combined real and mock players for full Bundesliga with deduplication');
       
-      return allBundesligaPlayers;
+      return deduplicatedPlayers;
     }
     
     return players;
@@ -259,26 +265,26 @@ export class KickbaseAdapter {
   async getAllPlayersFromTeams(): Promise<Player[]> {
     const allPlayers: Player[] = [];
     
-    // Get all team IDs from our team mapping
+    // Get all team IDs from our team mapping - Updated with CORRECT men's team IDs (≤ 55) for 2025/26 Bundesliga
     const teamIds = Object.keys({
-      '2': 'Bayern München',
-      '3': 'Borussia Dortmund', 
-      '4': 'RB Leipzig',
-      '5': 'SC Freiburg',
-      '7': 'Eintracht Frankfurt',
-      '9': 'Borussia Mönchengladbach',
-      '10': 'FC Augsburg',
-      '11': 'TSG Hoffenheim',
-      '13': 'Werder Bremen',
-      '14': '1. FC Köln',
-      '15': '1. FC Union Berlin',
-      '18': 'Hertha BSC',
-      '24': 'VfL Bochum',
-      '39': 'VfB Stuttgart',
-      '40': 'FSV Mainz 05',
-      '43': 'Bayer 04 Leverkusen',
-      '50': 'VfL Wolfsburg',
-      '51': '1. FC Heidenheim'
+      '2': 'Bayern München',         // Bayern (men's team, corrected ID)
+      '3': 'Borussia Dortmund',      // Dortmund
+      '4': 'Eintracht Frankfurt',    // Frankfurt (corrected ID)
+      '5': 'SC Freiburg',            // Freiburg (corrected ID)
+      '6': 'Hamburger SV',           // Hamburg (Promoted for 2025/26)
+      '7': 'Bayer 04 Leverkusen',    // Leverkusen (corrected ID)
+      '9': 'VfB Stuttgart',          // Stuttgart
+      '10': 'Werder Bremen',         // Bremen (corrected ID)
+      '11': 'VfL Wolfsburg',         // Wolfsburg (corrected ID)
+      '13': 'FC Augsburg',           // Augsburg
+      '14': 'TSG Hoffenheim',        // Hoffenheim (corrected ID)
+      '15': 'Borussia Mönchengladbach', // M'gladbach
+      '18': 'FSV Mainz 05',          // Mainz
+      '28': '1. FC Köln',            // Köln (Promoted for 2025/26, corrected ID)
+      '39': 'FC St. Pauli',          // St. Pauli (Promoted for 2025/26, corrected ID)
+      '40': '1. FC Union Berlin',    // Union Berlin
+      '43': 'RB Leipzig',            // Leipzig (corrected ID)
+      '50': '1. FC Heidenheim'       // Heidenheim
     });
 
     logger.info({ teamCount: teamIds.length }, 'Starting to fetch players from all teams');
@@ -588,29 +594,140 @@ export class KickbaseAdapter {
   }
 
   private getTeamName(teamId: string | number): string {
-    // Map team IDs to team names - Updated with current 2024/25 Bundesliga teams
+    // Map team IDs to team names - Updated with CORRECT men's team IDs (≤ 55) for 2025/26 Bundesliga teams
     const teamMap: Record<string, string> = {
-      '2': 'Bayern München',
-      '3': 'Borussia Dortmund', 
-      '4': 'RB Leipzig',
-      '5': 'SC Freiburg',
-      '7': 'Eintracht Frankfurt',
-      '9': 'Borussia Mönchengladbach',
-      '10': 'FC Augsburg',
-      '11': 'TSG Hoffenheim',
-      '13': 'Werder Bremen',
-      '14': '1. FC Köln',
-      '15': '1. FC Union Berlin',
-      '18': 'Hertha BSC',
-      '24': 'VfL Bochum',
-      '39': 'VfB Stuttgart',
-      '40': 'FSV Mainz 05',
-      '43': 'Bayer 04 Leverkusen',
-      '50': 'VfL Wolfsburg',
-      '51': '1. FC Heidenheim'
+      '2': 'Bayern München',         // Bayern (corrected ID)
+      '3': 'Borussia Dortmund',      // Dortmund
+      '4': 'Eintracht Frankfurt',    // Frankfurt (corrected ID)
+      '5': 'SC Freiburg',            // Freiburg (corrected ID)
+      '6': 'Hamburger SV',           // Hamburg (Promoted for 2025/26)
+      '7': 'Bayer 04 Leverkusen',    // Leverkusen (corrected ID)
+      '9': 'VfB Stuttgart',          // Stuttgart
+      '10': 'Werder Bremen',         // Bremen (corrected ID)
+      '11': 'VfL Wolfsburg',         // Wolfsburg (corrected ID)
+      '13': 'FC Augsburg',           // Augsburg
+      '14': 'TSG Hoffenheim',        // Hoffenheim (corrected ID)
+      '15': 'Borussia Mönchengladbach', // M'gladbach
+      '18': 'FSV Mainz 05',          // Mainz
+      '28': '1. FC Köln',            // Köln (Promoted for 2025/26, corrected ID)
+      '39': 'FC St. Pauli',          // St. Pauli (Promoted for 2025/26, corrected ID)
+      '40': '1. FC Union Berlin',    // Union Berlin
+      '43': 'RB Leipzig',            // Leipzig (corrected ID)
+      '50': '1. FC Heidenheim'       // Heidenheim
     };
     
     return teamMap[String(teamId)] || `Team ${teamId}`;
+  }
+
+  /**
+   * Deduplicate players by removing duplicates and normalizing team names
+   * Uses normalized name matching to handle accented characters properly
+   */
+  private deduplicatePlayers(players: Player[]): Player[] {
+    // First, normalize team names to prefer longer versions
+    const normalizedPlayers = players.map(player => ({
+      ...player,
+      verein: this.normalizeTeamName(player.verein)
+    }));
+
+    // Create a map to track unique players by normalized name
+    const playerMap = new Map<string, Player>();
+    
+    for (const player of normalizedPlayers) {
+      // Create a normalized key for comparison
+      const normalizedKey = normalizePlayerName(player.name, player.firstName);
+      
+      // Check if we already have a player with this normalized name
+      let foundExisting = false;
+      for (const [existingKey, existingPlayer] of playerMap.entries()) {
+        if (playerNamesMatch(player.name, existingPlayer.name, player.firstName, existingPlayer.firstName)) {
+          // Found a match - choose the better player and update the map
+          const betterPlayer = this.chooseBetterPlayer(existingPlayer, player);
+          playerMap.delete(existingKey);
+          playerMap.set(normalizePlayerName(betterPlayer.name, betterPlayer.firstName), betterPlayer);
+          foundExisting = true;
+          break;
+        }
+      }
+      
+      // If no existing player found, add this one
+      if (!foundExisting) {
+        playerMap.set(normalizedKey, player);
+      }
+    }
+    
+    const deduplicatedPlayers = Array.from(playerMap.values());
+    
+    logger.info({
+      originalCount: players.length,
+      deduplicatedCount: deduplicatedPlayers.length,
+      duplicatesRemoved: players.length - deduplicatedPlayers.length
+    }, 'Player deduplication completed with normalized name matching');
+    
+    return deduplicatedPlayers;
+  }
+
+  /**
+   * Normalize team names to prefer longer, more complete versions
+   */
+  private normalizeTeamName(teamName: string): string {
+    const teamNormalizations: Record<string, string> = {
+      'Bayern': 'Bayern München',
+      'Dortmund': 'Borussia Dortmund',
+      'Leipzig': 'RB Leipzig',
+      'Freiburg': 'SC Freiburg',
+      'Frankfurt': 'Eintracht Frankfurt',
+      'Gladbach': 'Borussia Mönchengladbach',
+      'Mönchengladbach': 'Borussia Mönchengladbach',
+      'Augsburg': 'FC Augsburg',
+      'Hoffenheim': 'TSG Hoffenheim',
+      'Bremen': 'Werder Bremen',
+      'Köln': '1. FC Köln',
+      'Union': '1. FC Union Berlin',
+      'Union Berlin': '1. FC Union Berlin',
+      'Hertha': 'Hertha BSC',
+      'Bochum': 'VfL Bochum',
+      'Stuttgart': 'VfB Stuttgart',
+      'Mainz': 'FSV Mainz 05',
+      'Leverkusen': 'Bayer 04 Leverkusen',
+      'Wolfsburg': 'VfL Wolfsburg',
+      'Heidenheim': '1. FC Heidenheim'
+    };
+    
+    return teamNormalizations[teamName] || teamName;
+  }
+
+  /**
+   * Choose the better player between two duplicates
+   * Prefers players with more complete data (firstName, team info, etc.)
+   */
+  private chooseBetterPlayer(player1: Player, player2: Player): Player {
+    // Prefer player with firstName
+    if (player1.firstName && !player2.firstName) return player1;
+    if (!player1.firstName && player2.firstName) return player2;
+    
+    // Prefer player with team information
+    if (player1.verein && player1.verein !== `Team ${player1.id}` && 
+        (!player2.verein || player2.verein === `Team ${player2.id}`)) {
+      return player1;
+    }
+    if (player2.verein && player2.verein !== `Team ${player2.id}` && 
+        (!player1.verein || player1.verein === `Team ${player1.id}`)) {
+      return player2;
+    }
+    
+    // Prefer player with market value data
+    if (player1.marketValue && !player2.marketValue) return player1;
+    if (!player1.marketValue && player2.marketValue) return player2;
+    
+    // Prefer player with higher total points (more recent/accurate data)
+    const points1 = player1.totalPoints || 0;
+    const points2 = player2.totalPoints || 0;
+    if (points1 > points2) return player1;
+    if (points2 > points1) return player2;
+    
+    // Default to first player if all else is equal
+    return player1;
   }
 
   async getMatches(spieltag: number): Promise<Match[]> {
@@ -648,7 +765,7 @@ export class KickbaseAdapter {
    * This creates authentic players for all 18 Bundesliga teams with correct team assignments
    */
   private generateBundesligaPlayers(startingId: number): Player[] {
-    // Real Bundesliga 2024/25 season teams and their actual players
+    // Real Bundesliga 2025/26 season teams and their actual players
     const realBundesligaPlayers = [
       // Bayern München
       { name: 'Manuel Neuer', position: 'GK' as const, team: 'Bayern München', marketValue: 4000000, points: 85 },
@@ -671,6 +788,24 @@ export class KickbaseAdapter {
       { name: 'Michael Olise', position: 'FWD' as const, team: 'Bayern München', marketValue: 60000000, points: 95 },
       { name: 'Mathys Tel', position: 'FWD' as const, team: 'Bayern München', marketValue: 30000000, points: 75 },
       { name: 'Eric Maxim Choupo-Moting', position: 'FWD' as const, team: 'Bayern München', marketValue: 8000000, points: 70 },
+
+      // FC Augsburg
+      { name: 'Finn Dahmen', position: 'GK' as const, team: 'FC Augsburg', marketValue: 3000000, points: 78 },
+      { name: 'Tomas Koubek', position: 'GK' as const, team: 'FC Augsburg', marketValue: 2000000, points: 72 },
+      { name: 'Jeffrey Gouweleeuw', position: 'DEF' as const, team: 'FC Augsburg', marketValue: 4000000, points: 80 },
+      { name: 'Keven Schlotterbeck', position: 'DEF' as const, team: 'FC Augsburg', marketValue: 3500000, points: 78 },
+      { name: 'Maximilian Bauer', position: 'DEF' as const, team: 'FC Augsburg', marketValue: 3000000, points: 76 },
+      { name: 'Marius Wolf', position: 'DEF' as const, team: 'FC Augsburg', marketValue: 4000000, points: 79 },
+      { name: 'Henri Koudossou', position: 'DEF' as const, team: 'FC Augsburg', marketValue: 2500000, points: 74 },
+      { name: 'Kristijan Jakic', position: 'MID' as const, team: 'FC Augsburg', marketValue: 8000000, points: 83 },
+      { name: 'Elvis Rexhbecaj', position: 'MID' as const, team: 'FC Augsburg', marketValue: 4500000, points: 80 },
+      { name: 'Arne Maier', position: 'MID' as const, team: 'FC Augsburg', marketValue: 6000000, points: 82 },
+      { name: 'Frank Onyeka', position: 'MID' as const, team: 'FC Augsburg', marketValue: 5000000, points: 78 },
+      { name: 'Rubén Vargas', position: 'MID' as const, team: 'FC Augsburg', marketValue: 7000000, points: 84 },
+      { name: 'Alexis Claude-Maurice', position: 'FWD' as const, team: 'FC Augsburg', marketValue: 6000000, points: 81 },
+      { name: 'Phillip Tietz', position: 'FWD' as const, team: 'FC Augsburg', marketValue: 4500000, points: 79 },
+      { name: 'Samuel Essende', position: 'FWD' as const, team: 'FC Augsburg', marketValue: 3500000, points: 76 },
+      { name: 'Steve Mounié', position: 'FWD' as const, team: 'FC Augsburg', marketValue: 3000000, points: 74 },
 
       // Borussia Dortmund
       { name: 'Gregor Kobel', position: 'GK' as const, team: 'Borussia Dortmund', marketValue: 35000000, points: 88 },
@@ -708,7 +843,7 @@ export class KickbaseAdapter {
       { name: 'Christoph Baumgartner', position: 'MID' as const, team: 'RB Leipzig', marketValue: 25000000, points: 85 },
       { name: 'Benjamin Šeško', position: 'FWD' as const, team: 'RB Leipzig', marketValue: 50000000, points: 88 },
       { name: 'Loïs Openda', position: 'FWD' as const, team: 'RB Leipzig', marketValue: 40000000, points: 85 },
-      { name: 'Yussuf Poulsen', position: 'FWD' as const, team: 'RB Leipzig', marketValue: 8000000, points: 75 },
+      { name: 'Yussuf Poulsen', position: 'FWD' as const, team: 'Hamburger SV', marketValue: 8000000, points: 75 },
 
       // Bayer 04 Leverkusen
       { name: 'Lukáš Hrádecký', position: 'GK' as const, team: 'Bayer 04 Leverkusen', marketValue: 8000000, points: 85 },
@@ -841,19 +976,6 @@ export class KickbaseAdapter {
       { name: 'Marvin Ducksch', position: 'FWD' as const, team: 'Werder Bremen', marketValue: 8000000, points: 85 },
       { name: 'Rafael Borré', position: 'FWD' as const, team: 'Werder Bremen', marketValue: 8000000, points: 82 },
 
-      // VfL Bochum
-      { name: 'Manuel Riemann', position: 'GK' as const, team: 'VfL Bochum', marketValue: 2000000, points: 78 },
-      { name: 'Andreas Luthe', position: 'GK' as const, team: 'VfL Bochum', marketValue: 1000000, points: 70 },
-      { name: 'Ivan Ordets', position: 'DEF' as const, team: 'VfL Bochum', marketValue: 3000000, points: 75 },
-      { name: 'Erhan Masovic', position: 'DEF' as const, team: 'VfL Bochum', marketValue: 5000000, points: 78 },
-      { name: 'Bernardo', position: 'DEF' as const, team: 'VfL Bochum', marketValue: 5000000, points: 76 },
-      { name: 'Tim Oermann', position: 'DEF' as const, team: 'VfL Bochum', marketValue: 3000000, points: 75 },
-      { name: 'Anthony Losilla', position: 'MID' as const, team: 'VfL Bochum', marketValue: 2000000, points: 78 },
-      { name: 'Kevin Stöger', position: 'MID' as const, team: 'VfL Bochum', marketValue: 5000000, points: 82 },
-      { name: 'Matúš Bero', position: 'MID' as const, team: 'VfL Bochum', marketValue: 8000000, points: 80 },
-      { name: 'Takuma Asano', position: 'FWD' as const, team: 'VfL Bochum', marketValue: 5000000, points: 78 },
-      { name: 'Philipp Hofmann', position: 'FWD' as const, team: 'VfL Bochum', marketValue: 3000000, points: 75 },
-
       // TSG Hoffenheim
       { name: 'Oliver Baumann', position: 'GK' as const, team: 'TSG Hoffenheim', marketValue: 3000000, points: 82 },
       { name: 'Luca Philipp', position: 'GK' as const, team: 'TSG Hoffenheim', marketValue: 1000000, points: 65 },
@@ -891,7 +1013,59 @@ export class KickbaseAdapter {
       { name: 'Jan-Niklas Beste', position: 'MID' as const, team: '1. FC Heidenheim', marketValue: 8000000, points: 82 },
       { name: 'Adrian Beck', position: 'MID' as const, team: '1. FC Heidenheim', marketValue: 3000000, points: 78 },
       { name: 'Marvin Pieringer', position: 'FWD' as const, team: '1. FC Heidenheim', marketValue: 3000000, points: 78 },
-      { name: 'Tim Kleindienst', position: 'FWD' as const, team: '1. FC Heidenheim', marketValue: 8000000, points: 82 }
+      { name: 'Tim Kleindienst', position: 'FWD' as const, team: '1. FC Heidenheim', marketValue: 8000000, points: 82 },
+
+      // FC St. Pauli
+      { name: 'Nikola Vasilj', position: 'GK' as const, team: 'FC St. Pauli', marketValue: 2500000, points: 76 },
+      { name: 'Ben Voll', position: 'GK' as const, team: 'FC St. Pauli', marketValue: 800000, points: 68 },
+      { name: 'Karol Mets', position: 'DEF' as const, team: 'FC St. Pauli', marketValue: 3500000, points: 79 },
+      { name: 'Eric Smith', position: 'DEF' as const, team: 'FC St. Pauli', marketValue: 4000000, points: 80 },
+      { name: 'Hauke Wahl', position: 'DEF' as const, team: 'FC St. Pauli', marketValue: 2000000, points: 74 },
+      { name: 'Manolis Saliakas', position: 'DEF' as const, team: 'FC St. Pauli', marketValue: 2500000, points: 76 },
+      { name: 'Philipp Treu', position: 'DEF' as const, team: 'FC St. Pauli', marketValue: 1800000, points: 73 },
+      { name: 'Jackson Irvine', position: 'MID' as const, team: 'FC St. Pauli', marketValue: 6000000, points: 83 },
+      { name: 'Carlo Boukhalfa', position: 'MID' as const, team: 'FC St. Pauli', marketValue: 3000000, points: 77 },
+      { name: 'Connor Metcalfe', position: 'MID' as const, team: 'FC St. Pauli', marketValue: 2500000, points: 75 },
+      { name: 'Robert Wagner', position: 'MID' as const, team: 'FC St. Pauli', marketValue: 1500000, points: 72 },
+      { name: 'Oladapo Afolayan', position: 'FWD' as const, team: 'FC St. Pauli', marketValue: 4500000, points: 81 },
+      { name: 'Elias Saad', position: 'FWD' as const, team: 'FC St. Pauli', marketValue: 3500000, points: 78 },
+      { name: 'Johannes Eggestein', position: 'FWD' as const, team: 'FC St. Pauli', marketValue: 5000000, points: 82 },
+      { name: 'Morgan Guilavogui', position: 'FWD' as const, team: 'FC St. Pauli', marketValue: 2000000, points: 74 },
+
+      // 1. FC Köln
+      { name: 'Marvin Schwäbe', position: 'GK' as const, team: '1. FC Köln', marketValue: 3000000, points: 79 },
+      { name: 'Jonas Urbig', position: 'GK' as const, team: '1. FC Köln', marketValue: 1500000, points: 72 },
+      { name: 'Timo Hübers', position: 'DEF' as const, team: '1. FC Köln', marketValue: 4000000, points: 80 },
+      { name: 'Jeff Chabot', position: 'DEF' as const, team: '1. FC Köln', marketValue: 3500000, points: 78 },
+      { name: 'Luca Kilian', position: 'DEF' as const, team: '1. FC Köln', marketValue: 3000000, points: 77 },
+      { name: 'Jan Thielmann', position: 'DEF' as const, team: '1. FC Köln', marketValue: 2500000, points: 75 },
+      { name: 'Max Finkgräfe', position: 'DEF' as const, team: '1. FC Köln', marketValue: 2000000, points: 74 },
+      { name: 'Ellyes Skhiri', position: 'MID' as const, team: '1. FC Köln', marketValue: 8000000, points: 85 },
+      { name: 'Eric Martel', position: 'MID' as const, team: '1. FC Köln', marketValue: 4000000, points: 79 },
+      { name: 'Florian Kainz', position: 'MID' as const, team: '1. FC Köln', marketValue: 5000000, points: 81 },
+      { name: 'Dejan Ljubicic', position: 'MID' as const, team: '1. FC Köln', marketValue: 3500000, points: 78 },
+      { name: 'Linton Maina', position: 'FWD' as const, team: '1. FC Köln', marketValue: 4500000, points: 80 },
+      { name: 'Steffen Tigges', position: 'FWD' as const, team: '1. FC Köln', marketValue: 3000000, points: 77 },
+      { name: 'Tim Lemperle', position: 'FWD' as const, team: '1. FC Köln', marketValue: 2500000, points: 75 },
+      { name: 'Damion Downs', position: 'FWD' as const, team: '1. FC Köln', marketValue: 2000000, points: 73 },
+
+      // Hamburger SV
+      { name: 'Daniel Heuer Fernandes', position: 'GK' as const, team: 'Hamburger SV', marketValue: 3500000, points: 81 },
+      { name: 'Matheo Raab', position: 'GK' as const, team: 'Hamburger SV', marketValue: 1200000, points: 70 },
+      { name: 'Sebastian Schonlau', position: 'DEF' as const, team: 'Hamburger SV', marketValue: 4000000, points: 82 },
+      { name: 'Miro Muheim', position: 'DEF' as const, team: 'Hamburger SV', marketValue: 3500000, points: 79 },
+      { name: 'Dennis Hadzikadunic', position: 'DEF' as const, team: 'Hamburger SV', marketValue: 3000000, points: 77 },
+      { name: 'Ignace Van der Brempt', position: 'DEF' as const, team: 'Hamburger SV', marketValue: 2500000, points: 75 },
+      { name: 'Noah Katterbach', position: 'DEF' as const, team: 'Hamburger SV', marketValue: 2800000, points: 76 },
+      { name: 'Jonas Meffert', position: 'MID' as const, team: 'Hamburger SV', marketValue: 4500000, points: 83 },
+      { name: 'László Bénes', position: 'MID' as const, team: 'Hamburger SV', marketValue: 3500000, points: 80 },
+      { name: 'Immanuel Pherai', position: 'MID' as const, team: 'Hamburger SV', marketValue: 4000000, points: 81 },
+      { name: 'Jean-Luc Dompé', position: 'MID' as const, team: 'Hamburger SV', marketValue: 3000000, points: 78 },
+      { name: 'Ludovit Reis', position: 'MID' as const, team: 'Hamburger SV', marketValue: 2500000, points: 76 },
+      { name: 'Robert Glatzel', position: 'FWD' as const, team: 'Hamburger SV', marketValue: 5000000, points: 85 },
+      { name: 'Ransford Königsdörffer', position: 'FWD' as const, team: 'Hamburger SV', marketValue: 4500000, points: 82 },
+      { name: 'Davie Selke', position: 'FWD' as const, team: 'Hamburger SV', marketValue: 3500000, points: 79 },
+      { name: 'András Németh', position: 'FWD' as const, team: 'Hamburger SV', marketValue: 2000000, points: 74 }
     ];
 
     // Transform real player data into our Player interface

@@ -2,8 +2,11 @@
  * Utility functions for handling player images with fallback sources
  */
 
+import { createSearchableName } from './stringUtils';
+
 export interface PlayerImageSources {
   kickbase?: string | null;
+  bundesliga?: string | null;
   theSportsDB?: string | null;
   fallback?: string;
 }
@@ -17,16 +20,32 @@ export function getKickbaseImageUrl(playerImageUrl?: string): string | null {
 }
 
 /**
+ * Search for player image in Bundesliga image mapping via API
+ */
+export async function getBundesligaImageUrl(playerName: string): Promise<string | null> {
+  try {
+    const response = await fetch(`/api/player-image?name=${encodeURIComponent(playerName)}`);
+    
+    if (!response.ok) {
+      return null;
+    }
+    
+    const data = await response.json();
+    return data.imageUrl || null;
+  } catch (error) {
+    console.warn('Failed to fetch Bundesliga image:', error);
+    return null;
+  }
+}
+
+/**
  * Search for player image on TheSportsDB
- * This is a simplified version - in production you'd want to cache these results
+ * Uses normalized name handling for better search results with accented characters
  */
 export async function searchTheSportsDBImage(playerName: string): Promise<string | null> {
   try {
-    // Clean player name for search (remove special characters, replace spaces with underscores)
-    const searchName = playerName
-      .replace(/[^a-zA-Z\s]/g, '')
-      .trim()
-      .replace(/\s+/g, '_');
+    // Use the normalized searchable name function
+    const searchName = createSearchableName(playerName);
     
     const response = await fetch(
       `https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(searchName)}`
@@ -61,7 +80,7 @@ export async function searchTheSportsDBImage(playerName: string): Promise<string
 export function getPlayerImageSources(playerImageUrl?: string, playerName?: string): PlayerImageSources {
   return {
     kickbase: getKickbaseImageUrl(playerImageUrl),
-    // TheSportsDB search would be done asynchronously
+    // Bundesliga and TheSportsDB search would be done asynchronously
     fallback: playerName ? generateInitialsUrl(playerName) : undefined
   };
 }

@@ -1,0 +1,3104 @@
+[
+  {
+    "playerName": "Finn Dahmen",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028co-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/finn-dahmen.png",
+    "lastUpdated": "2025-09-23T12:35:11.855Z"
+  },
+  {
+    "playerName": "Nediljko Labrović",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01qwt-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nediljko-labrovi.png",
+    "lastUpdated": "2025-09-23T12:35:11.855Z"
+  },
+  {
+    "playerName": "Daniel Klein",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fw1-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/daniel-klein.png",
+    "lastUpdated": "2025-09-23T12:35:11.885Z"
+  },
+  {
+    "playerName": "Mads Pedersen",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g1w-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mads-pedersen.png",
+    "lastUpdated": "2025-09-23T12:35:11.885Z"
+  },
+  {
+    "playerName": "Chrislain Matsima",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01l5i-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/chrislain-matsima.png",
+    "lastUpdated": "2025-09-23T12:35:11.885Z"
+  },
+  {
+    "playerName": "Jeffrey Gouweleeuw",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0026tp-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jeffrey-gouweleeuw.png",
+    "lastUpdated": "2025-09-23T12:35:12.920Z"
+  },
+  {
+    "playerName": "Dimitrios Giannoulis",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j017tj-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/dimitrios-giannoulis.png",
+    "lastUpdated": "2025-09-23T12:35:12.941Z"
+  },
+  {
+    "playerName": "Cédric Zesiger",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j017lg-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/c-dric-zesiger.png",
+    "lastUpdated": "2025-09-23T12:35:12.916Z"
+  },
+  {
+    "playerName": "Maximilian Bauer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028rz-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/maximilian-bauer.png",
+    "lastUpdated": "2025-09-23T12:35:12.918Z"
+  },
+  {
+    "playerName": "Marius Wolf",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0002ig-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/marius-wolf.png",
+    "lastUpdated": "2025-09-23T12:35:12.920Z"
+  },
+  {
+    "playerName": "Keven Schlotterbeck",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028d6-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/keven-schlotterbeck.png",
+    "lastUpdated": "2025-09-23T12:35:13.981Z"
+  },
+  {
+    "playerName": "Noahkai Banks",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ybz-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/noahkai-banks.png",
+    "lastUpdated": "2025-09-23T12:35:13.976Z"
+  },
+  {
+    "playerName": "Felix Meiser",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01npd-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/felix-meiser.png",
+    "lastUpdated": "2025-09-23T12:35:13.981Z"
+  },
+  {
+    "playerName": "Oliver Sorg",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01q8x-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/oliver-sorg.png",
+    "lastUpdated": "2025-09-23T12:35:13.981Z"
+  },
+  {
+    "playerName": "Han-Noah Massengo",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01bkl-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/han-noah-massengo.png",
+    "lastUpdated": "2025-09-23T12:35:13.981Z"
+  },
+  {
+    "playerName": "Elvis Rexhbecaj",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027uo-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/elvis-rexhbecaj.png",
+    "lastUpdated": "2025-09-23T12:35:15.016Z"
+  },
+  {
+    "playerName": "Arne Maier",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027m6-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/arne-maier.png",
+    "lastUpdated": "2025-09-23T12:35:15.018Z"
+  },
+  {
+    "playerName": "Ismaël Gharbi",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01gss-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/isma-l-gharbi.png",
+    "lastUpdated": "2025-09-23T12:35:15.016Z"
+  },
+  {
+    "playerName": "Kristijan Jakić",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01fx8-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kristijan-jaki.png",
+    "lastUpdated": "2025-09-23T12:35:15.016Z"
+  },
+  {
+    "playerName": "Robin Fellhauer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028c6-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/robin-fellhauer.png",
+    "lastUpdated": "2025-09-23T12:35:15.018Z"
+  },
+  {
+    "playerName": "Alexis Claude-Maurice",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01fur-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/alexis-claude-maurice.png",
+    "lastUpdated": "2025-09-23T12:35:16.050Z"
+  },
+  {
+    "playerName": "Anton Kade",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01k2x-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/anton-kade.png",
+    "lastUpdated": "2025-09-23T12:35:16.057Z"
+  },
+  {
+    "playerName": "Fabian Rieder",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01g82-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/fabian-rieder.png",
+    "lastUpdated": "2025-09-23T12:35:16.057Z"
+  },
+  {
+    "playerName": "Mert Kömür",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01kev-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mert-k-m-r.png",
+    "lastUpdated": "2025-09-23T12:35:16.057Z"
+  },
+  {
+    "playerName": "Mahmut Küçükşahin",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j020xw-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mahmut-k-k-ahin.png",
+    "lastUpdated": "2025-09-23T12:35:16.057Z"
+  },
+  {
+    "playerName": "Samuel Essende",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ct9-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/samuel-essende.png",
+    "lastUpdated": "2025-09-23T12:35:17.092Z"
+  },
+  {
+    "playerName": "Phillip Tietz",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0026vb-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/phillip-tietz.png",
+    "lastUpdated": "2025-09-23T12:35:17.095Z"
+  },
+  {
+    "playerName": "Elias Saad",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01iso-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/elias-saad.png",
+    "lastUpdated": "2025-09-23T12:35:17.092Z"
+  },
+  {
+    "playerName": "Aiman Dardari",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j024kp-dfl-clu-000010-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/aiman-dardari.png",
+    "lastUpdated": "2025-09-23T12:35:17.095Z"
+  },
+  {
+    "playerName": "Frederik Rønnow",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028p2-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/frederik-r-nnow.png",
+    "lastUpdated": "2025-09-23T12:35:17.095Z"
+  },
+  {
+    "playerName": "Carl Klaus",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g5e-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/carl-klaus.png",
+    "lastUpdated": "2025-09-23T12:35:18.134Z"
+  },
+  {
+    "playerName": "Matheo Raab",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j017cz-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/matheo-raab.png",
+    "lastUpdated": "2025-09-23T12:35:18.134Z"
+  },
+  {
+    "playerName": "Andrik Markgraf",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j021t8-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/andrik-markgraf.png",
+    "lastUpdated": "2025-09-23T12:35:18.134Z"
+  },
+  {
+    "playerName": "Diogo Leite",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j019t5-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/diogo-leite.png",
+    "lastUpdated": "2025-09-23T12:35:18.134Z"
+  },
+  {
+    "playerName": "Danilho Doekhi",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01gqo-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/danilho-doekhi.png",
+    "lastUpdated": "2025-09-23T12:35:18.134Z"
+  },
+  {
+    "playerName": "Leopold Querfeld",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j020kq-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/leopold-querfeld.png",
+    "lastUpdated": "2025-09-23T12:35:19.171Z"
+  },
+  {
+    "playerName": "Tom Rothe",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01kai-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/tom-rothe.png",
+    "lastUpdated": "2025-09-23T12:35:19.171Z"
+  },
+  {
+    "playerName": "Josip Juranovic",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01gso-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/josip-juranovic.png",
+    "lastUpdated": "2025-09-23T12:35:19.171Z"
+  },
+  {
+    "playerName": "Christopher Trimmel",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0002fx-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/christopher-trimmel.png",
+    "lastUpdated": "2025-09-23T12:35:19.171Z"
+  },
+  {
+    "playerName": "Stanley Nsoki",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j019uo-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/stanley-nsoki.png",
+    "lastUpdated": "2025-09-23T12:35:19.173Z"
+  },
+  {
+    "playerName": "Derrick Köhn",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01cad-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/derrick-k-hn.png",
+    "lastUpdated": "2025-09-23T12:35:20.210Z"
+  },
+  {
+    "playerName": "Oluwaseun Ogbemudia",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01xtj-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/oluwaseun-ogbemudia.png",
+    "lastUpdated": "2025-09-23T12:35:20.216Z"
+  },
+  {
+    "playerName": "Aljoscha Kemlein",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01nd9-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/aljoscha-kemlein.png",
+    "lastUpdated": "2025-09-23T12:35:20.210Z"
+  },
+  {
+    "playerName": "Rani Khedira",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001ea-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/rani-khedira.png",
+    "lastUpdated": "2025-09-23T12:35:20.216Z"
+  },
+  {
+    "playerName": "Wooyeong Jeong",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fvr-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/wooyeong-jeong.png",
+    "lastUpdated": "2025-09-23T12:35:20.210Z"
+  },
+  {
+    "playerName": "András Schäfer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01gua-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/andr-s-sch-fer.png",
+    "lastUpdated": "2025-09-23T12:35:21.272Z"
+  },
+  {
+    "playerName": "David Preu",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j02125-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/david-preu.png",
+    "lastUpdated": "2025-09-23T12:35:21.255Z"
+  },
+  {
+    "playerName": "Janik Haberer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0002dw-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/janik-haberer.png",
+    "lastUpdated": "2025-09-23T12:35:21.250Z"
+  },
+  {
+    "playerName": "Tim Skarke",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002659-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/tim-skarke.png",
+    "lastUpdated": "2025-09-23T12:35:21.255Z"
+  },
+  {
+    "playerName": "Robert Skov",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g4b-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/robert-skov.png",
+    "lastUpdated": "2025-09-23T12:35:21.255Z"
+  },
+  {
+    "playerName": "Alex Král",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01bvq-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/alex-kr-l.png",
+    "lastUpdated": "2025-09-23T12:35:22.304Z"
+  },
+  {
+    "playerName": "Oliver Burke",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027fw-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/oliver-burke.png",
+    "lastUpdated": "2025-09-23T12:35:22.308Z"
+  },
+  {
+    "playerName": "Livan Burcu",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01vyc-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/livan-burcu.png",
+    "lastUpdated": "2025-09-23T12:35:22.305Z"
+  },
+  {
+    "playerName": "Ilyas Ansah",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ws3-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ilyas-ansah.png",
+    "lastUpdated": "2025-09-23T12:35:22.308Z"
+  },
+  {
+    "playerName": "Andrej Ilić",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j021ze-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/andrej-ili.png",
+    "lastUpdated": "2025-09-23T12:35:22.296Z"
+  },
+  {
+    "playerName": "Marin Ljubicic",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01tmd-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/marin-ljubicic.png",
+    "lastUpdated": "2025-09-23T12:35:23.342Z"
+  },
+  {
+    "playerName": "Dmytro Bogdanov",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01y7c-dfl-clu-00000v-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/dmytro-bogdanov.png",
+    "lastUpdated": "2025-09-23T12:35:23.347Z"
+  },
+  {
+    "playerName": "Péter Gulácsi",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002662-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/p-ter-gul-csi.png",
+    "lastUpdated": "2025-09-23T12:35:23.342Z"
+  },
+  {
+    "playerName": "Leopold Zingerle",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0002bb-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/leopold-zingerle.png",
+    "lastUpdated": "2025-09-23T12:35:23.344Z"
+  },
+  {
+    "playerName": "Maarten Vandevoordt",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01bpg-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/maarten-vandevoordt.png",
+    "lastUpdated": "2025-09-23T12:35:23.344Z"
+  },
+  {
+    "playerName": "Willi Orbán",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000ho-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/willi-orb-n.png",
+    "lastUpdated": "2025-09-23T12:35:24.387Z"
+  },
+  {
+    "playerName": "El Chadaille Bitshiabu",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01k70-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/el-chadaille-bitshiabu.png",
+    "lastUpdated": "2025-09-23T12:35:24.387Z"
+  },
+  {
+    "playerName": "Lukas Klostermann",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0002ad-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/lukas-klostermann.png",
+    "lastUpdated": "2025-09-23T12:35:24.422Z"
+  },
+  {
+    "playerName": "Kosta Nedeljkovic",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j02320-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kosta-nedeljkovic.png",
+    "lastUpdated": "2025-09-23T12:35:24.387Z"
+  },
+  {
+    "playerName": "David Raum",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027it-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/david-raum.png",
+    "lastUpdated": "2025-09-23T12:35:24.387Z"
+  },
+  {
+    "playerName": "Castello Lukeba",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01dov-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/castello-lukeba.png",
+    "lastUpdated": "2025-09-23T12:35:25.460Z"
+  },
+  {
+    "playerName": "Max Finkgräfe",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01snf-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/max-finkgr-fe.png",
+    "lastUpdated": "2025-09-23T12:35:25.463Z"
+  },
+  {
+    "playerName": "Benjamin Henrichs",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002670-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/benjamin-henrichs.png",
+    "lastUpdated": "2025-09-23T12:35:25.460Z"
+  },
+  {
+    "playerName": "Ezechiel Banzuzi",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01o02-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ezechiel-banzuzi.png",
+    "lastUpdated": "2025-09-23T12:35:25.460Z"
+  },
+  {
+    "playerName": "Amadou Haidara",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fx0-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/amadou-haidara.png",
+    "lastUpdated": "2025-09-23T12:35:25.461Z"
+  },
+  {
+    "playerName": "Nicolas Seiwald",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01fo9-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nicolas-seiwald.png",
+    "lastUpdated": "2025-09-23T12:35:26.503Z"
+  },
+  {
+    "playerName": "Christoph Baumgartner",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028kn-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/christoph-baumgartner.png",
+    "lastUpdated": "2025-09-23T12:35:26.489Z"
+  },
+  {
+    "playerName": "Ridle Baku",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028cm-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ridle-baku.png",
+    "lastUpdated": "2025-09-23T12:35:26.487Z"
+  },
+  {
+    "playerName": "Assan Ouédraogo",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01kan-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/assan-ou-draogo.png",
+    "lastUpdated": "2025-09-23T12:35:26.503Z"
+  },
+  {
+    "playerName": "Xaver Schlager",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g1u-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/xaver-schlager.png",
+    "lastUpdated": "2025-09-23T12:35:26.523Z"
+  },
+  {
+    "playerName": "Andrija Maksimović",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01u5d-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/andrija-maksimovi.png",
+    "lastUpdated": "2025-09-23T12:35:27.561Z"
+  },
+  {
+    "playerName": "Joyeux Masanka Bungi",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j022jl-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/joyeux-masanka-bungi.png",
+    "lastUpdated": "2025-09-23T12:35:27.561Z"
+  },
+  {
+    "playerName": "Kevin Kampl",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001bn-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kevin-kampl.png",
+    "lastUpdated": "2025-09-23T12:35:27.561Z"
+  },
+  {
+    "playerName": "Viggo Gebel",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j021t4-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/viggo-gebel.png",
+    "lastUpdated": "2025-09-23T12:35:27.561Z"
+  },
+  {
+    "playerName": "Antonio Nusa",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01kk4-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/antonio-nusa.png",
+    "lastUpdated": "2025-09-23T12:35:27.566Z"
+  },
+  {
+    "playerName": "Johan Bakayoko",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01n5l-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/johan-bakayoko.png",
+    "lastUpdated": "2025-09-23T12:35:28.591Z"
+  },
+  {
+    "playerName": "Conrad Harder",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01u8l-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/conrad-harder.png",
+    "lastUpdated": "2025-09-23T12:35:28.604Z"
+  },
+  {
+    "playerName": "Tidiam Gomis",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01u0s-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/tidiam-gomis.png",
+    "lastUpdated": "2025-09-23T12:35:28.600Z"
+  },
+  {
+    "playerName": "Timo Werner",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00021u-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/timo-werner.png",
+    "lastUpdated": "2025-09-23T12:35:28.604Z"
+  },
+  {
+    "playerName": "Rômulo",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j024lv-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/r-mulo.png",
+    "lastUpdated": "2025-09-23T12:35:28.604Z"
+  },
+  {
+    "playerName": "Yan Diomande",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j024cc-dfl-clu-000017-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/yan-diomande.png",
+    "lastUpdated": "2025-09-23T12:35:29.640Z"
+  },
+  {
+    "playerName": "Mark Flekken",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027r7-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mark-flekken.png",
+    "lastUpdated": "2025-09-23T12:35:29.671Z"
+  },
+  {
+    "playerName": "Janis Blaswich",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000nt-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/janis-blaswich.png",
+    "lastUpdated": "2025-09-23T12:35:29.641Z"
+  },
+  {
+    "playerName": "Niklas Lomb",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-000177-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/niklas-lomb.png",
+    "lastUpdated": "2025-09-23T12:35:29.647Z"
+  },
+  {
+    "playerName": "Jarell Quansah",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ko9-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jarell-quansah.png",
+    "lastUpdated": "2025-09-23T12:35:29.647Z"
+  },
+  {
+    "playerName": "Loïc Badé",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01vw9-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/lo-c-bad.png",
+    "lastUpdated": "2025-09-23T12:35:30.709Z"
+  },
+  {
+    "playerName": "Edmond Tapsoba",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gar-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/edmond-tapsoba.png",
+    "lastUpdated": "2025-09-23T12:35:30.710Z"
+  },
+  {
+    "playerName": "Arthur",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01unl-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/arthur.png",
+    "lastUpdated": "2025-09-23T12:35:30.709Z"
+  },
+  {
+    "playerName": "Axel Tape",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j023to-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/axel-tape.png",
+    "lastUpdated": "2025-09-23T12:35:30.710Z"
+  },
+  {
+    "playerName": "Alejandro Grimaldo",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j016j2-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/alejandro-grimaldo.png",
+    "lastUpdated": "2025-09-23T12:35:30.888Z"
+  },
+  {
+    "playerName": "Lucas Vázquez",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0164x-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/lucas-v-zquez.png",
+    "lastUpdated": "2025-09-23T12:35:32.105Z"
+  },
+  {
+    "playerName": "Jeanuël Belocian",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01nzp-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jeanu-l-belocian.png",
+    "lastUpdated": "2025-09-23T12:35:31.926Z"
+  },
+  {
+    "playerName": "Ezequiel Fernández",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j024ss-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ezequiel-fern-ndez.png",
+    "lastUpdated": "2025-09-23T12:35:31.924Z"
+  },
+  {
+    "playerName": "Jonas Hofmann",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001e5-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jonas-hofmann.png",
+    "lastUpdated": "2025-09-23T12:35:31.945Z"
+  },
+  {
+    "playerName": "Robert Andrich",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001ew-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/robert-andrich.png",
+    "lastUpdated": "2025-09-23T12:35:31.929Z"
+  },
+  {
+    "playerName": "Claudio Echeverri",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01y31-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/claudio-echeverri.png",
+    "lastUpdated": "2025-09-23T12:35:33.141Z"
+  },
+  {
+    "playerName": "Malik Tillman",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gcu-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/malik-tillman.png",
+    "lastUpdated": "2025-09-23T12:35:33.145Z"
+  },
+  {
+    "playerName": "Aleix García",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01860-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/aleix-garc-a.png",
+    "lastUpdated": "2025-09-23T12:35:33.141Z"
+  },
+  {
+    "playerName": "Exequiel Palacios",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g8h-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/exequiel-palacios.png",
+    "lastUpdated": "2025-09-23T12:35:33.143Z"
+  },
+  {
+    "playerName": "Jeremiah Mensah",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01udd-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jeremiah-mensah.png",
+    "lastUpdated": "2025-09-23T12:35:33.143Z"
+  },
+  {
+    "playerName": "Ibrahim Maza",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01qpq-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ibrahim-maza.png",
+    "lastUpdated": "2025-09-23T12:35:34.202Z"
+  },
+  {
+    "playerName": "Martin Terrier",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01b7d-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/martin-terrier.png",
+    "lastUpdated": "2025-09-23T12:35:34.186Z"
+  },
+  {
+    "playerName": "Patrik Schick",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g6u-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/patrik-schick.png",
+    "lastUpdated": "2025-09-23T12:35:34.193Z"
+  },
+  {
+    "playerName": "Eliesse Ben Seghir",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01us3-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/eliesse-ben-seghir.png",
+    "lastUpdated": "2025-09-23T12:35:34.316Z"
+  },
+  {
+    "playerName": "Alejo Sarco",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01y1g-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/alejo-sarco.png",
+    "lastUpdated": "2025-09-23T12:35:34.183Z"
+  },
+  {
+    "playerName": "Ernest Poku",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01na3-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ernest-poku.png",
+    "lastUpdated": "2025-09-23T12:35:35.350Z"
+  },
+  {
+    "playerName": "Nathan Tella",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01xcm-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nathan-tella.png",
+    "lastUpdated": "2025-09-23T12:35:35.338Z"
+  },
+  {
+    "playerName": "Christian Kofane",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j024a2-dfl-clu-00000b-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/christian-kofane.png",
+    "lastUpdated": "2025-09-23T12:35:35.338Z"
+  },
+  {
+    "playerName": "Lasse Rieß",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01cx5-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/lasse-rie.png",
+    "lastUpdated": "2025-09-23T12:35:35.352Z"
+  },
+  {
+    "playerName": "Robin Zentner",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027wd-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/robin-zentner.png",
+    "lastUpdated": "2025-09-23T12:35:35.352Z"
+  },
+  {
+    "playerName": "Daniel Batz",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000qs-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/daniel-batz.png",
+    "lastUpdated": "2025-09-23T12:35:36.386Z"
+  },
+  {
+    "playerName": "Phillipp Mwene",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00278q-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/phillipp-mwene.png",
+    "lastUpdated": "2025-09-23T12:35:36.389Z"
+  },
+  {
+    "playerName": "Maxim Leitsch",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002708-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/maxim-leitsch.png",
+    "lastUpdated": "2025-09-23T12:35:36.386Z"
+  },
+  {
+    "playerName": "Stefan Bell",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00001r-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/stefan-bell.png",
+    "lastUpdated": "2025-09-23T12:35:36.389Z"
+  },
+  {
+    "playerName": "Kasey Bos",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0244p-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kasey-bos.png",
+    "lastUpdated": "2025-09-23T12:35:36.389Z"
+  },
+  {
+    "playerName": "Anthony Caci",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01c5k-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/anthony-caci.png",
+    "lastUpdated": "2025-09-23T12:35:37.412Z"
+  },
+  {
+    "playerName": "Danny da Costa",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000nb-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/danny-da-costa.png",
+    "lastUpdated": "2025-09-23T12:35:37.428Z"
+  },
+  {
+    "playerName": "Konstantin Schopp",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j024a7-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/konstantin-schopp.png",
+    "lastUpdated": "2025-09-23T12:35:37.425Z"
+  },
+  {
+    "playerName": "Andreas Hanche-Olsen",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j019xm-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/andreas-hanche-olsen.png",
+    "lastUpdated": "2025-09-23T12:35:37.573Z"
+  },
+  {
+    "playerName": "Silvan Widmer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j011lz-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/silvan-widmer.png",
+    "lastUpdated": "2025-09-23T12:35:37.428Z"
+  },
+  {
+    "playerName": "Dominik Kohr",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00015h-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/dominik-kohr.png",
+    "lastUpdated": "2025-09-23T12:35:38.599Z"
+  },
+  {
+    "playerName": "Maxim Dal",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01lr5-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/maxim-dal.png",
+    "lastUpdated": "2025-09-23T12:35:38.610Z"
+  },
+  {
+    "playerName": "Kacper Potulski",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01r6o-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kacper-potulski.png",
+    "lastUpdated": "2025-09-23T12:35:38.608Z"
+  },
+  {
+    "playerName": "Kaishu Sano",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j021ee-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kaishu-sano.png",
+    "lastUpdated": "2025-09-23T12:35:38.608Z"
+  },
+  {
+    "playerName": "Jae-sung Lee",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028rj-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jae-sung-lee.png",
+    "lastUpdated": "2025-09-23T12:35:38.608Z"
+  },
+  {
+    "playerName": "Paul Nebel",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g5b-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/paul-nebel.png",
+    "lastUpdated": "2025-09-23T12:35:39.650Z"
+  },
+  {
+    "playerName": "Arnaud Nordin",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j017vj-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/arnaud-nordin.png",
+    "lastUpdated": "2025-09-23T12:35:39.650Z"
+  },
+  {
+    "playerName": "Nadiem Amiri",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0002li-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nadiem-amiri.png",
+    "lastUpdated": "2025-09-23T12:35:39.650Z"
+  },
+  {
+    "playerName": "Lennard Maloney",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028bp-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/lennard-maloney.png",
+    "lastUpdated": "2025-09-23T12:35:39.650Z"
+  },
+  {
+    "playerName": "Nikolas Veratschnig",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j021b9-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nikolas-veratschnig.png",
+    "lastUpdated": "2025-09-23T12:35:39.637Z"
+  },
+  {
+    "playerName": "Sota Kawasaki",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01tot-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/sota-kawasaki.png",
+    "lastUpdated": "2025-09-23T12:35:40.685Z"
+  },
+  {
+    "playerName": "Daniel Gleiber",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01s1z-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/daniel-gleiber.png",
+    "lastUpdated": "2025-09-23T12:35:40.690Z"
+  },
+  {
+    "playerName": "Armindo Sieb",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gcc-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/armindo-sieb.png",
+    "lastUpdated": "2025-09-23T12:35:40.871Z"
+  },
+  {
+    "playerName": "William Bøving",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01fcc-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/william-b-ving.png",
+    "lastUpdated": "2025-09-23T12:35:40.690Z"
+  },
+  {
+    "playerName": "Benedict Hollerbach",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01dku-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/benedict-hollerbach.png",
+    "lastUpdated": "2025-09-23T12:35:40.685Z"
+  },
+  {
+    "playerName": "Ben Bobzien",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01dsx-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ben-bobzien.png",
+    "lastUpdated": "2025-09-23T12:35:41.904Z"
+  },
+  {
+    "playerName": "Nelson Weiper",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01kem-dfl-clu-000006-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nelson-weiper.png",
+    "lastUpdated": "2025-09-23T12:35:41.914Z"
+  },
+  {
+    "playerName": "Jonas Omlin",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j013ro-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jonas-omlin.png",
+    "lastUpdated": "2025-09-23T12:35:41.913Z"
+  },
+  {
+    "playerName": "Tobias Sippel",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000ht-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/tobias-sippel.png",
+    "lastUpdated": "2025-09-23T12:35:41.914Z"
+  },
+  {
+    "playerName": "Moritz Nicolas",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027ak-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/moritz-nicolas.png",
+    "lastUpdated": "2025-09-23T12:35:41.914Z"
+  },
+  {
+    "playerName": "Tiago Pereira Cardoso",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01nx9-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/tiago-pereira-cardoso.png",
+    "lastUpdated": "2025-09-23T12:35:42.948Z"
+  },
+  {
+    "playerName": "Fabio Chiarodia",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01jjj-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/fabio-chiarodia.png",
+    "lastUpdated": "2025-09-23T12:35:42.949Z"
+  },
+  {
+    "playerName": "Kevin Diks",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j019jx-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kevin-diks.png",
+    "lastUpdated": "2025-09-23T12:35:42.948Z"
+  },
+  {
+    "playerName": "Marvin Friedrich",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0002av-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/marvin-friedrich.png",
+    "lastUpdated": "2025-09-23T12:35:42.971Z"
+  },
+  {
+    "playerName": "Luca Netz",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gc7-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/luca-netz.png",
+    "lastUpdated": "2025-09-23T12:35:42.952Z"
+  },
+  {
+    "playerName": "Lukas Ullrich",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01kal-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/lukas-ullrich.png",
+    "lastUpdated": "2025-09-23T12:35:44.011Z"
+  },
+  {
+    "playerName": "Joe Scally",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gnn-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/joe-scally.png",
+    "lastUpdated": "2025-09-23T12:35:44.019Z"
+  },
+  {
+    "playerName": "Nico Elvedi",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00264n-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nico-elvedi.png",
+    "lastUpdated": "2025-09-23T12:35:44.001Z"
+  },
+  {
+    "playerName": "Yannik Engelhardt",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ib3-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/yannik-engelhardt.png",
+    "lastUpdated": "2025-09-23T12:35:44.019Z"
+  },
+  {
+    "playerName": "Kevin Stöger",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-000172-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kevin-st-ger.png",
+    "lastUpdated": "2025-09-23T12:35:44.019Z"
+  },
+  {
+    "playerName": "Franck Honorat",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01d4g-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/franck-honorat.png",
+    "lastUpdated": "2025-09-23T12:35:45.041Z"
+  },
+  {
+    "playerName": "Florian Neuhaus",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002706-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/florian-neuhaus.png",
+    "lastUpdated": "2025-09-23T12:35:45.059Z"
+  },
+  {
+    "playerName": "Giovanni Reyna",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g4x-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/giovanni-reyna.png",
+    "lastUpdated": "2025-09-23T12:35:45.054Z"
+  },
+  {
+    "playerName": "Philipp Sander",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028p3-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/philipp-sander.png",
+    "lastUpdated": "2025-09-23T12:35:45.059Z"
+  },
+  {
+    "playerName": "Jens Castrop",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gg4-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jens-castrop.png",
+    "lastUpdated": "2025-09-23T12:35:45.059Z"
+  },
+  {
+    "playerName": "Nathan Ngoumou",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01q6k-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nathan-ngoumou.png",
+    "lastUpdated": "2025-09-23T12:35:46.099Z"
+  },
+  {
+    "playerName": "Oscar Fraulo",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01nun-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/oscar-fraulo.png",
+    "lastUpdated": "2025-09-23T12:35:46.107Z"
+  },
+  {
+    "playerName": "Robin Hack",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027rm-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/robin-hack.png",
+    "lastUpdated": "2025-09-23T12:35:46.095Z"
+  },
+  {
+    "playerName": "Rocco Reitz",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gc0-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/rocco-reitz.png",
+    "lastUpdated": "2025-09-23T12:35:46.095Z"
+  },
+  {
+    "playerName": "Charles Herrmann",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01k9u-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/charles-herrmann.png",
+    "lastUpdated": "2025-09-23T12:35:46.095Z"
+  },
+  {
+    "playerName": "Wael Mohya",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01xeb-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/wael-mohya.png",
+    "lastUpdated": "2025-09-23T12:35:47.145Z"
+  },
+  {
+    "playerName": "Niklas Swider",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01nbn-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/niklas-swider.png",
+    "lastUpdated": "2025-09-23T12:35:47.164Z"
+  },
+  {
+    "playerName": "Tim Kleindienst",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001hg-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/tim-kleindienst.png",
+    "lastUpdated": "2025-09-23T12:35:47.145Z"
+  },
+  {
+    "playerName": "Haris Tabaković",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0117m-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/haris-tabakovi.png",
+    "lastUpdated": "2025-09-23T12:35:47.145Z"
+  },
+  {
+    "playerName": "Shuto Machino",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01qva-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/shuto-machino.png",
+    "lastUpdated": "2025-09-23T12:35:47.167Z"
+  },
+  {
+    "playerName": "Grant-Leon Ranos",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01cnt-dfl-clu-000004-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/grant-leon-ranos.png",
+    "lastUpdated": "2025-09-23T12:35:48.206Z"
+  },
+  {
+    "playerName": "Manuel Neuer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000i4-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/manuel-neuer.png",
+    "lastUpdated": "2025-09-23T12:35:48.206Z"
+  },
+  {
+    "playerName": "Sven Ulreich",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000lt-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/sven-ulreich.png",
+    "lastUpdated": "2025-09-23T12:35:48.212Z"
+  },
+  {
+    "playerName": "Jonas Urbig",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01jm5-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jonas-urbig.png",
+    "lastUpdated": "2025-09-23T12:35:48.206Z"
+  },
+  {
+    "playerName": "Leon Klanac",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01nax-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/leon-klanac.png",
+    "lastUpdated": "2025-09-23T12:35:49.276Z"
+  },
+  {
+    "playerName": "Dayot Upamecano",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027kl-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/dayot-upamecano.png",
+    "lastUpdated": "2025-09-23T12:35:49.266Z"
+  },
+  {
+    "playerName": "Minjae Kim",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ae6-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/minjae-kim.png",
+    "lastUpdated": "2025-09-23T12:35:49.265Z"
+  },
+  {
+    "playerName": "Jonathan Tah",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001up-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jonathan-tah.png",
+    "lastUpdated": "2025-09-23T12:35:49.265Z"
+  },
+  {
+    "playerName": "Alphonso Davies",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fwz-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/alphonso-davies.png",
+    "lastUpdated": "2025-09-23T12:35:49.290Z"
+  },
+  {
+    "playerName": "Hiroki Ito",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ill-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/hiroki-ito.png",
+    "lastUpdated": "2025-09-23T12:35:50.327Z"
+  },
+  {
+    "playerName": "Raphaël Guerreiro",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027ah-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/rapha-l-guerreiro.png",
+    "lastUpdated": "2025-09-23T12:35:50.492Z"
+  },
+  {
+    "playerName": "Sacha Boey",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01dzw-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/sacha-boey.png",
+    "lastUpdated": "2025-09-23T12:35:50.314Z"
+  },
+  {
+    "playerName": "Cassiano Kiala",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j020rf-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/cassiano-kiala.png",
+    "lastUpdated": "2025-09-23T12:35:50.327Z"
+  },
+  {
+    "playerName": "Josip Stanišić",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gic-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/josip-stani-i.png",
+    "lastUpdated": "2025-09-23T12:35:50.327Z"
+  },
+  {
+    "playerName": "Joshua Kimmich",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0002f5-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/joshua-kimmich.png",
+    "lastUpdated": "2025-09-23T12:35:51.514Z"
+  },
+  {
+    "playerName": "Leon Goretzka",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-000191-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/leon-goretzka.png",
+    "lastUpdated": "2025-09-23T12:35:51.514Z"
+  },
+  {
+    "playerName": "Jamal Musiala",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gcr-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jamal-musiala.png",
+    "lastUpdated": "2025-09-23T12:35:51.527Z"
+  },
+  {
+    "playerName": "Michael Olise",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01r3r-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/michael-olise.png",
+    "lastUpdated": "2025-09-23T12:35:51.516Z"
+  },
+  {
+    "playerName": "Tom Bischof",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01k2f-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/tom-bischof.png",
+    "lastUpdated": "2025-09-23T12:35:51.516Z"
+  },
+  {
+    "playerName": "Konrad Laimer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027t1-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/konrad-laimer.png",
+    "lastUpdated": "2025-09-23T12:35:52.549Z"
+  },
+  {
+    "playerName": "Lennart Karl",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ud5-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/lennart-karl.png",
+    "lastUpdated": "2025-09-23T12:35:52.551Z"
+  },
+  {
+    "playerName": "Aleksandar Pavlović",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01kah-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/aleksandar-pavlovi.png",
+    "lastUpdated": "2025-09-23T12:35:52.714Z"
+  },
+  {
+    "playerName": "David Santos Daiber",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01z07-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/david-santos-daiber.png",
+    "lastUpdated": "2025-09-23T12:35:52.562Z"
+  },
+  {
+    "playerName": "Serge Gnabry",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027g6-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/serge-gnabry.png",
+    "lastUpdated": "2025-09-23T12:35:52.553Z"
+  },
+  {
+    "playerName": "Harry Kane",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j00zz3-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/harry-kane.png",
+    "lastUpdated": "2025-09-23T12:35:53.736Z"
+  },
+  {
+    "playerName": "Nicolas Jackson",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01klu-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nicolas-jackson.png",
+    "lastUpdated": "2025-09-23T12:35:53.736Z"
+  },
+  {
+    "playerName": "Luis Díaz",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01da7-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/luis-d-az.png",
+    "lastUpdated": "2025-09-23T12:35:53.736Z"
+  },
+  {
+    "playerName": "Wisdom Mike",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ude-dfl-clu-00000g-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/wisdom-mike.png",
+    "lastUpdated": "2025-09-23T12:35:53.753Z"
+  },
+  {
+    "playerName": "Ben Voll",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01c9m-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ben-voll.png",
+    "lastUpdated": "2025-09-23T12:35:53.753Z"
+  },
+  {
+    "playerName": "Nikola Vasilj",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028lz-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nikola-vasilj.png",
+    "lastUpdated": "2025-09-23T12:35:54.927Z"
+  },
+  {
+    "playerName": "Simon Spari",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gps-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/simon-spari.png",
+    "lastUpdated": "2025-09-23T12:35:54.795Z"
+  },
+  {
+    "playerName": "Manolis Saliakas",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0157x-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/manolis-saliakas.png",
+    "lastUpdated": "2025-09-23T12:35:54.791Z"
+  },
+  {
+    "playerName": "Karol Mets",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j015au-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/karol-mets.png",
+    "lastUpdated": "2025-09-23T12:35:54.791Z"
+  },
+  {
+    "playerName": "David Nemeth",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002glh-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/david-nemeth.png",
+    "lastUpdated": "2025-09-23T12:35:54.819Z"
+  },
+  {
+    "playerName": "Hauke Wahl",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0025rv-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/hauke-wahl.png",
+    "lastUpdated": "2025-09-23T12:35:55.967Z"
+  },
+  {
+    "playerName": "Eric Smith",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gnl-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/eric-smith.png",
+    "lastUpdated": "2025-09-23T12:35:55.967Z"
+  },
+  {
+    "playerName": "Arkadiusz Pyrka",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01kuj-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/arkadiusz-pyrka.png",
+    "lastUpdated": "2025-09-23T12:35:55.967Z"
+  },
+  {
+    "playerName": "Fin Stevens",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ri9-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/fin-stevens.png",
+    "lastUpdated": "2025-09-23T12:35:55.967Z"
+  },
+  {
+    "playerName": "Lars Ritzka",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027uq-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/lars-ritzka.png",
+    "lastUpdated": "2025-09-23T12:35:55.967Z"
+  },
+  {
+    "playerName": "Louis Oppie",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01w5q-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/louis-oppie.png",
+    "lastUpdated": "2025-09-23T12:35:57.002Z"
+  },
+  {
+    "playerName": "Adam Dźwigała",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gn4-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/adam-d-wiga-a.png",
+    "lastUpdated": "2025-09-23T12:35:57.015Z"
+  },
+  {
+    "playerName": "Jannik Robatsch",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0244q-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jannik-robatsch.png",
+    "lastUpdated": "2025-09-23T12:35:57.005Z"
+  },
+  {
+    "playerName": "James Sands",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01mzs-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/james-sands.png",
+    "lastUpdated": "2025-09-23T12:35:57.002Z"
+  },
+  {
+    "playerName": "Jackson Irvine",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j014l2-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jackson-irvine.png",
+    "lastUpdated": "2025-09-23T12:35:57.006Z"
+  },
+  {
+    "playerName": "Joel Chima Fujita",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01rkl-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/joel-chima-fujita.png",
+    "lastUpdated": "2025-09-23T12:35:58.048Z"
+  },
+  {
+    "playerName": "Erik Ahlstrand",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01zxc-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/erik-ahlstrand.png",
+    "lastUpdated": "2025-09-23T12:35:58.055Z"
+  },
+  {
+    "playerName": "Connor Metcalfe",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01hch-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/connor-metcalfe.png",
+    "lastUpdated": "2025-09-23T12:35:58.052Z"
+  },
+  {
+    "playerName": "Marwin Schmitz",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j021ta-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/marwin-schmitz.png",
+    "lastUpdated": "2025-09-23T12:35:58.052Z"
+  },
+  {
+    "playerName": "Nick Schmidt",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j024kl-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nick-schmidt.png",
+    "lastUpdated": "2025-09-23T12:35:58.052Z"
+  },
+  {
+    "playerName": "Abdoulie Ceesay",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j022yi-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/abdoulie-ceesay.png",
+    "lastUpdated": "2025-09-23T12:35:59.091Z"
+  },
+  {
+    "playerName": "Danel Sinani",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01bgd-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/danel-sinani.png",
+    "lastUpdated": "2025-09-23T12:35:59.078Z"
+  },
+  {
+    "playerName": "Oladapo Afolayan",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01sn8-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/oladapo-afolayan.png",
+    "lastUpdated": "2025-09-23T12:35:59.091Z"
+  },
+  {
+    "playerName": "Martijn Kaars",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j021ar-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/martijn-kaars.png",
+    "lastUpdated": "2025-09-23T12:35:59.256Z"
+  },
+  {
+    "playerName": "Ricky-Jade Jones",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0244r-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ricky-jade-jones.png",
+    "lastUpdated": "2025-09-23T12:35:59.091Z"
+  },
+  {
+    "playerName": "Andréas Hountondji",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0248a-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/andr-as-hountondji.png",
+    "lastUpdated": "2025-09-23T12:36:00.298Z"
+  },
+  {
+    "playerName": "Mathias Pereira Lage",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j02452-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mathias-pereira-lage.png",
+    "lastUpdated": "2025-09-23T12:36:00.282Z"
+  },
+  {
+    "playerName": "Romeo Aigbekaen",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j022wr-dfl-clu-00000h-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/romeo-aigbekaen.png",
+    "lastUpdated": "2025-09-23T12:36:00.298Z"
+  },
+  {
+    "playerName": "Fabian Bredlow",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027q9-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/fabian-bredlow.png",
+    "lastUpdated": "2025-09-23T12:36:00.298Z"
+  },
+  {
+    "playerName": "Stefan Drljača",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fu9-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/stefan-drlja-a.png",
+    "lastUpdated": "2025-09-23T12:36:00.298Z"
+  },
+  {
+    "playerName": "Alexander Nübel",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0002hc-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/alexander-n-bel.png",
+    "lastUpdated": "2025-09-23T12:36:01.334Z"
+  },
+  {
+    "playerName": "Florian Hellstern",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01nav-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/florian-hellstern.png",
+    "lastUpdated": "2025-09-23T12:36:01.337Z"
+  },
+  {
+    "playerName": "Ameen Al-Dakhil",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01tqx-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ameen-al-dakhil.png",
+    "lastUpdated": "2025-09-23T12:36:01.336Z"
+  },
+  {
+    "playerName": "Ramon Hendriks",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01d9b-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ramon-hendriks.png",
+    "lastUpdated": "2025-09-23T12:36:01.502Z"
+  },
+  {
+    "playerName": "Josha Vagnoman",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028ls-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/josha-vagnoman.png",
+    "lastUpdated": "2025-09-23T12:36:01.336Z"
+  },
+  {
+    "playerName": "Maximilian Mittelstädt",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0025ad-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/maximilian-mittelst-dt.png",
+    "lastUpdated": "2025-09-23T12:36:02.534Z"
+  },
+  {
+    "playerName": "Luca Jaquez",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j02323-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/luca-jaquez.png",
+    "lastUpdated": "2025-09-23T12:36:02.542Z"
+  },
+  {
+    "playerName": "Pascal Stenzel",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0026ma-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/pascal-stenzel.png",
+    "lastUpdated": "2025-09-23T12:36:02.552Z"
+  },
+  {
+    "playerName": "Leonidas Stergiou",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01rhc-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/leonidas-stergiou.png",
+    "lastUpdated": "2025-09-23T12:36:02.540Z"
+  },
+  {
+    "playerName": "Lorenz Assignon",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01g5d-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/lorenz-assignon.png",
+    "lastUpdated": "2025-09-23T12:36:02.715Z"
+  },
+  {
+    "playerName": "Dan-Axel Zagadou",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027w7-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/dan-axel-zagadou.png",
+    "lastUpdated": "2025-09-23T12:36:03.750Z"
+  },
+  {
+    "playerName": "Jeff Chabot",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01d1w-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jeff-chabot.png",
+    "lastUpdated": "2025-09-23T12:36:03.740Z"
+  },
+  {
+    "playerName": "Finn Jeltsch",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01lax-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/finn-jeltsch.png",
+    "lastUpdated": "2025-09-23T12:36:03.750Z"
+  },
+  {
+    "playerName": "Yannik Keitel",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028sy-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/yannik-keitel.png",
+    "lastUpdated": "2025-09-23T12:36:03.752Z"
+  },
+  {
+    "playerName": "Angelo Stiller",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gcq-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/angelo-stiller.png",
+    "lastUpdated": "2025-09-23T12:36:03.771Z"
+  },
+  {
+    "playerName": "Chris Führich",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028i9-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/chris-f-hrich.png",
+    "lastUpdated": "2025-09-23T12:36:04.808Z"
+  },
+  {
+    "playerName": "Bilal El Khannouss",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01rf2-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/bilal-el-khannouss.png",
+    "lastUpdated": "2025-09-23T12:36:04.813Z"
+  },
+  {
+    "playerName": "Silas Katompa Mvumpa",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g5r-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/silas-katompa-mvumpa.png",
+    "lastUpdated": "2025-09-23T12:36:04.805Z"
+  },
+  {
+    "playerName": "Atakan Karazor",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027sd-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/atakan-karazor.png",
+    "lastUpdated": "2025-09-23T12:36:04.973Z"
+  },
+  {
+    "playerName": "Noah Darvich",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01laq-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/noah-darvich.png",
+    "lastUpdated": "2025-09-23T12:36:04.813Z"
+  },
+  {
+    "playerName": "Nikolas Nartey",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00286v-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nikolas-nartey.png",
+    "lastUpdated": "2025-09-23T12:36:06.032Z"
+  },
+  {
+    "playerName": "Chema Andrés",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j024fd-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/chema-andr-s.png",
+    "lastUpdated": "2025-09-23T12:36:06.013Z"
+  },
+  {
+    "playerName": "Mirza Ćatović",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j022ws-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mirza-atovi.png",
+    "lastUpdated": "2025-09-23T12:36:06.018Z"
+  },
+  {
+    "playerName": "Tiago Tomás",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01eag-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/tiago-tom-s.png",
+    "lastUpdated": "2025-09-23T12:36:06.169Z"
+  },
+  {
+    "playerName": "Ermedin Demirović",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gey-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ermedin-demirovi.png",
+    "lastUpdated": "2025-09-23T12:36:06.161Z"
+  },
+  {
+    "playerName": "Justin Diehl",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01k9z-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/justin-diehl.png",
+    "lastUpdated": "2025-09-23T12:36:07.203Z"
+  },
+  {
+    "playerName": "Jamie Leweling",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g41-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jamie-leweling.png",
+    "lastUpdated": "2025-09-23T12:36:07.193Z"
+  },
+  {
+    "playerName": "Deniz Undav",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027yk-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/deniz-undav.png",
+    "lastUpdated": "2025-09-23T12:36:07.206Z"
+  },
+  {
+    "playerName": "Badredine Bouanani",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01n62-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/badredine-bouanani.png",
+    "lastUpdated": "2025-09-23T12:36:07.375Z"
+  },
+  {
+    "playerName": "Lazar Jovanović",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01u5h-dfl-clu-00000d-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/lazar-jovanovi.png",
+    "lastUpdated": "2025-09-23T12:36:07.206Z"
+  },
+  {
+    "playerName": "Kamil Grabara",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01b4g-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kamil-grabara.png",
+    "lastUpdated": "2025-09-23T12:36:08.406Z"
+  },
+  {
+    "playerName": "Pavao Pervan",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028ou-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/pavao-pervan.png",
+    "lastUpdated": "2025-09-23T12:36:08.413Z"
+  },
+  {
+    "playerName": "Marius Müller",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00013r-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/marius-m-ller.png",
+    "lastUpdated": "2025-09-23T12:36:08.409Z"
+  },
+  {
+    "playerName": "Jakub Zielinski",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01xof-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jakub-zielinski.png",
+    "lastUpdated": "2025-09-23T12:36:08.413Z"
+  },
+  {
+    "playerName": "Kilian Fischer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01fbp-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kilian-fischer.png",
+    "lastUpdated": "2025-09-23T12:36:08.413Z"
+  },
+  {
+    "playerName": "Denis Vavro",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j017wj-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/denis-vavro.png",
+    "lastUpdated": "2025-09-23T12:36:09.448Z"
+  },
+  {
+    "playerName": "Konstantinos Koulierakis",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01g3p-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/konstantinos-koulierakis.png",
+    "lastUpdated": "2025-09-23T12:36:09.450Z"
+  },
+  {
+    "playerName": "Rogério",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01x7c-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/rog-rio.png",
+    "lastUpdated": "2025-09-23T12:36:09.448Z"
+  },
+  {
+    "playerName": "Jenson Seelt",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j024sw-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jenson-seelt.png",
+    "lastUpdated": "2025-09-23T12:36:09.450Z"
+  },
+  {
+    "playerName": "Moritz Jenz",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01szz-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/moritz-jenz.png",
+    "lastUpdated": "2025-09-23T12:36:09.450Z"
+  },
+  {
+    "playerName": "Joakim Mæhle",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0159a-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/joakim-m-hle.png",
+    "lastUpdated": "2025-09-23T12:36:10.487Z"
+  },
+  {
+    "playerName": "Mathys Angély",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j021sz-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mathys-ang-ly.png",
+    "lastUpdated": "2025-09-23T12:36:10.487Z"
+  },
+  {
+    "playerName": "Saël Kumbedi",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01nzr-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/sa-l-kumbedi.png",
+    "lastUpdated": "2025-09-23T12:36:10.487Z"
+  },
+  {
+    "playerName": "Vinicius Souza",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j02471-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/vinicius-souza.png",
+    "lastUpdated": "2025-09-23T12:36:10.487Z"
+  },
+  {
+    "playerName": "Andreas Skov Olsen",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01c0a-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/andreas-skov-olsen.png",
+    "lastUpdated": "2025-09-23T12:36:10.488Z"
+  },
+  {
+    "playerName": "Bence Dardai",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01k9o-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/bence-dardai.png",
+    "lastUpdated": "2025-09-23T12:36:11.524Z"
+  },
+  {
+    "playerName": "Lovro Majer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01be1-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/lovro-majer.png",
+    "lastUpdated": "2025-09-23T12:36:11.524Z"
+  },
+  {
+    "playerName": "Jesper Lindström",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01gtd-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jesper-lindstr-m.png",
+    "lastUpdated": "2025-09-23T12:36:11.545Z"
+  },
+  {
+    "playerName": "Christian Eriksen",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j00w7b-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/christian-eriksen.png",
+    "lastUpdated": "2025-09-23T12:36:11.524Z"
+  },
+  {
+    "playerName": "Aaron Zehnter",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01kas-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/aaron-zehnter.png",
+    "lastUpdated": "2025-09-23T12:36:11.526Z"
+  },
+  {
+    "playerName": "Maximilian Arnold",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000y4-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/maximilian-arnold.png",
+    "lastUpdated": "2025-09-23T12:36:12.582Z"
+  },
+  {
+    "playerName": "Yannick Gerhardt",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001v4-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/yannick-gerhardt.png",
+    "lastUpdated": "2025-09-23T12:36:12.584Z"
+  },
+  {
+    "playerName": "Mattias Svanberg",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0165w-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mattias-svanberg.png",
+    "lastUpdated": "2025-09-23T12:36:12.582Z"
+  },
+  {
+    "playerName": "Patrick Wimmer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01k33-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/patrick-wimmer.png",
+    "lastUpdated": "2025-09-23T12:36:12.584Z"
+  },
+  {
+    "playerName": "Kevin Paredes",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01mru-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kevin-paredes.png",
+    "lastUpdated": "2025-09-23T12:36:12.584Z"
+  },
+  {
+    "playerName": "Mohamed Amoura",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j021et-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mohamed-amoura.png",
+    "lastUpdated": "2025-09-23T12:36:13.628Z"
+  },
+  {
+    "playerName": "Adam Daghim",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01u8k-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/adam-daghim.png",
+    "lastUpdated": "2025-09-23T12:36:13.629Z"
+  },
+  {
+    "playerName": "Dženan Pejčinović",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01keb-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/d-enan-pej-inovi.png",
+    "lastUpdated": "2025-09-23T12:36:13.628Z"
+  },
+  {
+    "playerName": "Jonas Wind",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j019ze-dfl-clu-000003-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jonas-wind.png",
+    "lastUpdated": "2025-09-23T12:36:13.629Z"
+  },
+  {
+    "playerName": "Karl Hein",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01g8y-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/karl-hein.png",
+    "lastUpdated": "2025-09-23T12:36:13.628Z"
+  },
+  {
+    "playerName": "Markus Kolke",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fzb-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/markus-kolke.png",
+    "lastUpdated": "2025-09-23T12:36:14.688Z"
+  },
+  {
+    "playerName": "Mio Backhaus",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01k9l-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mio-backhaus.png",
+    "lastUpdated": "2025-09-23T12:36:14.667Z"
+  },
+  {
+    "playerName": "Stefan Smarkalev",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j02498-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/stefan-smarkalev.png",
+    "lastUpdated": "2025-09-23T12:36:14.685Z"
+  },
+  {
+    "playerName": "Olivier Deman",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01tr0-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/olivier-deman.png",
+    "lastUpdated": "2025-09-23T12:36:14.667Z"
+  },
+  {
+    "playerName": "Yukinari Sugawara",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01dco-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/yukinari-sugawara.png",
+    "lastUpdated": "2025-09-23T12:36:14.705Z"
+  },
+  {
+    "playerName": "Niklas Stark",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001hj-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/niklas-stark.png",
+    "lastUpdated": "2025-09-23T12:36:15.740Z"
+  },
+  {
+    "playerName": "Amos Pieper",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fw5-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/amos-pieper.png",
+    "lastUpdated": "2025-09-23T12:36:15.741Z"
+  },
+  {
+    "playerName": "Mitchell Weiser",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000yo-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mitchell-weiser.png",
+    "lastUpdated": "2025-09-23T12:36:15.740Z"
+  },
+  {
+    "playerName": "Julián Malatini",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01zvh-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/juli-n-malatini.png",
+    "lastUpdated": "2025-09-23T12:36:15.764Z"
+  },
+  {
+    "playerName": "Isaac Schmidt",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j024rf-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/isaac-schmidt.png",
+    "lastUpdated": "2025-09-23T12:36:15.749Z"
+  },
+  {
+    "playerName": "Felix Agu",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fzo-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/felix-agu.png",
+    "lastUpdated": "2025-09-23T12:36:16.984Z"
+  },
+  {
+    "playerName": "Karim Coulibaly",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01np1-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/karim-coulibaly.png",
+    "lastUpdated": "2025-09-23T12:36:16.804Z"
+  },
+  {
+    "playerName": "Marco Friedl",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027bh-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/marco-friedl.png",
+    "lastUpdated": "2025-09-23T12:36:16.800Z"
+  },
+  {
+    "playerName": "Mick Schmetgens",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01xbt-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mick-schmetgens.png",
+    "lastUpdated": "2025-09-23T12:36:16.800Z"
+  },
+  {
+    "playerName": "Maximilian Wöber",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j016rq-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/maximilian-w-ber.png",
+    "lastUpdated": "2025-09-23T12:36:16.964Z"
+  },
+  {
+    "playerName": "Jens Stage",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01c07-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jens-stage.png",
+    "lastUpdated": "2025-09-23T12:36:18.161Z"
+  },
+  {
+    "playerName": "Leonardo Bittencourt",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000dt-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/leonardo-bittencourt.png",
+    "lastUpdated": "2025-09-23T12:36:18.022Z"
+  },
+  {
+    "playerName": "Senne Lynen",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01qja-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/senne-lynen.png",
+    "lastUpdated": "2025-09-23T12:36:18.017Z"
+  },
+  {
+    "playerName": "Cameron Puertas",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0208z-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/cameron-puertas.png",
+    "lastUpdated": "2025-09-23T12:36:18.186Z"
+  },
+  {
+    "playerName": "Romano Schmid",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fx2-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/romano-schmid.png",
+    "lastUpdated": "2025-09-23T12:36:18.005Z"
+  },
+  {
+    "playerName": "Isak Hansen-Aaröen",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01zzy-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/isak-hansen-aar-en.png",
+    "lastUpdated": "2025-09-23T12:36:19.222Z"
+  },
+  {
+    "playerName": "Patrice Čović",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01tkc-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/patrice-ovi.png",
+    "lastUpdated": "2025-09-23T12:36:19.231Z"
+  },
+  {
+    "playerName": "Skelly Alvero",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01zyq-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/skelly-alvero.png",
+    "lastUpdated": "2025-09-23T12:36:19.225Z"
+  },
+  {
+    "playerName": "Wesley Adeh",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01xbu-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/wesley-adeh.png",
+    "lastUpdated": "2025-09-23T12:36:19.225Z"
+  },
+  {
+    "playerName": "Samuel Mbangula",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01nu1-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/samuel-mbangula.png",
+    "lastUpdated": "2025-09-23T12:36:19.225Z"
+  },
+  {
+    "playerName": "Keke Topp",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01kaj-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/keke-topp.png",
+    "lastUpdated": "2025-09-23T12:36:20.268Z"
+  },
+  {
+    "playerName": "Justin Njinmah",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gpz-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/justin-njinmah.png",
+    "lastUpdated": "2025-09-23T12:36:20.510Z"
+  },
+  {
+    "playerName": "Marco Grüll",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j020yn-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/marco-gr-ll.png",
+    "lastUpdated": "2025-09-23T12:36:20.454Z"
+  },
+  {
+    "playerName": "Salim Musah",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j02499-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/salim-musah.png",
+    "lastUpdated": "2025-09-23T12:36:20.268Z"
+  },
+  {
+    "playerName": "Victor Boniface",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01tl9-dfl-clu-00000e-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/victor-boniface.png",
+    "lastUpdated": "2025-09-23T12:36:20.439Z"
+  },
+  {
+    "playerName": "Gregor Kobel",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027bl-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/gregor-kobel.png",
+    "lastUpdated": "2025-09-23T12:36:21.549Z"
+  },
+  {
+    "playerName": "Patrick Drewes",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00018c-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/patrick-drewes.png",
+    "lastUpdated": "2025-09-23T12:36:21.549Z"
+  },
+  {
+    "playerName": "Silas Ostrzinski",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002ghp-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/silas-ostrzinski.png",
+    "lastUpdated": "2025-09-23T12:36:21.549Z"
+  },
+  {
+    "playerName": "Alexander Meyer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028fc-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/alexander-meyer.png",
+    "lastUpdated": "2025-09-23T12:36:21.552Z"
+  },
+  {
+    "playerName": "Yan Couto",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j021mh-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/yan-couto.png",
+    "lastUpdated": "2025-09-23T12:36:21.552Z"
+  },
+  {
+    "playerName": "Waldemar Anton",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00264t-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/waldemar-anton.png",
+    "lastUpdated": "2025-09-23T12:36:22.589Z"
+  },
+  {
+    "playerName": "Nico Schlotterbeck",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028t1-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nico-schlotterbeck.png",
+    "lastUpdated": "2025-09-23T12:36:22.589Z"
+  },
+  {
+    "playerName": "Ramy Bensebaini",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g5s-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ramy-bensebaini.png",
+    "lastUpdated": "2025-09-23T12:36:22.589Z"
+  },
+  {
+    "playerName": "Daniel Svensson",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j02324-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/daniel-svensson.png",
+    "lastUpdated": "2025-09-23T12:36:22.589Z"
+  },
+  {
+    "playerName": "Niklas Süle",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001ht-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/niklas-s-le.png",
+    "lastUpdated": "2025-09-23T12:36:22.589Z"
+  },
+  {
+    "playerName": "Julian Ryerson",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028rm-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/julian-ryerson.png",
+    "lastUpdated": "2025-09-23T12:36:23.626Z"
+  },
+  {
+    "playerName": "Aarón Anselmino",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j024j2-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/aar-n-anselmino.png",
+    "lastUpdated": "2025-09-23T12:36:23.629Z"
+  },
+  {
+    "playerName": "Filippo Mané",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01nwr-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/filippo-man.png",
+    "lastUpdated": "2025-09-23T12:36:23.626Z"
+  },
+  {
+    "playerName": "Almugera Kabar",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01k9x-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/almugera-kabar.png",
+    "lastUpdated": "2025-09-23T12:36:23.644Z"
+  },
+  {
+    "playerName": "Salih Özcan",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00278o-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/salih-zcan.png",
+    "lastUpdated": "2025-09-23T12:36:23.629Z"
+  },
+  {
+    "playerName": "Jobe Bellingham",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01up1-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jobe-bellingham.png",
+    "lastUpdated": "2025-09-23T12:36:24.683Z"
+  },
+  {
+    "playerName": "Felix Nmecha",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01bsn-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/felix-nmecha.png",
+    "lastUpdated": "2025-09-23T12:36:24.688Z"
+  },
+  {
+    "playerName": "Julian Brandt",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-000280-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/julian-brandt.png",
+    "lastUpdated": "2025-09-23T12:36:24.692Z"
+  },
+  {
+    "playerName": "Pascal Groß",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00002t-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/pascal-gro.png",
+    "lastUpdated": "2025-09-23T12:36:24.683Z"
+  },
+  {
+    "playerName": "Carney Chukwuemeka",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01r3q-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/carney-chukwuemeka.png",
+    "lastUpdated": "2025-09-23T12:36:24.683Z"
+  },
+  {
+    "playerName": "Marcel Sabitzer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002666-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/marcel-sabitzer.png",
+    "lastUpdated": "2025-09-23T12:36:25.752Z"
+  },
+  {
+    "playerName": "Emre Can",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00012t-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/emre-can.png",
+    "lastUpdated": "2025-09-23T12:36:25.732Z"
+  },
+  {
+    "playerName": "Serhou Guirassy",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00278s-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/serhou-guirassy.png",
+    "lastUpdated": "2025-09-23T12:36:25.716Z"
+  },
+  {
+    "playerName": "Maximilian Beier",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g7p-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/maximilian-beier.png",
+    "lastUpdated": "2025-09-23T12:36:25.732Z"
+  },
+  {
+    "playerName": "Julien Duranville",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01rh2-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/julien-duranville.png",
+    "lastUpdated": "2025-09-23T12:36:25.732Z"
+  },
+  {
+    "playerName": "Fabio Silva",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01dab-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/fabio-silva.png",
+    "lastUpdated": "2025-09-23T12:36:26.786Z"
+  },
+  {
+    "playerName": "Karim Adeyemi",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01e9x-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/karim-adeyemi.png",
+    "lastUpdated": "2025-09-23T12:36:26.786Z"
+  },
+  {
+    "playerName": "Cole Campbell",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01xkb-dfl-clu-000007-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/cole-campbell.png",
+    "lastUpdated": "2025-09-23T12:36:26.989Z"
+  },
+  {
+    "playerName": "Michael Zetterer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00259o-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/michael-zetterer.png",
+    "lastUpdated": "2025-09-23T12:36:26.775Z"
+  },
+  {
+    "playerName": "Jens Grahl",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000g2-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jens-grahl.png",
+    "lastUpdated": "2025-09-23T12:36:26.793Z"
+  },
+  {
+    "playerName": "Amil Siljevic",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j021ts-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/amil-siljevic.png",
+    "lastUpdated": "2025-09-23T12:36:28.028Z"
+  },
+  {
+    "playerName": "Kauã Santos",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01unv-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kau-santos.png",
+    "lastUpdated": "2025-09-23T12:36:28.049Z"
+  },
+  {
+    "playerName": "Elias Baum",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ltj-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/elias-baum.png",
+    "lastUpdated": "2025-09-23T12:36:28.028Z"
+  },
+  {
+    "playerName": "Arthur Theate",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01djj-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/arthur-theate.png",
+    "lastUpdated": "2025-09-23T12:36:28.028Z"
+  },
+  {
+    "playerName": "Robin Koch",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0025w7-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/robin-koch.png",
+    "lastUpdated": "2025-09-23T12:36:28.028Z"
+  },
+  {
+    "playerName": "Aurèle Amenda",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01klq-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/aur-le-amenda.png",
+    "lastUpdated": "2025-09-23T12:36:29.086Z"
+  },
+  {
+    "playerName": "Rasmus Kristensen",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j018bs-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/rasmus-kristensen.png",
+    "lastUpdated": "2025-09-23T12:36:29.086Z"
+  },
+  {
+    "playerName": "Nathaniel Brown",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01dnm-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nathaniel-brown.png",
+    "lastUpdated": "2025-09-23T12:36:29.086Z"
+  },
+  {
+    "playerName": "Aurélio Buta",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01fyn-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/aur-lio-buta.png",
+    "lastUpdated": "2025-09-23T12:36:29.088Z"
+  },
+  {
+    "playerName": "Nnamdi Collins",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gg7-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nnamdi-collins.png",
+    "lastUpdated": "2025-09-23T12:36:29.088Z"
+  },
+  {
+    "playerName": "Oscar Höjlund",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01obq-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/oscar-h-jlund.png",
+    "lastUpdated": "2025-09-23T12:36:30.125Z"
+  },
+  {
+    "playerName": "Farès Chaïbi",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01xee-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/far-s-cha-bi.png",
+    "lastUpdated": "2025-09-23T12:36:30.119Z"
+  },
+  {
+    "playerName": "Ellyes Skhiri",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g4a-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ellyes-skhiri.png",
+    "lastUpdated": "2025-09-23T12:36:30.123Z"
+  },
+  {
+    "playerName": "Hugo Larsson",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01vx4-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/hugo-larsson.png",
+    "lastUpdated": "2025-09-23T12:36:30.123Z"
+  },
+  {
+    "playerName": "Mahmoud Dahoud",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00021p-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mahmoud-dahoud.png",
+    "lastUpdated": "2025-09-23T12:36:31.205Z"
+  },
+  {
+    "playerName": "Ritsu Dōan",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gjn-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ritsu-d-an.png",
+    "lastUpdated": "2025-09-23T12:36:31.213Z"
+  },
+  {
+    "playerName": "Timothy Chandler",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000pi-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/timothy-chandler.png",
+    "lastUpdated": "2025-09-23T12:36:31.210Z"
+  },
+  {
+    "playerName": "Mario Götze",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00000h-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mario-g-tze.png",
+    "lastUpdated": "2025-09-23T12:36:31.210Z"
+  },
+  {
+    "playerName": "Can Uzun",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01lmn-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/can-uzun.png",
+    "lastUpdated": "2025-09-23T12:36:31.213Z"
+  },
+  {
+    "playerName": "Noah Fenyö",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01q0q-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/noah-feny.png",
+    "lastUpdated": "2025-09-23T12:36:32.250Z"
+  },
+  {
+    "playerName": "Ansgar Knauff",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gkg-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ansgar-knauff.png",
+    "lastUpdated": "2025-09-23T12:36:32.251Z"
+  },
+  {
+    "playerName": "Jonathan Burkardt",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fu7-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jonathan-burkardt.png",
+    "lastUpdated": "2025-09-23T12:36:32.250Z"
+  },
+  {
+    "playerName": "Elye Wahi",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01qyf-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/elye-wahi.png",
+    "lastUpdated": "2025-09-23T12:36:32.250Z"
+  },
+  {
+    "playerName": "Jean-Mattéo Bahoya",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01tpa-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jean-matt-o-bahoya.png",
+    "lastUpdated": "2025-09-23T12:36:32.250Z"
+  },
+  {
+    "playerName": "Michy Batshuayi",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028l8-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/michy-batshuayi.png",
+    "lastUpdated": "2025-09-23T12:36:33.288Z"
+  },
+  {
+    "playerName": "Jessic Ngankam",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gc8-dfl-clu-00000f-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jessic-ngankam.png",
+    "lastUpdated": "2025-09-23T12:36:33.426Z"
+  },
+  {
+    "playerName": "Noah Atubolu",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g6c-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/noah-atubolu.png",
+    "lastUpdated": "2025-09-23T12:36:33.288Z"
+  },
+  {
+    "playerName": "Florian Müller",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027u0-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/florian-m-ller.png",
+    "lastUpdated": "2025-09-23T12:36:33.290Z"
+  },
+  {
+    "playerName": "Jannik Huth",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0026oo-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jannik-huth.png",
+    "lastUpdated": "2025-09-23T12:36:33.290Z"
+  },
+  {
+    "playerName": "Philipp Lienhart",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027wp-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/philipp-lienhart.png",
+    "lastUpdated": "2025-09-23T12:36:34.635Z"
+  },
+  {
+    "playerName": "Anthony Jung",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00019u-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/anthony-jung.png",
+    "lastUpdated": "2025-09-23T12:36:34.652Z"
+  },
+  {
+    "playerName": "Lukas Kübler",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00012y-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/lukas-k-bler.png",
+    "lastUpdated": "2025-09-23T12:36:34.628Z"
+  },
+  {
+    "playerName": "Matthias Ginter",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000zs-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/matthias-ginter.png",
+    "lastUpdated": "2025-09-23T12:36:34.470Z"
+  },
+  {
+    "playerName": "Philipp Treu",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g4w-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/philipp-treu.png",
+    "lastUpdated": "2025-09-23T12:36:34.470Z"
+  },
+  {
+    "playerName": "Christian Günter",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00017v-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/christian-g-nter.png",
+    "lastUpdated": "2025-09-23T12:36:35.687Z"
+  },
+  {
+    "playerName": "Jordy Makengo",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ib2-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jordy-makengo.png",
+    "lastUpdated": "2025-09-23T12:36:35.689Z"
+  },
+  {
+    "playerName": "Max Rosenfelder",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01d2o-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/max-rosenfelder.png",
+    "lastUpdated": "2025-09-23T12:36:35.707Z"
+  },
+  {
+    "playerName": "Bruno Ogbus",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01xa7-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/bruno-ogbus.png",
+    "lastUpdated": "2025-09-23T12:36:35.689Z"
+  },
+  {
+    "playerName": "Patrick Osterhage",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g4g-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/patrick-osterhage.png",
+    "lastUpdated": "2025-09-23T12:36:35.689Z"
+  },
+  {
+    "playerName": "Maximilian Eggestein",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00258b-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/maximilian-eggestein.png",
+    "lastUpdated": "2025-09-23T12:36:36.744Z"
+  },
+  {
+    "playerName": "Daniel Kofi Kyereh",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fzd-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/daniel-kofi-kyereh.png",
+    "lastUpdated": "2025-09-23T12:36:36.744Z"
+  },
+  {
+    "playerName": "Yuito Suzuki",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01tov-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/yuito-suzuki.png",
+    "lastUpdated": "2025-09-23T12:36:36.744Z"
+  },
+  {
+    "playerName": "Niklas Beste",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028b6-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/niklas-beste.png",
+    "lastUpdated": "2025-09-23T12:36:36.895Z"
+  },
+  {
+    "playerName": "Nicolas Höfler",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000d9-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nicolas-h-fler.png",
+    "lastUpdated": "2025-09-23T12:36:36.746Z"
+  },
+  {
+    "playerName": "Vincenzo Grifo",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001e6-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/vincenzo-grifo.png",
+    "lastUpdated": "2025-09-23T12:36:37.936Z"
+  },
+  {
+    "playerName": "Johan Manzambi",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01wx3-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/johan-manzambi.png",
+    "lastUpdated": "2025-09-23T12:36:37.936Z"
+  },
+  {
+    "playerName": "Derry Scherhant",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01oyi-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/derry-scherhant.png",
+    "lastUpdated": "2025-09-23T12:36:38.108Z"
+  },
+  {
+    "playerName": "Lucas Höler",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027b9-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/lucas-h-ler.png",
+    "lastUpdated": "2025-09-23T12:36:37.936Z"
+  },
+  {
+    "playerName": "Eren Dinkçi",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g8e-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/eren-dink-i.png",
+    "lastUpdated": "2025-09-23T12:36:37.936Z"
+  },
+  {
+    "playerName": "Junior Adamu",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01fo8-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/junior-adamu.png",
+    "lastUpdated": "2025-09-23T12:36:39.145Z"
+  },
+  {
+    "playerName": "Cyriaque Irié",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0244o-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/cyriaque-iri.png",
+    "lastUpdated": "2025-09-23T12:36:39.147Z"
+  },
+  {
+    "playerName": "Maximilian Philipp",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0002b9-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/maximilian-philipp.png",
+    "lastUpdated": "2025-09-23T12:36:39.145Z"
+  },
+  {
+    "playerName": "Igor Matanović",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gmv-dfl-clu-00000a-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/igor-matanovi.png",
+    "lastUpdated": "2025-09-23T12:36:39.145Z"
+  },
+  {
+    "playerName": "Daniel Heuer Fernandes",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001eh-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/daniel-heuer-fernandes.png",
+    "lastUpdated": "2025-09-23T12:36:39.133Z"
+  },
+  {
+    "playerName": "Daniel Peretz",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j019vh-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/daniel-peretz.png",
+    "lastUpdated": "2025-09-23T12:36:40.180Z"
+  },
+  {
+    "playerName": "Hannes Hermann",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01keq-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/hannes-hermann.png",
+    "lastUpdated": "2025-09-23T12:36:40.183Z"
+  },
+  {
+    "playerName": "Fernando Dickes",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01s9m-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/fernando-dickes.png",
+    "lastUpdated": "2025-09-23T12:36:40.180Z"
+  },
+  {
+    "playerName": "William Mikelbrencis",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01n5u-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/william-mikelbrencis.png",
+    "lastUpdated": "2025-09-23T12:36:40.180Z"
+  },
+  {
+    "playerName": "Noah Katterbach",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fw7-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/noah-katterbach.png",
+    "lastUpdated": "2025-09-23T12:36:40.183Z"
+  },
+  {
+    "playerName": "Guilherme Ramos",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j019df-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/guilherme-ramos.png",
+    "lastUpdated": "2025-09-23T12:36:41.217Z"
+  },
+  {
+    "playerName": "Giorgi Gocholeishvili",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01vxc-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/giorgi-gocholeishvili.png",
+    "lastUpdated": "2025-09-23T12:36:41.240Z"
+  },
+  {
+    "playerName": "Warmed Omari",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01g5f-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/warmed-omari.png",
+    "lastUpdated": "2025-09-23T12:36:41.217Z"
+  },
+  {
+    "playerName": "Aboubaka Soumahoro",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j02321-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/aboubaka-soumahoro.png",
+    "lastUpdated": "2025-09-23T12:36:41.219Z"
+  },
+  {
+    "playerName": "Jordan Torunarigha",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027ju-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jordan-torunarigha.png",
+    "lastUpdated": "2025-09-23T12:36:41.226Z"
+  },
+  {
+    "playerName": "Miro Muheim",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01hp7-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/miro-muheim.png",
+    "lastUpdated": "2025-09-23T12:36:42.263Z"
+  },
+  {
+    "playerName": "Silvan Hefti",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j016nc-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/silvan-hefti.png",
+    "lastUpdated": "2025-09-23T12:36:42.279Z"
+  },
+  {
+    "playerName": "Luka Vušković",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j020ih-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/luka-vu-kovi.png",
+    "lastUpdated": "2025-09-23T12:36:42.277Z"
+  },
+  {
+    "playerName": "Albert Sambi Lokonga",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01a3i-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/albert-sambi-lokonga.png",
+    "lastUpdated": "2025-09-23T12:36:42.277Z"
+  },
+  {
+    "playerName": "Daniel Elfadli",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01oyx-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/daniel-elfadli.png",
+    "lastUpdated": "2025-09-23T12:36:42.437Z"
+  },
+  {
+    "playerName": "Immanuël Pherai",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g5y-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/immanu-l-pherai.png",
+    "lastUpdated": "2025-09-23T12:36:43.474Z"
+  },
+  {
+    "playerName": "Fábio Vieira",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01fro-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/f-bio-vieira.png",
+    "lastUpdated": "2025-09-23T12:36:43.480Z"
+  },
+  {
+    "playerName": "Nicolai Remberg",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01iz9-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nicolai-remberg.png",
+    "lastUpdated": "2025-09-23T12:36:43.614Z"
+  },
+  {
+    "playerName": "Jonas Meffert",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001qt-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jonas-meffert.png",
+    "lastUpdated": "2025-09-23T12:36:43.687Z"
+  },
+  {
+    "playerName": "Nicolas Capaldo",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01h5g-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nicolas-capaldo.png",
+    "lastUpdated": "2025-09-23T12:36:43.656Z"
+  },
+  {
+    "playerName": "Jean-Luc Dompé",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j017pc-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jean-luc-domp.png",
+    "lastUpdated": "2025-09-23T12:36:44.720Z"
+  },
+  {
+    "playerName": "Robert Glatzel",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027ho-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/robert-glatzel.png",
+    "lastUpdated": "2025-09-23T12:36:44.869Z"
+  },
+  {
+    "playerName": "Ransford-Yeboah Königsdörffer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g8b-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ransford-yeboah-k-nigsd-rffer.png",
+    "lastUpdated": "2025-09-23T12:36:44.722Z"
+  },
+  {
+    "playerName": "Rayan Philippe",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01w6j-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/rayan-philippe.png",
+    "lastUpdated": "2025-09-23T12:36:44.895Z"
+  },
+  {
+    "playerName": "Yussuf Poulsen",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0002f6-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/yussuf-poulsen.png",
+    "lastUpdated": "2025-09-23T12:36:44.724Z"
+  },
+  {
+    "playerName": "Bakery Jatta",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027at-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/bakery-jatta.png",
+    "lastUpdated": "2025-09-23T12:36:45.926Z"
+  },
+  {
+    "playerName": "Emir Sahiti",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j02270-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/emir-sahiti.png",
+    "lastUpdated": "2025-09-23T12:36:45.928Z"
+  },
+  {
+    "playerName": "Alexander Rössing-Lelesiit",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j02322-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/alexander-r-ssing-lelesiit.png",
+    "lastUpdated": "2025-09-23T12:36:46.115Z"
+  },
+  {
+    "playerName": "Fabio Baldé",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j021lj-dfl-clu-00000c-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/fabio-bald.png",
+    "lastUpdated": "2025-09-23T12:36:46.132Z"
+  },
+  {
+    "playerName": "Kevin Müller",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00006b-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kevin-m-ller.png",
+    "lastUpdated": "2025-09-23T12:36:45.932Z"
+  },
+  {
+    "playerName": "Paul Tschernuth",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01i8o-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/paul-tschernuth.png",
+    "lastUpdated": "2025-09-23T12:36:47.168Z"
+  },
+  {
+    "playerName": "Frank Feller",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01j8l-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/frank-feller.png",
+    "lastUpdated": "2025-09-23T12:36:47.171Z"
+  },
+  {
+    "playerName": "Diant Ramaj",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fy2-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/diant-ramaj.png",
+    "lastUpdated": "2025-09-23T12:36:47.168Z"
+  },
+  {
+    "playerName": "Marnon Busch",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0002jt-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/marnon-busch.png",
+    "lastUpdated": "2025-09-23T12:36:47.171Z"
+  },
+  {
+    "playerName": "Tim Siersleben",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g76-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/tim-siersleben.png",
+    "lastUpdated": "2025-09-23T12:36:47.171Z"
+  },
+  {
+    "playerName": "Benedikt Gimber",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002651-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/benedikt-gimber.png",
+    "lastUpdated": "2025-09-23T12:36:48.205Z"
+  },
+  {
+    "playerName": "Patrick Mainka",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001k8-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/patrick-mainka.png",
+    "lastUpdated": "2025-09-23T12:36:48.207Z"
+  },
+  {
+    "playerName": "Jonas Föhrenbach",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00266e-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jonas-f-hrenbach.png",
+    "lastUpdated": "2025-09-23T12:36:48.205Z"
+  },
+  {
+    "playerName": "Omar Haktab Traoré",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01azq-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/omar-haktab-traor.png",
+    "lastUpdated": "2025-09-23T12:36:48.205Z"
+  },
+  {
+    "playerName": "Thomas Keller",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fyu-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/thomas-keller.png",
+    "lastUpdated": "2025-09-23T12:36:48.207Z"
+  },
+  {
+    "playerName": "Adam Kölle",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0244z-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/adam-k-lle.png",
+    "lastUpdated": "2025-09-23T12:36:49.401Z"
+  },
+  {
+    "playerName": "Leart Paqarada",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0002el-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/leart-paqarada.png",
+    "lastUpdated": "2025-09-23T12:36:49.245Z"
+  },
+  {
+    "playerName": "Jan Schöppner",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002ga9-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jan-sch-ppner.png",
+    "lastUpdated": "2025-09-23T12:36:49.240Z"
+  },
+  {
+    "playerName": "Julian Niehues",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002ghl-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/julian-niehues.png",
+    "lastUpdated": "2025-09-23T12:36:49.245Z"
+  },
+  {
+    "playerName": "Mathias Honsak",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028qv-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mathias-honsak.png",
+    "lastUpdated": "2025-09-23T12:36:49.245Z"
+  },
+  {
+    "playerName": "Luca Kerber",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ght-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/luca-kerber.png",
+    "lastUpdated": "2025-09-23T12:36:50.637Z"
+  },
+  {
+    "playerName": "Adrian Beck",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01auu-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/adrian-beck.png",
+    "lastUpdated": "2025-09-23T12:36:50.440Z"
+  },
+  {
+    "playerName": "Arijon Ibrahimović",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01eaz-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/arijon-ibrahimovi.png",
+    "lastUpdated": "2025-09-23T12:36:50.435Z"
+  },
+  {
+    "playerName": "Niklas Dorsch",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027bi-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/niklas-dorsch.png",
+    "lastUpdated": "2025-09-23T12:36:50.440Z"
+  },
+  {
+    "playerName": "Sirlord Conteh",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028ha-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/sirlord-conteh.png",
+    "lastUpdated": "2025-09-23T12:36:50.440Z"
+  },
+  {
+    "playerName": "Nick Rothweiler",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j02450-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/nick-rothweiler.png",
+    "lastUpdated": "2025-09-23T12:36:51.675Z"
+  },
+  {
+    "playerName": "Stefan Schimmer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g56-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/stefan-schimmer.png",
+    "lastUpdated": "2025-09-23T12:36:51.677Z"
+  },
+  {
+    "playerName": "Budu Zivzivadze",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01q2v-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/budu-zivzivadze.png",
+    "lastUpdated": "2025-09-23T12:36:51.675Z"
+  },
+  {
+    "playerName": "Marvin Pieringer",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028t0-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/marvin-pieringer.png",
+    "lastUpdated": "2025-09-23T12:36:51.675Z"
+  },
+  {
+    "playerName": "Mikkel Kaufmann",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01eaq-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/mikkel-kaufmann.png",
+    "lastUpdated": "2025-09-23T12:36:51.675Z"
+  },
+  {
+    "playerName": "Yannik Wagner",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j024k2-dfl-clu-000018-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/yannik-wagner.png",
+    "lastUpdated": "2025-09-23T12:36:52.890Z"
+  },
+  {
+    "playerName": "Oliver Baumann",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00001e-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/oliver-baumann.png",
+    "lastUpdated": "2025-09-23T12:36:52.714Z"
+  },
+  {
+    "playerName": "Lúkas Petersson",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j020ug-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/l-kas-petersson.png",
+    "lastUpdated": "2025-09-23T12:36:52.711Z"
+  },
+  {
+    "playerName": "Luca Philipp",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gdm-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/luca-philipp.png",
+    "lastUpdated": "2025-09-23T12:36:52.711Z"
+  },
+  {
+    "playerName": "Robin Hranáč",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01tmv-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/robin-hran.png",
+    "lastUpdated": "2025-09-23T12:36:52.702Z"
+  },
+  {
+    "playerName": "Ozan Kabak",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002fxb-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ozan-kabak.png",
+    "lastUpdated": "2025-09-23T12:36:53.926Z"
+  },
+  {
+    "playerName": "Bernardo",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027fu-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/bernardo.png",
+    "lastUpdated": "2025-09-23T12:36:53.917Z"
+  },
+  {
+    "playerName": "Valentin Gendrey",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01toe-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/valentin-gendrey.png",
+    "lastUpdated": "2025-09-23T12:36:53.926Z"
+  },
+  {
+    "playerName": "Albian Hajdari",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j02110-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/albian-hajdari.png",
+    "lastUpdated": "2025-09-23T12:36:53.927Z"
+  },
+  {
+    "playerName": "Kevin Akpoguma",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001lz-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kevin-akpoguma.png",
+    "lastUpdated": "2025-09-23T12:36:53.917Z"
+  },
+  {
+    "playerName": "Koki Machida",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01h9p-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/koki-machida.png",
+    "lastUpdated": "2025-09-23T12:36:54.961Z"
+  },
+  {
+    "playerName": "Vladimir Coufal",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0133p-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/vladimir-coufal.png",
+    "lastUpdated": "2025-09-23T12:36:54.951Z"
+  },
+  {
+    "playerName": "Arthur Chaves",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j021ye-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/arthur-chaves.png",
+    "lastUpdated": "2025-09-23T12:36:54.961Z"
+  },
+  {
+    "playerName": "Hennes Behrens",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01s1y-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/hennes-behrens.png",
+    "lastUpdated": "2025-09-23T12:36:54.961Z"
+  },
+  {
+    "playerName": "Grischa Prömel",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0025j3-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/grischa-pr-mel.png",
+    "lastUpdated": "2025-09-23T12:36:54.949Z"
+  },
+  {
+    "playerName": "Leon Avdullahu",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0244y-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/leon-avdullahu.png",
+    "lastUpdated": "2025-09-23T12:36:55.985Z"
+  },
+  {
+    "playerName": "Dennis Geiger",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027kk-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/dennis-geiger.png",
+    "lastUpdated": "2025-09-23T12:36:55.999Z"
+  },
+  {
+    "playerName": "Muhammed Damar",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ngw-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/muhammed-damar.png",
+    "lastUpdated": "2025-09-23T12:36:55.985Z"
+  },
+  {
+    "playerName": "Umut Tohumcu",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01d03-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/umut-tohumcu.png",
+    "lastUpdated": "2025-09-23T12:36:55.987Z"
+  },
+  {
+    "playerName": "Wouter Burger",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01d90-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/wouter-burger.png",
+    "lastUpdated": "2025-09-23T12:36:55.985Z"
+  },
+  {
+    "playerName": "Alexander Prass",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01t26-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/alexander-prass.png",
+    "lastUpdated": "2025-09-23T12:36:57.021Z"
+  },
+  {
+    "playerName": "Andrej Kramarić",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0026tu-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/andrej-kramari.png",
+    "lastUpdated": "2025-09-23T12:36:57.023Z"
+  },
+  {
+    "playerName": "Ihlas Bebou",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0001v0-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ihlas-bebou.png",
+    "lastUpdated": "2025-09-23T12:36:57.021Z"
+  },
+  {
+    "playerName": "Fisnik Asllani",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gn3-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/fisnik-asllani.png",
+    "lastUpdated": "2025-09-23T12:36:57.024Z"
+  },
+  {
+    "playerName": "Tim Lemperle",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gbw-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/tim-lemperle.png",
+    "lastUpdated": "2025-09-23T12:36:57.038Z"
+  },
+  {
+    "playerName": "Adam Hložek",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01g0j-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/adam-hlo-ek.png",
+    "lastUpdated": "2025-09-23T12:36:58.077Z"
+  },
+  {
+    "playerName": "David Mokwa",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01nh0-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/david-mokwa.png",
+    "lastUpdated": "2025-09-23T12:36:58.078Z"
+  },
+  {
+    "playerName": "Bazoumana Toure",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j0231z-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/bazoumana-toure.png",
+    "lastUpdated": "2025-09-23T12:36:58.061Z"
+  },
+  {
+    "playerName": "Mërgim Berisha",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028nk-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/m-rgim-berisha.png",
+    "lastUpdated": "2025-09-23T12:36:58.077Z"
+  },
+  {
+    "playerName": "Max Moerstedt",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ka5-dfl-clu-000002-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/max-moerstedt.png",
+    "lastUpdated": "2025-09-23T12:36:58.077Z"
+  },
+  {
+    "playerName": "Marvin Schwäbe",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0002he-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/marvin-schw-be.png",
+    "lastUpdated": "2025-09-23T12:36:59.119Z"
+  },
+  {
+    "playerName": "Ron-Robert Zieler",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000st-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ron-robert-zieler.png",
+    "lastUpdated": "2025-09-23T12:36:59.119Z"
+  },
+  {
+    "playerName": "Matthias Köbbing",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027sx-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/matthias-k-bbing.png",
+    "lastUpdated": "2025-09-23T12:36:59.119Z"
+  },
+  {
+    "playerName": "Joël Schmied",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j019vx-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jo-l-schmied.png",
+    "lastUpdated": "2025-09-23T12:37:00.205Z"
+  },
+  {
+    "playerName": "Dominique Heintz",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0000xu-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/dominique-heintz.png",
+    "lastUpdated": "2025-09-23T12:37:00.208Z"
+  },
+  {
+    "playerName": "Timo Hübers",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027b6-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/timo-h-bers.png",
+    "lastUpdated": "2025-09-23T12:37:00.205Z"
+  },
+  {
+    "playerName": "Luca Kilian",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g0r-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/luca-kilian.png",
+    "lastUpdated": "2025-09-23T12:37:00.208Z"
+  },
+  {
+    "playerName": "Jusuf Gazibegović",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01fs6-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jusuf-gazibegovi.png",
+    "lastUpdated": "2025-09-23T12:37:00.208Z"
+  },
+  {
+    "playerName": "Sebastian Sebulonsen",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01ucr-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/sebastian-sebulonsen.png",
+    "lastUpdated": "2025-09-23T12:37:01.248Z"
+  },
+  {
+    "playerName": "Kristoffer Lund",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01xhg-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/kristoffer-lund.png",
+    "lastUpdated": "2025-09-23T12:37:01.248Z"
+  },
+  {
+    "playerName": "Rav van den Berg",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01n8x-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/rav-van-den-berg.png",
+    "lastUpdated": "2025-09-23T12:37:01.248Z"
+  },
+  {
+    "playerName": "Cenk Özkacar",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01t3r-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/cenk-zkacar.png",
+    "lastUpdated": "2025-09-23T12:37:01.248Z"
+  },
+  {
+    "playerName": "Neo Telle",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j021j0-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/neo-telle.png",
+    "lastUpdated": "2025-09-23T12:37:01.248Z"
+  },
+  {
+    "playerName": "Tom Krauß",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028ti-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/tom-krau.png",
+    "lastUpdated": "2025-09-23T12:37:02.286Z"
+  },
+  {
+    "playerName": "Eric Martel",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gko-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/eric-martel.png",
+    "lastUpdated": "2025-09-23T12:37:02.291Z"
+  },
+  {
+    "playerName": "Denis Huseinbašić",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01dvc-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/denis-huseinba-i.png",
+    "lastUpdated": "2025-09-23T12:37:02.286Z"
+  },
+  {
+    "playerName": "Florian Kainz",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0027ax-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/florian-kainz.png",
+    "lastUpdated": "2025-09-23T12:37:02.288Z"
+  },
+  {
+    "playerName": "Saïd El Mala",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01zqd-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/sa-d-el-mala.png",
+    "lastUpdated": "2025-09-23T12:37:02.286Z"
+  },
+  {
+    "playerName": "Jakub Kamiński",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01fye-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jakub-kami-ski.png",
+    "lastUpdated": "2025-09-23T12:37:03.329Z"
+  },
+  {
+    "playerName": "Alessio Castro-Montes",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01d5b-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/alessio-castro-montes.png",
+    "lastUpdated": "2025-09-23T12:37:03.331Z"
+  },
+  {
+    "playerName": "Ísak Jóhannesson",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01gsf-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/sak-j-hannesson.png",
+    "lastUpdated": "2025-09-23T12:37:03.329Z"
+  },
+  {
+    "playerName": "Jan Thielmann",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002g89-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/jan-thielmann.png",
+    "lastUpdated": "2025-09-23T12:37:03.329Z"
+  },
+  {
+    "playerName": "Fayssal Harchaoui",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01lar-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/fayssal-harchaoui.png",
+    "lastUpdated": "2025-09-23T12:37:03.329Z"
+  },
+  {
+    "playerName": "Linton Maina",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028bd-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/linton-maina.png",
+    "lastUpdated": "2025-09-23T12:37:04.369Z"
+  },
+  {
+    "playerName": "Emin Kujovic",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j01x7r-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/emin-kujovic.png",
+    "lastUpdated": "2025-09-23T12:37:04.372Z"
+  },
+  {
+    "playerName": "Luca Waldschmidt",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-00021q-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/luca-waldschmidt.png",
+    "lastUpdated": "2025-09-23T12:37:04.369Z"
+  },
+  {
+    "playerName": "Ragnar Ache",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-002gda-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/ragnar-ache.png",
+    "lastUpdated": "2025-09-23T12:37:04.370Z"
+  },
+  {
+    "playerName": "Malek El Mala",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-j02001-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/malek-el-mala.png",
+    "lastUpdated": "2025-09-23T12:37:04.370Z"
+  },
+  {
+    "playerName": "Marius Bülter",
+    "bundesligaImageUrl": "https://assets.bundesliga.com/player/dfl-obj-0028nr-dfl-clu-000008-dfl-sea-0001k9-circle.png?fit=64,64",
+    "localImagePath": "/images/players/marius-b-lter.png",
+    "lastUpdated": "2025-09-23T12:37:05.412Z"
+  }
+]

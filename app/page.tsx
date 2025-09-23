@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { DEFAULT_PARAMS, FORMATION_LIST } from '../lib/constants';
 import { computeProjections } from '../lib/projection';
+import { excludePlayer, getExcludedPlayersWithStats, includePlayer, filterExcludedPlayers } from '../lib/playerExclusion';
 import type { Formation, Match, Odds, OptimizationResult, Player, ProjectionParams } from '../lib/types';
 import PlayerDetailModal from '../components/PlayerDetailModal';
 import PlayerImage from '../components/PlayerImage';
@@ -65,6 +66,15 @@ export default function HomePage() {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
   
+  // Excluded players management
+  const [excludedPlayers, setExcludedPlayers] = useState<ReturnType<typeof getExcludedPlayersWithStats>>([]);
+  const [showExcludedPlayers, setShowExcludedPlayers] = useState(false);
+  
+  // Load excluded players on mount and when players change
+  useEffect(() => {
+    setExcludedPlayers(getExcludedPlayersWithStats());
+  }, [players]);
+  
   // New state variables for player explorer
   const [searchTerm, setSearchTerm] = useState('');
   const [positionFilter, setPositionFilter] = useState<string>('');
@@ -81,40 +91,57 @@ export default function HomePage() {
     [players]
   );
 
-  useEffect(() => {
-    async function loadData() {
-      setLoadingData(true);
-      try {
-        const [playersRes, matchesRes] = await Promise.all([
-          fetch(`/api/players?spieltag=${spieltag}`).then((res) => res.json()),
-          fetch(`/api/matches?spieltag=${spieltag}`).then((res) => res.json())
-        ]);
-        if (playersRes.error) {
-          throw new Error(playersRes.error);
-        }
-        if (matchesRes.error) {
-          throw new Error(matchesRes.error);
-        }
-        setPlayers(playersRes.players as Player[]);
-        setMatches(matchesRes.matches as Match[]);
-        setOdds((matchesRes.odds ?? []) as Odds[]);
-        setCacheInfo({
-          updatedAt: playersRes.updatedAt,
-          cacheAgeDays: playersRes.cacheAgeDays
-        });
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoadingData(false);
+  // Function to load player and match data
+  const loadData = async () => {
+    setLoadingData(true);
+    try {
+      const [playersRes, matchesRes] = await Promise.all([
+        fetch(`/api/players?spieltag=${spieltag}`).then((res) => res.json()),
+        fetch(`/api/matches?spieltag=${spieltag}`).then((res) => res.json())
+      ]);
+      if (playersRes.error) {
+        throw new Error(playersRes.error);
       }
+      if (matchesRes.error) {
+        throw new Error(matchesRes.error);
+      }
+      setPlayers(playersRes.players as Player[]);
+      setMatches(matchesRes.matches as Match[]);
+      setOdds((matchesRes.odds ?? []) as Odds[]);
+      setCacheInfo({
+        updatedAt: playersRes.updatedAt,
+        cacheAgeDays: playersRes.cacheAgeDays
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingData(false);
     }
+  };
+
+  useEffect(() => {
     loadData();
   }, [spieltag]);
 
   // Modal handlers
-  const openPlayerModal = (player: Player) => {
+  const handlePlayerClick = (player: Player) => {
     setSelectedPlayer(player);
     setIsPlayerModalOpen(true);
+  };
+
+  // Player exclusion handlers
+  const handleExcludePlayer = (player: Player) => {
+    excludePlayer(player);
+    setExcludedPlayers(getExcludedPlayersWithStats());
+    // Refresh player data to remove excluded player from the list
+    loadData();
+  };
+
+  const handleIncludePlayer = (playerId: string) => {
+    includePlayer(playerId);
+    setExcludedPlayers(getExcludedPlayersWithStats());
+    // Refresh player data to add player back to the list
+    loadData();
   };
 
   const closePlayerModal = () => {
@@ -140,7 +167,10 @@ export default function HomePage() {
 
   // Filter and sort players for the explorer
   const filteredAndSortedPlayers = useMemo(() => {
-    let filtered = projections.filter(player => {
+    // First filter out excluded players
+    const nonExcludedPlayers = filterExcludedPlayers(projections);
+    
+    let filtered = nonExcludedPlayers.filter(player => {
       const fullName = getFullPlayerName(player).toLowerCase();
       const matchesSearch = searchTerm === '' || 
         fullName.includes(searchTerm.toLowerCase()) ||
@@ -202,7 +232,7 @@ export default function HomePage() {
     }
 
     return filtered;
-  }, [projections, searchTerm, positionFilter, clubFilter, sortColumn, sortDirection]);
+  }, [projections, searchTerm, positionFilter, clubFilter, sortColumn, sortDirection, excludedPlayers]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredAndSortedPlayers.length / playersPerPage);
@@ -673,6 +703,9 @@ export default function HomePage() {
                     >
                       Punkte/Min {getSortIndicator('pointsPerMinute')}
                     </th>
+                    <th className="px-3 py-3">
+                      Aktionen
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -680,7 +713,7 @@ export default function HomePage() {
                     <tr 
                       key={player.id} 
                       className="border-t border-slate-800 hover:bg-slate-800 cursor-pointer transition-colors"
-                      onClick={() => openPlayerModal(player)}
+                      onClick={() => handlePlayerClick(player)}
                     >
                       {/* Position */}
                       <td className="px-3 py-3">
@@ -729,6 +762,20 @@ export default function HomePage() {
                       <td className="px-3 py-3 text-slate-300">
                         {calculatePointsPerMinute(player)}
                       </td>
+                      
+                      {/* Actions */}
+                      <td className="px-3 py-3">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent row click
+                            handleExcludePlayer(player);
+                          }}
+                          className="px-2 py-1 text-xs bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+                          title="Spieler ausschließen"
+                        >
+                          Ausschließen
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -746,6 +793,54 @@ export default function HomePage() {
                 </div>
               )}
             </div>
+
+            {/* Excluded Players Section */}
+            {excludedPlayers.length > 0 && (
+              <div className="mt-8 border-t border-slate-700 pt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-white">
+                    Ausgeschlossene Spieler ({excludedPlayers.length})
+                  </h3>
+                  <button
+                    onClick={() => setShowExcludedPlayers(!showExcludedPlayers)}
+                    className="px-3 py-1 text-sm bg-slate-700 hover:bg-slate-600 text-white rounded transition-colors"
+                  >
+                    {showExcludedPlayers ? 'Ausblenden' : 'Anzeigen'}
+                  </button>
+                </div>
+                
+                {showExcludedPlayers && (
+                  <div className="bg-slate-800 rounded-lg p-4">
+                    <div className="grid gap-2">
+                      {excludedPlayers.map((excludedPlayer) => (
+                        <div
+                          key={excludedPlayer.id}
+                          className="flex items-center justify-between p-3 bg-slate-700 rounded border border-slate-600"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="inline-flex items-center justify-center w-8 h-6 bg-slate-600 text-slate-200 rounded text-xs font-medium">
+                              {translatePosition(excludedPlayer.position)}
+                            </span>
+                            <div>
+                              <div className="font-medium text-white">{excludedPlayer.name}</div>
+                              <div className="text-sm text-slate-400">
+                                {excludedPlayer.verein} • Ausgeschlossen vor {excludedPlayer.daysSinceExclusion} Tag{excludedPlayer.daysSinceExclusion !== 1 ? 'en' : ''}
+                              </div>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleIncludePlayer(excludedPlayer.id)}
+                            className="px-3 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
+                          >
+                            Wieder einschließen
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Pagination controls at bottom */}
             {filteredAndSortedPlayers.length > 0 && (
