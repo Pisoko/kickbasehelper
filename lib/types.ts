@@ -3,6 +3,7 @@ export type Position = 'GK' | 'DEF' | 'MID' | 'FWD';
 export interface Player {
   id: string;
   name: string;
+  firstName?: string;              // First name from API (fn field)
   position: Position;
   verein: string;
   kosten: number;

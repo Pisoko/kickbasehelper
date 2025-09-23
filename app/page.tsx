@@ -6,6 +6,7 @@ import { DEFAULT_PARAMS, FORMATION_LIST } from '../lib/constants';
 import { computeProjections } from '../lib/projection';
 import type { Formation, Match, Odds, OptimizationResult, Player, ProjectionParams } from '../lib/types';
 import PlayerDetailModal from '../components/PlayerDetailModal';
+import PlayerImage from '../components/PlayerImage';
 
 interface CacheInfo {
   updatedAt?: string;
@@ -25,12 +26,20 @@ const formatter = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 
 // Function to translate positions to German
 const translatePosition = (position: string): string => {
   const positionMap: Record<string, string> = {
-    'FWD': 'ANG',
-    'MID': 'MIT', 
-    'DEF': 'VER',
-    'GK': 'TW'
+    'GK': 'TW',
+    'DEF': 'ABW',
+    'MID': 'MF',
+    'FWD': 'ST'
   };
   return positionMap[position] || position;
+};
+
+// Helper function to display full player name
+const getFullPlayerName = (player: Player): string => {
+  if (player.firstName && player.firstName.trim()) {
+    return `${player.firstName} ${player.name}`;
+  }
+  return player.name;
 };
 
 export default function HomePage() {
@@ -55,6 +64,18 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>('Dashboard');
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
+  
+  // New state variables for player explorer
+  const [searchTerm, setSearchTerm] = useState('');
+  const [positionFilter, setPositionFilter] = useState<string>('');
+  const [clubFilter, setClubFilter] = useState<string>('');
+  const [sortColumn, setSortColumn] = useState<string>('');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [playersPerPage, setPlayersPerPage] = useState(25);
+  
   const hasMinutes = useMemo(
     () => players.some((player) => player.minutes_hist && player.minutes_hist.length > 0),
     [players]
@@ -116,6 +137,117 @@ export default function HomePage() {
     }
     return summary;
   }, [optState.result]);
+
+  // Filter and sort players for the explorer
+  const filteredAndSortedPlayers = useMemo(() => {
+    let filtered = projections.filter(player => {
+      const fullName = getFullPlayerName(player).toLowerCase();
+      const matchesSearch = searchTerm === '' || 
+        fullName.includes(searchTerm.toLowerCase()) ||
+        player.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (player.firstName && player.firstName.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesPosition = positionFilter === '' || player.position === positionFilter;
+      const matchesClub = clubFilter === '' || player.verein === clubFilter;
+      
+      return matchesSearch && matchesPosition && matchesClub;
+    });
+
+    // Sort players
+    if (sortColumn) {
+      filtered.sort((a, b) => {
+        let aValue: any, bValue: any;
+        
+        switch (sortColumn) {
+          case 'position':
+            aValue = a.position;
+            bValue = b.position;
+            break;
+          case 'name':
+            aValue = a.name;
+            bValue = b.name;
+            break;
+          case 'club':
+            aValue = a.verein;
+            bValue = b.verein;
+            break;
+          case 'marketValue':
+            aValue = a.kosten || 0;
+            bValue = b.kosten || 0;
+            break;
+          case 'totalPoints':
+            aValue = a.punkte_sum || 0;
+            bValue = b.punkte_sum || 0;
+            break;
+          case 'pointsPerMinute':
+            const aMinutes = a.minutes_hist ? a.minutes_hist.reduce((sum, min) => sum + min, 0) : 0;
+            const bMinutes = b.minutes_hist ? b.minutes_hist.reduce((sum, min) => sum + min, 0) : 0;
+            aValue = aMinutes > 0 ? (a.punkte_sum || 0) / aMinutes : 0;
+            bValue = bMinutes > 0 ? (b.punkte_sum || 0) / bMinutes : 0;
+            break;
+          default:
+            return 0;
+        }
+        
+        if (typeof aValue === 'string') {
+          return sortDirection === 'asc' 
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue);
+        } else {
+          return sortDirection === 'asc' 
+            ? aValue - bValue
+            : bValue - aValue;
+        }
+      });
+    }
+
+    return filtered;
+  }, [projections, searchTerm, positionFilter, clubFilter, sortColumn, sortDirection]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredAndSortedPlayers.length / playersPerPage);
+  const startIndex = (currentPage - 1) * playersPerPage;
+  const endIndex = startIndex + playersPerPage;
+  const paginatedPlayers = filteredAndSortedPlayers.slice(startIndex, endIndex);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, positionFilter, clubFilter, playersPerPage]);
+
+  // Get unique positions and clubs for filters
+  const uniquePositions = useMemo(() => {
+    const positions = [...new Set(projections.map(p => p.position))];
+    return positions.sort();
+  }, [projections]);
+
+  const uniqueClubs = useMemo(() => {
+    const clubs = [...new Set(projections.map(p => p.verein))];
+    return clubs.sort();
+  }, [projections]);
+
+  // Handle column sorting
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('desc');
+    }
+  };
+
+  // Get sort indicator
+  const getSortIndicator = (column: string) => {
+    if (sortColumn !== column) return '↕️';
+    return sortDirection === 'asc' ? '↑' : '↓';
+  };
+
+  // Calculate points per minute
+  const calculatePointsPerMinute = (player: any) => {
+    const totalMinutes = player.minutes_hist ? player.minutes_hist.reduce((sum: number, min: number) => sum + min, 0) : 0;
+    if (totalMinutes === 0) return 0;
+    return ((player.punkte_sum || 0) / totalMinutes).toFixed(4);
+  };
 
   async function handleRefresh() {
     setLoadingData(true);
@@ -438,92 +570,230 @@ export default function HomePage() {
       )}
 
       {activeTab === 'Spieler-Explorer' && (
-        <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-          <h2 className="text-xl font-semibold">Spieler Explorer</h2>
-          <div className="overflow-x-auto">
-            <table className="mt-4 min-w-full text-sm">
-              <thead>
-                <tr className="text-left text-xs uppercase tracking-wide text-slate-400">
-                  <th className="px-3 py-2">Name</th>
-                  <th className="px-3 py-2">Verein</th>
-                  <th className="px-3 py-2">Pos</th>
-                  <th className="px-3 py-2">Marktwert</th>
-                  <th className="px-3 py-2">Gesamtpunkte</th>
-                  <th className="px-3 py-2">Ø Punkte</th>
-                  <th className="px-3 py-2">Tore</th>
-                  <th className="px-3 py-2">Vorlagen</th>
-                  <th className="px-3 py-2">Minuten</th>
-                  <th className="px-3 py-2">Status</th>
-                  <th className="px-3 py-2">Pᵢ</th>
-                  <th className="px-3 py-2">ValueScore</th>
-                </tr>
-              </thead>
-              <tbody>
-                {projections
-                  .slice()
-                  .sort((a, b) => b.value - a.value)
-                  .map((player) => (
+          <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+            <h2 className="text-xl font-semibold mb-4">Spieler Explorer</h2>
+            
+            {/* Search and Filter Controls */}
+            <div className="mb-4 grid gap-4 md:grid-cols-3">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Spieler suchen
+                </label>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Name eingeben..."
+                  className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white placeholder-slate-400"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Position filtern
+                </label>
+                <select
+                  value={positionFilter}
+                  onChange={(e) => setPositionFilter(e.target.value)}
+                  className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white"
+                >
+                  <option value="">Alle Positionen</option>
+                  {uniquePositions.map(pos => (
+                    <option key={pos} value={pos}>{translatePosition(pos)}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Verein filtern
+                </label>
+                <select
+                  value={clubFilter}
+                  onChange={(e) => setClubFilter(e.target.value)}
+                  className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white"
+                >
+                  <option value="">Alle Vereine</option>
+                  {uniqueClubs.map(club => (
+                    <option key={club} value={club}>{club}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Results count */}
+            <div className="mb-4 text-sm text-slate-400">
+              {filteredAndSortedPlayers.length} von {projections.length} Spielern
+              {filteredAndSortedPlayers.length > 0 && (
+                <span className="ml-2">
+                  (Seite {currentPage} von {totalPages})
+                </span>
+              )}
+            </div>
+
+            {/* Player Table */}
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="text-left text-xs uppercase tracking-wide text-slate-400 border-b border-slate-700">
+                    <th 
+                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
+                      onClick={() => handleSort('position')}
+                    >
+                      Position {getSortIndicator('position')}
+                    </th>
+                    <th className="px-3 py-3">{/* Image column - no header */}</th>
+                    <th 
+                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
+                      onClick={() => handleSort('name')}
+                    >
+                      Name {getSortIndicator('name')}
+                    </th>
+                    <th 
+                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
+                      onClick={() => handleSort('club')}
+                    >
+                      Verein {getSortIndicator('club')}
+                    </th>
+                    <th 
+                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
+                      onClick={() => handleSort('marketValue')}
+                    >
+                      Marktwert {getSortIndicator('marketValue')}
+                    </th>
+                    <th 
+                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
+                      onClick={() => handleSort('totalPoints')}
+                    >
+                      Gesamtpunkte {getSortIndicator('totalPoints')}
+                    </th>
+                    <th 
+                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
+                      onClick={() => handleSort('pointsPerMinute')}
+                    >
+                      Punkte/Min {getSortIndicator('pointsPerMinute')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedPlayers.map((player) => (
                     <tr 
                       key={player.id} 
                       className="border-t border-slate-800 hover:bg-slate-800 cursor-pointer transition-colors"
                       onClick={() => openPlayerModal(player)}
                     >
-                      <td className="px-3 py-2">
-                        <div className="flex items-center gap-3">
-                          {player.playerImageUrl ? (
-                            <img 
-                              src={`https://kickbase.b-cdn.net/${player.playerImageUrl}`}
-                              alt={player.name}
-                              className="h-10 w-10 rounded-full object-cover border-2 border-slate-600"
-                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded-full bg-slate-600 flex items-center justify-center text-sm font-bold">
-                              {player.name.charAt(0)}
-                            </div>
-                          )}
-                          <div>
-                            <span className={player.isInjured ? 'text-red-400' : 'text-white font-medium'}>{player.name}</span>
-                            {player.isInjured && <span className="text-red-500 text-xs ml-1">🤕</span>}
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-3 py-2 text-slate-400">{player.verein}</td>
-                      <td className="px-3 py-2">{translatePosition(player.position)}</td>
-                      <td className="px-3 py-2">
-                        {player.kosten ? formatter.format(player.kosten) : '-'}
-                      </td>
-                      <td className="px-3 py-2 font-semibold text-emerald-400">
-                        {player.punkte_sum}
-                      </td>
-                      <td className="px-3 py-2">
-                        {player.punkte_avg.toFixed(1)}
-                      </td>
-                      <td className="px-3 py-2 text-center">
-                        <span className="inline-flex items-center justify-center w-6 h-6 bg-green-900/30 text-green-400 rounded-full text-xs">
-                          {player.goals_hist ? player.goals_hist.reduce((sum, goals) => sum + goals, 0) : (player.goals || 0)}
+                      {/* Position */}
+                      <td className="px-3 py-3">
+                        <span className="inline-flex items-center justify-center w-8 h-6 bg-slate-700 text-slate-200 rounded text-xs font-medium">
+                          {translatePosition(player.position)}
                         </span>
                       </td>
-                      <td className="px-3 py-2 text-center">
-                         <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-900/30 text-blue-400 rounded-full text-xs">
-                           {player.assists_hist ? player.assists_hist.reduce((sum, assists) => sum + assists, 0) : (player.assists || 0)}
-                         </span>
-                       </td>
-                       <td className="px-3 py-2 text-center text-slate-300">
-                         {player.minutes_hist ? `${player.minutes_hist.reduce((sum, min) => sum + min, 0)}'` : '-'}
-                       </td>
-                       <td className="px-3 py-2 text-xs text-slate-500">
-                         {player.status || '-'}
-                       </td>
-                      <td className="px-3 py-2">{player.p_pred.toFixed(2)}</td>
-                      <td className="px-3 py-2">{player.value.toExponential(2)}</td>
+                      
+                      {/* Player Image */}
+                      <td className="px-3 py-3">
+                        <PlayerImage 
+                          playerImageUrl={player.playerImageUrl}
+                          playerName={getFullPlayerName(player)}
+                          size="md"
+                        />
+                      </td>
+                      
+                      {/* Player Name */}
+                      <td className="px-3 py-3">
+                        <div className="flex flex-col">
+                          <span className={`font-medium ${player.isInjured ? 'text-red-400' : 'text-white'}`}>
+                            {getFullPlayerName(player)}
+                          </span>
+                          {player.isInjured && (
+                            <span className="text-red-500 text-xs">🤕 Verletzt</span>
+                          )}
+                        </div>
+                      </td>
+                      
+                      {/* Club */}
+                      <td className="px-3 py-3 text-slate-300">
+                        {player.verein}
+                      </td>
+                      
+                      {/* Market Value */}
+                      <td className="px-3 py-3 font-medium text-emerald-400">
+                        {player.kosten ? formatter.format(player.kosten) : '-'}
+                      </td>
+                      
+                      {/* Total Points */}
+                      <td className="px-3 py-3 font-semibold text-blue-400">
+                        {player.punkte_sum || 0}
+                      </td>
+                      
+                      {/* Points per Minute */}
+                      <td className="px-3 py-3 text-slate-300">
+                        {calculatePointsPerMinute(player)}
+                      </td>
                     </tr>
                   ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
+                </tbody>
+              </table>
+              
+              {filteredAndSortedPlayers.length === 0 && (
+                <div className="text-center py-8 text-slate-400">
+                  Keine Spieler gefunden. Versuchen Sie andere Suchkriterien.
+                </div>
+              )}
+              
+              {filteredAndSortedPlayers.length > 0 && paginatedPlayers.length === 0 && (
+                <div className="text-center py-8 text-slate-400">
+                  Keine Spieler auf dieser Seite. Gehen Sie zu einer anderen Seite.
+                </div>
+              )}
+            </div>
+
+            {/* Pagination controls at bottom */}
+            {filteredAndSortedPlayers.length > 0 && (
+              <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  {/* Players per page selector */}
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-slate-400">Pro Seite:</label>
+                    <select
+                      value={playersPerPage}
+                      onChange={(e) => setPlayersPerPage(Number(e.target.value))}
+                      className="rounded border border-slate-700 bg-slate-950 px-2 py-1 text-sm text-white"
+                    >
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
+                </div>
+                
+                {/* Pagination buttons */}
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                      className="px-3 py-1 text-sm rounded border border-slate-700 bg-slate-950 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 transition-colors"
+                    >
+                      ← Zurück
+                    </button>
+                    
+                    <span className="text-sm text-slate-400 px-2">
+                      {currentPage} / {totalPages}
+                    </span>
+                    
+                    <button
+                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-1 text-sm rounded border border-slate-700 bg-slate-950 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 transition-colors"
+                    >
+                      Weiter →
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
+        )}
 
       {activeTab === 'Ergebnis' && (
         <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
