@@ -162,10 +162,14 @@ export class KickbaseAdapter {
         }
       }
 
-      // Extract real market value from 'mv' field
-      if (data.mv && typeof data.mv === 'number') {
+      // Extract real market value from 'cv' field (Arena Mode uses current value, not market value)
+      if (data.cv && typeof data.cv === 'number') {
+        details.marketValue = data.cv;
+        details.kosten = data.cv; // Use current value for Arena Mode
+      } else if (data.mv && typeof data.mv === 'number') {
+        // Fallback to mv if cv is not available
         details.marketValue = data.mv;
-        details.kosten = data.mv; // Use real market value instead of calculated
+        details.kosten = data.mv;
       }
 
       // Extract total and average points
@@ -259,6 +263,43 @@ export class KickbaseAdapter {
   }
 
   /**
+   * Fetch team profile with all player IDs using the new team profile endpoint
+   * @param teamId - The team ID to fetch profile for
+   * @param leagueId - The league ID (default: 7389547)
+   * @returns Team profile with player IDs
+   */
+  async getTeamProfile(teamId: string | number, leagueId: string = '7389547'): Promise<any> {
+    try {
+      const data = await this.request<any>(`/v4/leagues/${leagueId}/teams/${teamId}/teamprofile/`);
+      logger.info({ 
+        teamId, 
+        hasData: !!data, 
+        playerCount: data?.it?.length || 0
+      }, 'Team profile fetched successfully');
+      return data;
+    } catch (error) {
+      logger.error({ teamId, error }, 'Error fetching team profile');
+      throw error;
+    }
+  }
+
+  /**
+   * Fetch detailed player information using the competition player endpoint
+   * @param playerId - The player ID to fetch details for
+   * @returns Detailed player information from competition endpoint
+   */
+  async getCompetitionPlayerDetails(playerId: string | number): Promise<any> {
+    try {
+      const data = await this.request<any>(`/v4/competitions/1/players/${playerId}`);
+      logger.info({ playerId, hasData: !!data }, 'Competition player details fetched successfully');
+      return data;
+    } catch (error) {
+      logger.error({ playerId, error }, 'Error fetching competition player details');
+      throw error;
+    }
+  }
+
+  /**
    * Fetch all players from all teams using the team center endpoints
    * @returns Array of all players with detailed information
    */
@@ -332,6 +373,100 @@ export class KickbaseAdapter {
   }
 
   /**
+   * Optimized method to fetch all players using the new team profile and competition player endpoints
+   * This method uses the newly discovered endpoints for better data quality and performance
+   * @param leagueId - The league ID (default: 7389547)
+   * @returns Array of all players with detailed information
+   */
+  async getAllPlayersFromTeamsOptimized(leagueId: string = '7389547'): Promise<Player[]> {
+    const allPlayers: Player[] = [];
+    
+    // Get all team IDs from our team mapping - Updated with CORRECT men's team IDs (≤ 55) for 2025/26 Bundesliga
+    const teamIds = Object.keys({
+      '2': 'Bayern München',         // Bayern (men's team, corrected ID)
+      '3': 'Borussia Dortmund',      // Dortmund
+      '4': 'Eintracht Frankfurt',    // Frankfurt (corrected ID)
+      '5': 'SC Freiburg',            // Freiburg (corrected ID)
+      '6': 'Hamburger SV',           // Hamburg (Promoted for 2025/26)
+      '7': 'Bayer 04 Leverkusen',    // Leverkusen (corrected ID)
+      '9': 'VfB Stuttgart',          // Stuttgart
+      '10': 'Werder Bremen',         // Bremen (corrected ID)
+      '11': 'VfL Wolfsburg',         // Wolfsburg (corrected ID)
+      '13': 'FC Augsburg',           // Augsburg
+      '14': 'TSG Hoffenheim',        // Hoffenheim (corrected ID)
+      '15': 'Borussia Mönchengladbach', // M'gladbach
+      '18': 'FSV Mainz 05',          // Mainz
+      '28': '1. FC Köln',            // Köln (Promoted for 2025/26, corrected ID)
+      '39': 'FC St. Pauli',          // St. Pauli (Promoted for 2025/26, corrected ID)
+      '40': '1. FC Union Berlin',    // Union Berlin
+      '43': 'RB Leipzig',            // Leipzig (corrected ID)
+      '50': '1. FC Heidenheim'       // Heidenheim
+    });
+
+    console.log(`[OPTIMIZED] Starting fetch for ${teamIds.length} teams using new endpoints`);
+    logger.info({ teamCount: teamIds.length }, 'Starting optimized fetch of players from all teams using new endpoints');
+
+    for (const teamId of teamIds) {
+      try {
+        // Step 1: Fetch team profile to get all player IDs
+        const teamProfile = await this.getTeamProfile(teamId, leagueId);
+        
+        // The player data is in the 'it' array, not 'pl' (pl is just the count)
+        const playersArray = teamProfile?.it || [];
+        
+        console.log(`[OPTIMIZED] Team ${teamId}: Found ${playersArray.length} players in it array`);
+        
+        if (playersArray && Array.isArray(playersArray) && playersArray.length > 0) {
+          // Step 2: Fetch detailed data for each player using the detailed player endpoint (same as Player Details Page)
+          for (const playerBasic of playersArray) {
+            try {
+              const playerId = playerBasic.i;
+              if (!playerId) continue;
+              
+              // Fetch detailed player data from detailed player endpoint (includes 'sec' field)
+              const detailedPlayer = await this.getDetailedPlayerData(playerId, leagueId);
+              
+              if (detailedPlayer) {
+                // Transform to our Player format using the detailed data (includes proper 'sec' processing)
+                const player = this.transformDetailedPlayer(detailedPlayer, teamId);
+                allPlayers.push(player);
+                console.log(`[OPTIMIZED] Team ${teamId}: Successfully processed player ${player.name}`);
+              } else {
+                // Fallback: use basic team profile data
+                const fallbackPlayer = this.transformTeamProfilePlayer(playerBasic, teamId);
+                allPlayers.push(fallbackPlayer);
+                console.log(`[OPTIMIZED] Team ${teamId}: Used fallback for player ${fallbackPlayer.name}`);
+              }
+              
+            } catch (playerError) {
+              console.warn(`[OPTIMIZED] Team ${teamId}: Failed to process player ${playerBasic?.i}:`, playerError);
+              
+              // Fallback: use basic team profile data
+              try {
+                const fallbackPlayer = this.transformTeamProfilePlayer(playerBasic, teamId);
+                allPlayers.push(fallbackPlayer);
+              } catch (fallbackError) {
+                console.error(`[OPTIMIZED] Team ${teamId}: Complete failure for player ${playerBasic?.i}`);
+              }
+            }
+          }
+        } else {
+          console.warn(`[OPTIMIZED] Team ${teamId}: No players found in team profile`);
+        }
+        
+        // Add small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+      } catch (teamError) {
+        console.error(`[OPTIMIZED] Team ${teamId}: Failed to fetch team profile:`, teamError);
+      }
+    }
+
+    console.log(`[OPTIMIZED] Completed: Found ${allPlayers.length} total players`);
+    return allPlayers;
+  }
+
+  /**
    * Transform detailed player data from the individual player API endpoint
    * @param detailedPlayer - Raw player data from the detailed API
    * @param teamId - The team ID for team assignment (optional, will use player's team if not provided)
@@ -362,8 +497,20 @@ export class KickbaseAdapter {
       firstName = nameParts[0] || '';
       lastName = nameParts.slice(1).join(' ') || nameParts[0] || '';
     } else {
+      // Enhanced fallback: try to get name from other fields or use player ID
+      const playerId = detailedPlayer.id || detailedPlayer.pid || 'unknown';
+      const teamName = detailedPlayer.tn || this.getTeamName(detailedPlayer.tid);
+      
+      // Log the missing name issue for debugging
+      logger.warn(`Player missing name data`, {
+        playerId,
+        teamName,
+        availableFields: Object.keys(detailedPlayer),
+        marketValue: detailedPlayer.mv || detailedPlayer.marketValue
+      });
+      
       firstName = '';
-      lastName = 'Unknown Player';
+      lastName = `Spieler #${playerId}`;
     }
 
     // Extract real performance history from 'ph' field
@@ -372,7 +519,7 @@ export class KickbaseAdapter {
       : this.generateMockHistory(detailedPlayer.tp || 0);
 
     // Calculate minutes played (convert seconds to minutes)
-    const minutesPlayed = detailedPlayer.sec ? Math.round(detailedPlayer.sec / 60) : 0;
+    const totalMinutesPlayed = detailedPlayer.sec ? Math.round(detailedPlayer.sec / 60) : 0;
     
     // Use provided teamId or extract from player data
     const playerTeamId = teamId || detailedPlayer.tid;
@@ -384,7 +531,7 @@ export class KickbaseAdapter {
       firstName: firstName,
       position: positionMap[detailedPlayer.pos] || 'MID',
       verein: teamName,
-      kosten: detailedPlayer.mv || 1000000,
+      kosten: detailedPlayer.cv || detailedPlayer.mv || 1000000,
       punkte_hist: pointsHistory,
       punkte_avg: detailedPlayer.ap || 0,
       punkte_sum: detailedPlayer.tp || 0,
@@ -392,12 +539,15 @@ export class KickbaseAdapter {
       goals_hist: this.generateMockGoals(detailedPlayer.g || 0),
       assists_hist: this.generateMockAssists(detailedPlayer.a || 0),
       // Enhanced fields
-      marketValue: detailedPlayer.mv || 1000000,
+      marketValue: detailedPlayer.cv || detailedPlayer.mv || 1000000,
       totalPoints: detailedPlayer.tp || 0,
       averagePoints: detailedPlayer.ap || 0,
       goals: detailedPlayer.g || 0,
       assists: detailedPlayer.a || 0,
-      minutesPlayed: minutesPlayed,
+      minutesPlayed: totalMinutesPlayed, // This is now total minutes, not last game minutes
+      totalMinutesPlayed: totalMinutesPlayed, // Total minutes played this season
+      appearances: detailedPlayer.smc || detailedPlayer.ismc || 0, // Number of appearances/games played
+      jerseyNumber: detailedPlayer.shn || undefined, // Jersey/shirt number
       playerImageUrl: detailedPlayer.pim || detailedPlayer.plpim,
       isInjured: detailedPlayer.st === 1 || detailedPlayer.il === 1,
       status: detailedPlayer.st?.toString()
@@ -438,6 +588,134 @@ export class KickbaseAdapter {
       playerImageUrl: teamPlayer.pim,
       isInjured: false,
       status: undefined
+    };
+  }
+
+  /**
+   * Transform competition player data from the new API endpoint
+   */
+  private transformCompetitionPlayer(competitionPlayer: any, teamId?: string): Player {
+    const positionMap: Record<number, Player['position']> = {
+      1: 'GK',   // Goalkeeper
+      2: 'DEF',  // Defender
+      3: 'MID',  // Midfielder
+      4: 'FWD'   // Forward
+    };
+
+    // Handle name fields properly
+    let firstName = '';
+    let fullName = '';
+    
+    if (competitionPlayer.fn && competitionPlayer.ln) {
+      firstName = competitionPlayer.fn;
+      fullName = competitionPlayer.ln; // Use last name as main name
+    } else if (competitionPlayer.n) {
+      const nameParts = competitionPlayer.n.trim().split(' ');
+      firstName = nameParts[0] || '';
+      fullName = nameParts.slice(1).join(' ') || nameParts[0] || '';
+    } else {
+      const playerId = competitionPlayer.id || competitionPlayer.pid || 'unknown';
+      const teamName = competitionPlayer.tn || this.getTeamName(teamId || competitionPlayer.tid);
+      
+      logger.warn(`Competition player missing name data`, {
+        playerId,
+        teamName,
+        availableFields: Object.keys(competitionPlayer)
+      });
+      
+      firstName = '';
+      fullName = `Spieler #${playerId}`;
+    }
+
+    const points = competitionPlayer.totalPoints || competitionPlayer.tp || 0;
+    const marketValue = competitionPlayer.marketValue || competitionPlayer.cv || competitionPlayer.mv || 0;
+
+    return {
+      id: competitionPlayer.i || competitionPlayer.id || competitionPlayer.pid || 'unknown',
+      firstName,
+      name: fullName,
+      position: positionMap[competitionPlayer.pos] || 'MID',
+      verein: competitionPlayer.teamName || competitionPlayer.tn || this.getTeamName(teamId || competitionPlayer.tid),
+      kosten: marketValue,
+      punkte_hist: [points],
+      punkte_avg: points,
+      punkte_sum: points,
+      marketValue,
+      totalPoints: points,
+      averagePoints: points,
+      goals: competitionPlayer.goals || competitionPlayer.g || 0,
+      assists: competitionPlayer.assists || competitionPlayer.a || 0,
+      minutesPlayed: competitionPlayer.minutesPlayed || competitionPlayer.mp || 0,
+      totalMinutesPlayed: competitionPlayer.sec ? Math.round(competitionPlayer.sec / 60) : (competitionPlayer.minutesPlayed || competitionPlayer.mp || 0),
+      appearances: competitionPlayer.smc || competitionPlayer.ismc || 0,
+      jerseyNumber: competitionPlayer.shn || undefined,
+      playerImageUrl: competitionPlayer.playerImageUrl || competitionPlayer.pim,
+      isInjured: competitionPlayer.st === 1 || competitionPlayer.il === 1,
+      status: competitionPlayer.st?.toString()
+    };
+  }
+
+  /**
+   * Transform team profile player data (basic player info from team profile)
+   */
+  private transformTeamProfilePlayer(profilePlayer: any, teamId: string): Player {
+    const positionMap: Record<number, Player['position']> = {
+      1: 'GK',   // Goalkeeper
+      2: 'DEF',  // Defender
+      3: 'MID',  // Midfielder
+      4: 'FWD'   // Forward
+    };
+
+    // Handle name fields
+    let firstName = '';
+    let fullName = '';
+    
+    if (profilePlayer.fn && profilePlayer.ln) {
+      firstName = profilePlayer.fn;
+      fullName = profilePlayer.ln; // Use last name as main name
+    } else if (profilePlayer.n) {
+      const nameParts = profilePlayer.n.trim().split(' ');
+      firstName = nameParts[0] || '';
+      fullName = nameParts.slice(1).join(' ') || nameParts[0] || '';
+    } else {
+      const playerId = profilePlayer.id || profilePlayer.pid || 'unknown';
+      const teamName = this.getTeamName(teamId);
+      
+      logger.warn(`Team profile player missing name data`, {
+        playerId,
+        teamName,
+        availableFields: Object.keys(profilePlayer)
+      });
+      
+      firstName = '';
+      fullName = `Spieler #${playerId}`;
+    }
+
+    const points = profilePlayer.totalPoints || profilePlayer.tp || 0;
+    const marketValue = profilePlayer.marketValue || profilePlayer.cv || profilePlayer.mv || 0;
+
+    return {
+      id: `profile-${profilePlayer.id || profilePlayer.pid}`,
+      firstName,
+      name: fullName,
+      position: positionMap[profilePlayer.position] || positionMap[profilePlayer.p] || 'MID',
+      verein: this.getTeamName(teamId),
+      kosten: marketValue,
+      punkte_hist: [points],
+      punkte_avg: points,
+      punkte_sum: points,
+      marketValue,
+      totalPoints: points,
+      averagePoints: points,
+      goals: profilePlayer.goals || profilePlayer.g || 0,
+      assists: profilePlayer.assists || profilePlayer.a || 0,
+      minutesPlayed: profilePlayer.minutesPlayed || profilePlayer.mp || 0,
+      totalMinutesPlayed: profilePlayer.sec ? Math.round(profilePlayer.sec / 60) : (profilePlayer.minutesPlayed || profilePlayer.mp || 0),
+      appearances: profilePlayer.smc || profilePlayer.ismc || 0,
+      jerseyNumber: profilePlayer.shn || undefined,
+      playerImageUrl: profilePlayer.playerImageUrl || profilePlayer.pim,
+      isInjured: profilePlayer.injured || false,
+      status: profilePlayer.status
     };
   }
 
@@ -557,7 +835,12 @@ export class KickbaseAdapter {
   }
 
   private calculateMarketValue(kickbasePlayer: any): number {
-    // If API provides market value, use it (convert from thousands to full amount)
+    // If API provides current value (Arena Mode), use it (convert from thousands to full amount)
+    if (kickbasePlayer.cv && kickbasePlayer.cv > 0) {
+      return kickbasePlayer.cv * 1000;
+    }
+    
+    // Fallback to market value if current value is not available
     if (kickbasePlayer.mv && kickbasePlayer.mv > 0) {
       return kickbasePlayer.mv * 1000;
     }
@@ -678,6 +961,7 @@ export class KickbaseAdapter {
       'Freiburg': 'SC Freiburg',
       'Frankfurt': 'Eintracht Frankfurt',
       'Gladbach': 'Borussia Mönchengladbach',
+      'M\'gladbach': 'Borussia Mönchengladbach',  // Fix duplicate: M'gladbach -> Borussia Mönchengladbach
       'Mönchengladbach': 'Borussia Mönchengladbach',
       'Augsburg': 'FC Augsburg',
       'Hoffenheim': 'TSG Hoffenheim',
@@ -691,7 +975,9 @@ export class KickbaseAdapter {
       'Mainz': 'FSV Mainz 05',
       'Leverkusen': 'Bayer 04 Leverkusen',
       'Wolfsburg': 'VfL Wolfsburg',
-      'Heidenheim': '1. FC Heidenheim'
+      'Heidenheim': '1. FC Heidenheim',
+      'Hamburg': 'Hamburger SV',  // Fix duplicate: Hamburg -> Hamburger SV
+      'St. Pauli': 'FC St. Pauli'  // Fix duplicate: St. Pauli -> FC St. Pauli
     };
     
     return teamNormalizations[teamName] || teamName;
@@ -843,7 +1129,7 @@ export class KickbaseAdapter {
       { name: 'Christoph Baumgartner', position: 'MID' as const, team: 'RB Leipzig', marketValue: 25000000, points: 85 },
       { name: 'Benjamin Šeško', position: 'FWD' as const, team: 'RB Leipzig', marketValue: 50000000, points: 88 },
       { name: 'Loïs Openda', position: 'FWD' as const, team: 'RB Leipzig', marketValue: 40000000, points: 85 },
-      { name: 'Yussuf Poulsen', position: 'FWD' as const, team: 'Hamburger SV', marketValue: 8000000, points: 75 },
+      { name: 'Yussuf Poulsen', position: 'FWD' as const, team: 'RB Leipzig', marketValue: 8000000, points: 80 },
 
       // Bayer 04 Leverkusen
       { name: 'Lukáš Hrádecký', position: 'GK' as const, team: 'Bayer 04 Leverkusen', marketValue: 8000000, points: 85 },
@@ -924,7 +1210,6 @@ export class KickbaseAdapter {
 
       // FSV Mainz 05
       { name: 'Robin Zentner', position: 'GK' as const, team: 'FSV Mainz 05', marketValue: 5000000, points: 82 },
-      { name: 'Finn Dahmen', position: 'GK' as const, team: 'FSV Mainz 05', marketValue: 3000000, points: 70 },
       { name: 'Stefan Bell', position: 'DEF' as const, team: 'FSV Mainz 05', marketValue: 3000000, points: 78 },
       { name: 'Sepp van den Berg', position: 'DEF' as const, team: 'FSV Mainz 05', marketValue: 15000000, points: 82 },
       { name: 'Maxim Leitsch', position: 'DEF' as const, team: 'FSV Mainz 05', marketValue: 8000000, points: 78 },

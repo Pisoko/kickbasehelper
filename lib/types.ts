@@ -24,6 +24,9 @@ export interface Player {
   status?: string;               // Player status (st field)
   playerImageUrl?: string;       // Player image URL (pim field)
   minutesPlayed?: number;        // Minutes played in last game (mt field)
+  totalMinutesPlayed?: number;   // Total minutes played this season (sec field converted to minutes)
+  appearances?: number;          // Number of appearances/games played (smc field)
+  jerseyNumber?: number;         // Jersey/shirt number (shn field)
   recentPerformance?: number[];  // Points from last 3-5 games
   marketValueHistory?: number[]; // Historical market values
 }

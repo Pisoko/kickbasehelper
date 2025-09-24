@@ -51,6 +51,16 @@ export function cacheAgeDays(spieltag: number, season?: string): number | null {
   return Math.floor(diff / (1000 * 60 * 60 * 24));
 }
 
+// Function to calculate totalMinutesPlayed from minutes_hist array
+export function calculateTotalMinutesPlayed(player: any): number {
+  if (!player.minutes_hist || !Array.isArray(player.minutes_hist)) {
+    return 0;
+  }
+  
+  // minutes_hist already contains minutes, so we just sum them up
+  return player.minutes_hist.reduce((total: number, minutes: number) => total + (minutes || 0), 0);
+}
+
 export function validatePlayerData(players: Player[]) {
   if (!Array.isArray(players)) {
     throw new Error('Spielerdaten ungültig');
@@ -97,7 +107,7 @@ export function validateBundesligaTeamMembership(players: Player[]): Player[] {
     ['Dortmund', 'Borussia Dortmund'],
     ['Frankfurt', 'Eintracht Frankfurt'],
     ['Freiburg', 'SC Freiburg'],
-    ['Hamburg', 'Hamburger SV'],
+    ['Hamburg', 'Hamburger SV'],  // Fix duplicate: Hamburg -> Hamburger SV
     ['HSV', 'Hamburger SV'],
     ['Leverkusen', 'Bayer 04 Leverkusen'],
     ['Stuttgart', 'VfB Stuttgart'],
@@ -106,11 +116,11 @@ export function validateBundesligaTeamMembership(players: Player[]): Player[] {
     ['Augsburg', 'FC Augsburg'],
     ['Hoffenheim', 'TSG Hoffenheim'],
     ['Gladbach', 'Borussia Mönchengladbach'],
-    ['M\'gladbach', 'Borussia Mönchengladbach'],
+    ['M\'gladbach', 'Borussia Mönchengladbach'],  // Fix duplicate: M'gladbach -> Borussia Mönchengladbach
     ['Mönchengladbach', 'Borussia Mönchengladbach'],
     ['Mainz', 'FSV Mainz 05'],
     ['Köln', '1. FC Köln'],
-    ['St. Pauli', 'FC St. Pauli'],
+    ['St. Pauli', 'FC St. Pauli'],  // Fix duplicate: St. Pauli -> FC St. Pauli
     ['Union Berlin', '1. FC Union Berlin'],
     ['Union', '1. FC Union Berlin'],
     ['Leipzig', 'RB Leipzig'],
@@ -138,7 +148,7 @@ export function validateBundesligaTeamMembership(players: Player[]): Player[] {
     // Log invalid teams for debugging
     console.warn(`Player ${player.name} belongs to non-Bundesliga team: "${teamName}", excluding from roster`);
     return false;
-  });
+  }).map(player => ({ ...player })); // Ensure all properties are preserved
 
   const excludedCount = players.length - validPlayers.length;
   if (excludedCount > 0) {

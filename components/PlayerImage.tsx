@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getKickbaseImageUrl, generateInitialsUrl, searchTheSportsDBImage, getBundesligaImageUrl } from '../lib/imageUtils';
+import { getKickbaseImageUrl, generateInitialsUrl, searchTheSportsDBImage, getBundesligaImageUrl, testImageUrl } from '../lib/imageUtils';
 
 interface PlayerImageProps {
   playerImageUrl?: string;
@@ -37,8 +37,11 @@ export default function PlayerImage({
       // Try Kickbase CDN first
       const kickbaseUrl = getKickbaseImageUrl(playerImageUrl);
       if (kickbaseUrl && isMounted) {
-        setCurrentImageUrl(kickbaseUrl);
-        return;
+        const isKickbaseValid = await testImageUrl(kickbaseUrl);
+        if (isKickbaseValid) {
+          setCurrentImageUrl(kickbaseUrl);
+          return;
+        }
       }
 
       // If no Kickbase image, try Bundesliga images

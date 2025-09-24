@@ -43,7 +43,12 @@ export async function fetchMatchdayData(spieltag: number, options: FetchOptions 
     odds = mock.odds;
   } else {
     const adapter = new KickbaseAdapter(baseUrl, apiKey);
-    players = await adapter.getPlayers(spieltag);
+    
+    // Test the new optimized method
+    logger.info('Testing new optimized player fetching method...');
+    players = await adapter.getAllPlayersFromTeamsOptimized();
+    logger.info(`Fetched ${players.length} players using optimized method`);
+    
     matches = await adapter.getMatches(spieltag);
     const adapterOdds = await createOddsAdapter(oddsProvider, oddsKey);
     odds = await adapterOdds.fetchOdds(matches);
@@ -60,7 +65,7 @@ export async function fetchMatchdayData(spieltag: number, options: FetchOptions 
 }
 
 function generateMockData(spieltag: number) {
-  const teams = ['FC Atlas', 'SV Comet', 'Union Helios', 'Bayern Nova', 'SC Polaris', 'Dynamo Eclipse'];
+  const teams = ['Bayern München', 'Borussia Dortmund', 'RB Leipzig', 'Bayer 04 Leverkusen', 'VfB Stuttgart', 'Eintracht Frankfurt'];
   const positions: { pos: Player['position']; count: number; basePoints: number; baseCost: number }[] = [
     { pos: 'GK', count: 1, basePoints: 65, baseCost: 5_000_000 },
     { pos: 'DEF', count: 4, basePoints: 78, baseCost: 7_500_000 },

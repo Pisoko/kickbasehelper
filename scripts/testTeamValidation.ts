@@ -13,7 +13,7 @@ async function testTeamValidation() {
 
   try {
     // Read cached player data
-    const cache = readCache(1);
+    const cache = readCache(4);
     if (!cache) {
       console.error('❌ No cached data found. Please run data fetching first.');
       process.exit(1);
@@ -71,7 +71,7 @@ async function testTeamValidation() {
       ['Dortmund', 'Borussia Dortmund'],
       ['Frankfurt', 'Eintracht Frankfurt'],
       ['Freiburg', 'SC Freiburg'],
-      ['Hamburg', 'Hamburger SV'],
+      ['Hamburg', 'Hamburger SV'],  // Fix duplicate: Hamburg -> Hamburger SV
       ['HSV', 'Hamburger SV'],
       ['Leverkusen', 'Bayer 04 Leverkusen'],
       ['Stuttgart', 'VfB Stuttgart'],
@@ -80,11 +80,13 @@ async function testTeamValidation() {
       ['Augsburg', 'FC Augsburg'],
       ['Hoffenheim', 'TSG Hoffenheim'],
       ['Gladbach', 'Borussia Mönchengladbach'],
+      ['M\'gladbach', 'Borussia Mönchengladbach'],  // Fix duplicate: M'gladbach -> Borussia Mönchengladbach
       ['Mönchengladbach', 'Borussia Mönchengladbach'],
       ['Mainz', 'FSV Mainz 05'],
       ['Köln', '1. FC Köln'],
-      ['St. Pauli', 'FC St. Pauli'],
+      ['St. Pauli', 'FC St. Pauli'],  // Fix duplicate: St. Pauli -> FC St. Pauli
       ['Union Berlin', '1. FC Union Berlin'],
+      ['Union', '1. FC Union Berlin'],
       ['Leipzig', 'RB Leipzig'],
       ['Heidenheim', '1. FC Heidenheim']
     ]);

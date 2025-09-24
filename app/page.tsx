@@ -8,6 +8,9 @@ import { excludePlayer, getExcludedPlayersWithStats, includePlayer, filterExclud
 import type { Formation, Match, Odds, OptimizationResult, Player, ProjectionParams } from '../lib/types';
 import PlayerDetailModal from '../components/PlayerDetailModal';
 import PlayerImage from '../components/PlayerImage';
+import PlayerStatusTag from '../components/PlayerStatusTag';
+import BundesligaLogo from '../components/BundesligaLogo';
+import { getFullTeamName } from '../lib/teamMapping';
 
 interface CacheInfo {
   updatedAt?: string;
@@ -24,13 +27,54 @@ const tabs = ['Dashboard', 'Spieler-Explorer', 'Ergebnis'] as const;
 
 const formatter = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
+// Function to format market value in millions (without "Mio €")
+const formatMarketValue = (value: number): string => {
+  if (value >= 1_000_000) {
+    const millions = value / 1_000_000;
+    return millions.toFixed(1);
+  }
+  return (value / 1_000_000).toFixed(1);
+};
+
+// Function to calculate points per minute (same as PlayerDetailModal)
+const calculatePointsPerMinute = (player: any): string => {
+  const totalPoints = player.punkte_sum || 0;
+  const totalMinutes = player.totalMinutesPlayed || player.minutesPlayed || 0;
+  
+  // If we have actual minutes data, use it
+  if (totalMinutes > 0) {
+    const pointsPerMinute = totalPoints / totalMinutes;
+    return pointsPerMinute.toFixed(2);
+  }
+  
+  // Fallback: estimate based on games played
+  // Assume average of 70 minutes per game for field players, 90 for goalkeepers
+  const gamesPlayed = player.punkte_hist?.length || 0;
+  if (gamesPlayed === 0) return '0.00';
+  
+  const avgMinutesPerGame = player.position === 'GK' ? 90 : 70;
+  const estimatedTotalMinutes = gamesPlayed * avgMinutesPerGame;
+  
+  const pointsPerMinute = totalPoints / estimatedTotalMinutes;
+  return pointsPerMinute.toFixed(2);
+};
+
+// Function to calculate points per million euros
+const calculatePointsPerMillion = (player: any): string => {
+  const marketValue = player.kosten || 0;
+  const totalPoints = player.punkte_sum || 0;
+  if (marketValue === 0) return '0';
+  const pointsPerMillion = (totalPoints / (marketValue / 1_000_000));
+  return pointsPerMillion.toFixed(1);
+};
+
 // Function to translate positions to German
 const translatePosition = (position: string): string => {
   const positionMap: Record<string, string> = {
     'GK': 'TW',
     'DEF': 'ABW',
     'MID': 'MF',
-    'FWD': 'ST'
+    'FWD': 'ANG'
   };
   return positionMap[position] || position;
 };
@@ -43,8 +87,102 @@ const getFullPlayerName = (player: Player): string => {
   return player.name;
 };
 
+// Helper function to get player name color based on status
+const getPlayerNameColor = (status?: string | number, isInjured?: boolean): string => {
+  // If we have a status code, use it
+  if (status !== undefined && status !== null) {
+    const statusCode = typeof status === 'string' ? parseInt(status) : status;
+    
+    switch (statusCode) {
+      case 1: // Verletzt
+      case 8: // Glatt Rot
+      case 16: // Gelb-Rote Karte
+        return 'text-red-400';
+      case 2: // Angeschlagen
+      case 4: // Aufbautraining
+        return 'text-yellow-400';
+      case 0: // Fit
+      default:
+        return 'text-white';
+    }
+  }
+  
+  // Fallback: use isInjured field if available
+  if (isInjured === true) {
+    return 'text-red-400';
+  }
+  
+  // Default to white
+  return 'text-white';
+};
+
+// Helper function to get status label for tooltip
+const getStatusLabel = (status?: string | number, isInjured?: boolean): string => {
+  // If we have a status code, use it
+  if (status !== undefined && status !== null) {
+    const statusCode = typeof status === 'string' ? parseInt(status) : status;
+    
+    switch (statusCode) {
+      case 0:
+        return 'Fit';
+      case 1:
+        return 'Verletzt';
+      case 2:
+        return 'Angeschlagen';
+      case 4:
+        return 'Aufbautraining';
+      case 8:
+        return 'Glatt Rot';
+      case 16:
+        return 'Gelb-Rot';
+      default:
+        return 'Fit';
+    }
+  }
+  
+  // Fallback: use isInjured field if available
+  if (isInjured === true) {
+    return 'Verletzt';
+  }
+  
+  // Default
+  return 'Fit';
+};
+
+// Helper function to get status with emoji for display under name
+const getStatusWithEmoji = (status?: string | number, isInjured?: boolean): string | null => {
+  // If we have a status code, use it
+  if (status !== undefined && status !== null) {
+    const statusCode = typeof status === 'string' ? parseInt(status) : status;
+    
+    switch (statusCode) {
+      case 1:
+        return '🤕 Verletzt';
+      case 2:
+        return '⚠️ Angeschlagen';
+      case 4:
+        return '🏃 Aufbautraining';
+      case 8:
+        return '🟥 Glatt Rot';
+      case 16:
+        return '🟨🟥 Gelb-Rot';
+      case 0:
+      default:
+        return null; // Don't show anything for "Fit"
+    }
+  }
+  
+  // Fallback: use isInjured field if available
+  if (isInjured === true) {
+    return '🤕 Verletzt';
+  }
+  
+  // Default: don't show anything
+  return null;
+};
+
 export default function HomePage() {
-  const [spieltag, setSpieltag] = useState(1);
+  const [spieltag, setSpieltag] = useState(4);
   const [budget, setBudget] = useState(150_000_000);
   const [baseMode, setBaseMode] = useState<ProjectionParams['baseMode']>('avg');
   const defaultWeights: Omit<ProjectionParams, 'baseMode'> = useMemo(() => {
@@ -87,7 +225,7 @@ export default function HomePage() {
   const [playersPerPage, setPlayersPerPage] = useState(25);
   
   const hasMinutes = useMemo(
-    () => players.some((player) => player.minutes_hist && player.minutes_hist.length > 0),
+    () => players?.some((player) => player.minutes_hist && player.minutes_hist.length > 0) || false,
     [players]
   );
 
@@ -105,8 +243,8 @@ export default function HomePage() {
       if (matchesRes.error) {
         throw new Error(matchesRes.error);
       }
-      setPlayers(playersRes.players as Player[]);
-      setMatches(matchesRes.matches as Match[]);
+      setPlayers((playersRes.players as Player[]) || []);
+      setMatches((matchesRes.matches as Match[]) || []);
       setOdds((matchesRes.odds ?? []) as Odds[]);
       setCacheInfo({
         updatedAt: playersRes.updatedAt,
@@ -150,7 +288,7 @@ export default function HomePage() {
   };
 
   const projections = useMemo(() => {
-    if (players.length === 0) {
+    if (!players || players.length === 0) {
       return [];
     }
     const params: ProjectionParams = { ...weights, baseMode };
@@ -197,6 +335,11 @@ export default function HomePage() {
             aValue = a.name;
             bValue = b.name;
             break;
+          case 'status':
+            // Sort by status code, treating undefined/null as 0 (Fit)
+            aValue = a.status ? parseInt(a.status.toString()) : 0;
+            bValue = b.status ? parseInt(b.status.toString()) : 0;
+            break;
           case 'club':
             aValue = a.verein;
             bValue = b.verein;
@@ -210,10 +353,16 @@ export default function HomePage() {
             bValue = b.punkte_sum || 0;
             break;
           case 'pointsPerMinute':
-            const aMinutes = a.minutes_hist ? a.minutes_hist.reduce((sum, min) => sum + min, 0) : 0;
-            const bMinutes = b.minutes_hist ? b.minutes_hist.reduce((sum, min) => sum + min, 0) : 0;
+            const aMinutes = a.totalMinutesPlayed || a.minutesPlayed || 0;
+            const bMinutes = b.totalMinutesPlayed || b.minutesPlayed || 0;
             aValue = aMinutes > 0 ? (a.punkte_sum || 0) / aMinutes : 0;
             bValue = bMinutes > 0 ? (b.punkte_sum || 0) / bMinutes : 0;
+            break;
+          case 'pointsPerMillion':
+            const aMarketValue = a.kosten || 0;
+            const bMarketValue = b.kosten || 0;
+            aValue = aMarketValue > 0 ? (a.punkte_sum || 0) / (aMarketValue / 1_000_000) : 0;
+            bValue = bMarketValue > 0 ? (b.punkte_sum || 0) / (bMarketValue / 1_000_000) : 0;
             break;
           default:
             return 0;
@@ -272,12 +421,7 @@ export default function HomePage() {
     return sortDirection === 'asc' ? '↑' : '↓';
   };
 
-  // Calculate points per minute
-  const calculatePointsPerMinute = (player: any) => {
-    const totalMinutes = player.minutes_hist ? player.minutes_hist.reduce((sum: number, min: number) => sum + min, 0) : 0;
-    if (totalMinutes === 0) return 0;
-    return ((player.punkte_sum || 0) / totalMinutes).toFixed(4);
-  };
+
 
   async function handleRefresh() {
     setLoadingData(true);
@@ -569,7 +713,7 @@ export default function HomePage() {
                         className="hover:text-emerald-300"
                         onClick={() => handleBlacklistAdd(player.name)}
                       >
-                        {player.name} ({player.verein})
+                        {player.name} ({getFullTeamName(player.verein)})
                       </button>
                     </li>
                   ))}
@@ -645,7 +789,7 @@ export default function HomePage() {
                 >
                   <option value="">Alle Vereine</option>
                   {uniqueClubs.map(club => (
-                    <option key={club} value={club}>{club}</option>
+                    <option key={club} value={club}>{getFullTeamName(club)}</option>
                   ))}
                 </select>
               </div>
@@ -689,7 +833,7 @@ export default function HomePage() {
                       className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
                       onClick={() => handleSort('marketValue')}
                     >
-                      Marktwert {getSortIndicator('marketValue')}
+                      Marktwert in Mio € {getSortIndicator('marketValue')}
                     </th>
                     <th 
                       className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
@@ -702,6 +846,12 @@ export default function HomePage() {
                       onClick={() => handleSort('pointsPerMinute')}
                     >
                       Punkte/Min {getSortIndicator('pointsPerMinute')}
+                    </th>
+                    <th 
+                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
+                      onClick={() => handleSort('pointsPerMillion')}
+                    >
+                      Punkte/Mio € {getSortIndicator('pointsPerMillion')}
                     </th>
                     <th className="px-3 py-3">
                       Aktionen
@@ -734,23 +884,33 @@ export default function HomePage() {
                       {/* Player Name */}
                       <td className="px-3 py-3">
                         <div className="flex flex-col">
-                          <span className={`font-medium ${player.isInjured ? 'text-red-400' : 'text-white'}`}>
+                          <span 
+                            className={`font-medium ${getPlayerNameColor(player.status, player.isInjured)}`}
+                          >
                             {getFullPlayerName(player)}
                           </span>
                           {player.isInjured && (
                             <span className="text-red-500 text-xs">🤕 Verletzt</span>
                           )}
+                          {!player.isInjured && getStatusWithEmoji(player.status, player.isInjured) && (
+                            <span className="text-yellow-400 text-xs">{getStatusWithEmoji(player.status, player.isInjured)}</span>
+                          )}
                         </div>
                       </td>
                       
                       {/* Club */}
-                      <td className="px-3 py-3 text-slate-300">
-                        {player.verein}
+                      <td className="px-3 py-3">
+                        <div className="flex items-center justify-center">
+                          <BundesligaLogo 
+                            teamName={player.verein} 
+                            size="md"
+                          />
+                        </div>
                       </td>
                       
                       {/* Market Value */}
                       <td className="px-3 py-3 font-medium text-emerald-400">
-                        {player.kosten ? formatter.format(player.kosten) : '-'}
+                        {player.kosten ? formatMarketValue(player.kosten) : '-'}
                       </td>
                       
                       {/* Total Points */}
@@ -763,6 +923,11 @@ export default function HomePage() {
                         {calculatePointsPerMinute(player)}
                       </td>
                       
+                      {/* Points per Million € */}
+                      <td className="px-3 py-3 text-yellow-400">
+                        {calculatePointsPerMillion(player)}
+                      </td>
+                      
                       {/* Actions */}
                       <td className="px-3 py-3">
                         <button
@@ -770,10 +935,10 @@ export default function HomePage() {
                             e.stopPropagation(); // Prevent row click
                             handleExcludePlayer(player);
                           }}
-                          className="px-2 py-1 text-xs bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
-                          title="Spieler ausschließen"
+                          className="w-8 h-8 flex items-center justify-center text-lg hover:bg-red-600 hover:text-white rounded transition-colors"
+                          title="auf blacklist setzen"
                         >
-                          Ausschließen
+                          🚫
                         </button>
                       </td>
                     </tr>
@@ -824,7 +989,7 @@ export default function HomePage() {
                             <div>
                               <div className="font-medium text-white">{excludedPlayer.name}</div>
                               <div className="text-sm text-slate-400">
-                                {excludedPlayer.verein} • Ausgeschlossen vor {excludedPlayer.daysSinceExclusion} Tag{excludedPlayer.daysSinceExclusion !== 1 ? 'en' : ''}
+                                {getFullTeamName(excludedPlayer.verein)} • Ausgeschlossen vor {excludedPlayer.daysSinceExclusion} Tag{excludedPlayer.daysSinceExclusion !== 1 ? 'en' : ''}
                               </div>
                             </div>
                           </div>
@@ -940,7 +1105,7 @@ export default function HomePage() {
                       .map((player) => (
                         <li key={player.playerId} className="rounded bg-slate-800/60 px-3 py-2">
                           <div className="font-semibold text-emerald-200">{player.name}</div>
-                          <div className="text-xs text-slate-400">{player.verein}</div>
+                          <div className="text-xs text-slate-400">{getFullTeamName(player.verein)}</div>
                           <div className="mt-1 flex justify-between text-xs text-slate-300">
                             <span>Pᵢ: {player.p_pred.toFixed(2)}</span>
                             <span>Kosten: {formatter.format(player.kosten)}</span>
