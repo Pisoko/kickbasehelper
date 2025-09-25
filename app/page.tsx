@@ -454,7 +454,7 @@ export default function HomePage() {
     }
 
     return filtered;
-  }, [projections, searchTerm, positionFilter, clubFilter, sortColumn, sortDirection, excludedPlayers]);
+  }, [projections, searchTerm, positionFilter, clubFilter, sortColumn, sortDirection]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredAndSortedPlayers.length / playersPerPage);

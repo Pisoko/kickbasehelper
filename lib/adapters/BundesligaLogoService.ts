@@ -81,6 +81,7 @@ const FULL_NAME_TO_SHORT_NAME: Record<string, string> = {
   
   // FC Heidenheim Varianten
   '1. FC Heidenheim 1846': 'Heidenheim',
+  '1. FC Heidenheim': 'Heidenheim',
   'FC Heidenheim': 'Heidenheim',
   
   // FC St. Pauli Varianten

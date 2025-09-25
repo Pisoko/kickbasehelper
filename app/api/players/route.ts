@@ -14,51 +14,35 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Keine Daten verfügbar' }, { status: 404 });
     }
 
-    // Debug: Check Kane's data directly from cache
-    const kaneFromCache = cache.players.find(p => p.name === 'Kane');
-    console.log('Kane from cache:', kaneFromCache ? {
-      name: kaneFromCache.name,
-      totalMinutesPlayed: kaneFromCache.totalMinutesPlayed,
-      minutesPlayed: kaneFromCache.minutesPlayed,
-      minutes_hist: kaneFromCache.minutes_hist
-    } : 'not found');
-
-    // Debug: Check Kane's data before validation
-    const kaneBefore = cache.players.find(p => p.name === 'Kane');
-    console.log('Kane before validation:', kaneBefore ? {
-      name: kaneBefore.name,
-      totalMinutesPlayed: kaneBefore.totalMinutesPlayed,
-      minutesPlayed: kaneBefore.minutesPlayed,
-      minutes_hist: kaneBefore.minutes_hist
-    } : 'not found');
-    
-    // Validate and filter players to ensure only Bundesliga teams are included
     const validatedPlayers = validatePlayerDataWithTeamCheck(cache.players);
-    
-    // Debug: Check Kane's data after validation
-    const kaneAfterValidation = validatedPlayers.find(p => p.name === 'Kane');
-    console.log('Kane after validation:', kaneAfterValidation ? {
-      name: kaneAfterValidation.name,
-      totalMinutesPlayed: kaneAfterValidation.totalMinutesPlayed,
-      minutesPlayed: kaneAfterValidation.minutesPlayed,
-      minutes_hist: kaneAfterValidation.minutes_hist
-    } : 'not found');
-    
-    // Filter out excluded players
-    const filteredPlayers = filterExcludedPlayers(validatedPlayers);
-    
-    // Debug: Check Kane's data after filtering (totalMinutesPlayed should already be correct)
-    const kaneAfterCalculation = filteredPlayers.find(p => p.name === 'Kane');
-    console.log('Kane after calculation:', kaneAfterCalculation ? {
-      name: kaneAfterCalculation.name,
-      totalMinutesPlayed: kaneAfterCalculation.totalMinutesPlayed,
-      minutesPlayed: kaneAfterCalculation.minutesPlayed,
-      minutes_hist: kaneAfterCalculation.minutes_hist
-    } : 'not found');
+  const filteredPlayers = filterExcludedPlayers(validatedPlayers);
+  
+  // Fix punkte_avg calculation - ensure it's calculated from punkte_hist
+  const correctedPlayers = filteredPlayers.map(player => {
+    if (player.punkte_hist && Array.isArray(player.punkte_hist) && player.punkte_hist.length > 0) {
+      // Calculate correct average from punkte_hist
+      const validPoints = player.punkte_hist.filter(p => typeof p === 'number' && !isNaN(p));
+      if (validPoints.length > 0) {
+        const correctAvg = Math.round(validPoints.reduce((sum, points) => sum + points, 0) / validPoints.length);
+        
+        // Only update if the current punkte_avg is wrong
+        if (player.punkte_avg !== correctAvg) {
+          console.log(`Correcting punkte_avg for ${player.name}: ${player.punkte_avg} -> ${correctAvg}`);
+          return {
+            ...player,
+            punkte_avg: correctAvg
+          };
+        }
+      }
+    }
+    return player;
+  });
+  
+
     
     const age = cacheAgeDays(spieltag);
     return NextResponse.json({
-      players: filteredPlayers as Player[],
+      players: correctedPlayers as Player[],
       updatedAt: cache.updatedAt,
       cacheAgeDays: age
     });

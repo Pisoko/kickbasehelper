@@ -457,7 +457,8 @@ export class FormationBasedStart11Calculator {
    */
   private convertToStart11Data(player: Player): PlayerStart11Data {
     const totalMinutes = player.totalMinutesPlayed || 0;
-    const appearances = player.appearances || 1;
+    // Use punkte_hist length as primary source for appearances (more reliable than appearances field)
+    const appearances = player.punkte_hist?.length || player.appearances || 1;
     const averageMinutesPerGame = appearances > 0 ? totalMinutes / appearances : 0;
     
     // Extract last match performance from punkte_hist

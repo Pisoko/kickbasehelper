@@ -21,7 +21,7 @@ interface PlayerMatchHistoryProps {
   currentTeam: string;
 }
 
-export function PlayerMatchHistory({ playerId, playerName, currentTeam }: PlayerMatchHistoryProps) {
+export default function PlayerMatchHistory({ playerId, playerName, currentTeam }: PlayerMatchHistoryProps) {
   const [matchHistory, setMatchHistory] = useState<MatchHistoryData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -130,6 +130,11 @@ export function PlayerMatchHistory({ playerId, playerName, currentTeam }: Player
   const maxPoints = Math.max(...matchHistory.map(match => match.playerPoints), 400);
   const totalPoints = matchHistory.reduce((sum, match) => sum + match.playerPoints, 0);
   const totalMinutes = matchHistory.reduce((sum, match) => sum + match.playerMinutes, 0);
+  
+  // Calculate actual appearances (only games with minutes > 0) for correct averages
+  const actualAppearances = matchHistory.filter(match => match.playerMinutes > 0);
+
+
 
   // Sort matchHistory by matchday to ensure proper order
   const sortedMatchHistory = [...matchHistory].sort((a, b) => a.matchday - b.matchday);
@@ -239,15 +244,19 @@ export function PlayerMatchHistory({ playerId, playerName, currentTeam }: Player
       <div className="border-t border-slate-600 pt-4">
         <div className="flex justify-between items-center text-center">
           <div className="flex-1">
+            <div className="text-lg font-semibold text-white">{actualAppearances.length}/{matchHistory.length}</div>
+            <div className="text-xs text-slate-400">Einsätze</div>
+          </div>
+          <div className="flex-1">
             <div className="text-lg font-semibold text-white">{totalPoints}</div>
             <div className="text-xs text-slate-400">Gesamtpunkte</div>
           </div>
           <div className="flex-1">
-            <div className="text-lg font-semibold text-white">{Math.round(totalPoints / matchHistory.length)}</div>
+            <div className="text-lg font-semibold text-white">{actualAppearances.length > 0 ? Math.round(totalPoints / actualAppearances.length) : 0}</div>
             <div className="text-xs text-slate-400">Ø Punkte</div>
           </div>
           <div className="flex-1">
-            <div className="text-lg font-semibold text-white">{Math.round(totalMinutes / matchHistory.length)}</div>
+            <div className="text-lg font-semibold text-white">{actualAppearances.length > 0 ? Math.round(totalMinutes / actualAppearances.length) : 0}</div>
             <div className="text-xs text-slate-400">Ø Minuten</div>
           </div>
         </div>

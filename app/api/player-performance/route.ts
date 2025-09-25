@@ -25,7 +25,7 @@ const getTeamName = (teamId: string): string => {
     '80': 'Werder Bremen',         // Bremen
     '14': 'VfL Bochum',            // Bochum (if still in league)
     '18': 'FSV Mainz 05',          // Mainz
-    '49': 'FC Heidenheim',         // Heidenheim
+    '49': '1. FC Heidenheim 1846', // Heidenheim
     '17': 'Holstein Kiel',         // Holstein Kiel
     '39': 'FC St. Pauli',          // St. Pauli
     '86': '1. FC Köln',            // Köln
@@ -40,7 +40,7 @@ const getTeamName = (teamId: string): string => {
     '10': 'Werder Bremen',         // Legacy Bremen ID
     '11': 'TSG Hoffenheim',        // Legacy Hoffenheim ID
     '12': 'VfB Stuttgart',         // Legacy Stuttgart ID
-    '16': 'FC Heidenheim',         // Legacy Heidenheim ID
+    '16': '1. FC Heidenheim 1846', // Legacy Heidenheim ID
     
     // Additional team IDs that might appear
     '43': 'Eintracht Braunschweig', // Possible 2. Liga team
@@ -78,15 +78,15 @@ export async function GET(request: NextRequest) {
       throw new Error('No current season (2025/2026) data found in performance data');
     }
     
-    // Filter only played matches (matches with actual data, not null values)
+    // Filter all squad appearances (matches with actual data, not null values)
     // According to user requirements, only 4 matchdays have been played so far
-    // Include all matches where the player was in the squad, even with 0 minutes
-    const playedMatches = currentSeasonData.ph.filter((match: any) => 
+    // Include all matches where the player was in the squad (even with 0 minutes for transparency)
+    const squadAppearances = currentSeasonData.ph.filter((match: any) => 
       match.p !== null && match.mp !== null && match.day <= 4
     );
     
     // Transform the match history data
-    const matches = playedMatches.map((match: any) => ({
+    const matches = squadAppearances.map((match: any) => ({
       matchday: match.day,
       homeTeam: getTeamName(match.t1) || 'Unknown',
       awayTeam: getTeamName(match.t2) || 'Unknown',
@@ -98,10 +98,11 @@ export async function GET(request: NextRequest) {
       playerTeam: match.pt === match.t1 ? getTeamName(match.t1) : getTeamName(match.t2)
     }));
     
-    // Calculate totals
+    // Calculate totals and actual appearances (only games with minutes > 0)
+    const actualAppearances = matches.filter((match: any) => match.playerMinutes > 0);
     const totalPoints = matches.reduce((sum: number, match: any) => sum + match.playerPoints, 0);
     const totalMinutes = matches.reduce((sum: number, match: any) => sum + match.playerMinutes, 0);
-    const averagePoints = matches.length > 0 ? totalPoints / matches.length : 0;
+    const averagePoints = actualAppearances.length > 0 ? totalPoints / actualAppearances.length : 0;
     
     // Transform the data to match our expected format
     const transformedData = {

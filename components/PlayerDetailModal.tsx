@@ -3,7 +3,7 @@
 import PlayerImage from './PlayerImage';
 import BundesligaLogo from './BundesligaLogo';
 import PlayerStatusTag from './PlayerStatusTag';
-import { PlayerMatchHistory } from './PlayerMatchHistory';
+import PlayerMatchHistory from './PlayerMatchHistory';
 import type { Player } from '../lib/types';
 import { getFullTeamName } from '../lib/teamMapping';
 
@@ -51,11 +51,10 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
   // Use the correct fields from the API
   const totalMinutes = player.totalMinutesPlayed || player.minutesPlayed || 0;
   
-  // Use appearances from API instead of hardcoded value
-  const gamesPlayed = player.appearances || player.punkte_hist?.length || 0;
-  
-  // Calculate total games based on current spieltag (assuming spieltag 4 means 4 total games)
-  const totalGames = 4; // This should ideally come from context or props
+  // Calculate games played and total games
+  // Use punkte_hist length instead of unreliable API appearances data
+  const gamesPlayed = player.punkte_hist?.length || 0;
+  const totalGames = 4; // Current matchday
   
   // Calculate total goals and assists
   const totalGoals = player.goals_hist?.reduce((sum, goals) => sum + goals, 0) || player.goals || 0;
@@ -249,10 +248,10 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
             {/* Match History */}
             <div className="col-span-full">
               <PlayerMatchHistory 
-                playerId={player.id} 
-                playerName={player.name}
-                currentTeam={player.verein}
-              />
+              playerId={player.id} 
+              playerName={player.name}
+              currentTeam={player.verein}
+            />
             </div>
 
           </div>

@@ -66,8 +66,8 @@ function analyzePlayerData(): AnalysisResult {
   const players = data.players;
   const totalPlayers = players.length;
   
-  // Filtere aktive Spieler (mindestens ein Einsatz)
-  const activePlayers = players.filter(p => p.appearances > 0);
+  // Filtere aktive Spieler (mindestens ein Einsatz) - use punkte_hist.length as more reliable indicator
+  const activePlayers = players.filter(p => (p.punkte_hist?.length || p.appearances || 0) > 0);
   const activePlayerCount = activePlayers.length;
   
   // Berechne Liga-Durchschnitte
