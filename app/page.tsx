@@ -6,11 +6,20 @@ import { DEFAULT_PARAMS, FORMATION_LIST } from '../lib/constants';
 import { computeProjections } from '../lib/projection';
 import { excludePlayer, getExcludedPlayersWithStats, includePlayer, filterExcludedPlayers } from '../lib/playerExclusion';
 import type { Formation, Match, Odds, OptimizationResult, Player, ProjectionParams } from '../lib/types';
+import { calculateFormationBasedStart11Probability } from '../lib/formationBasedStart11';
 import PlayerDetailModal from '../components/PlayerDetailModal';
 import PlayerImage from '../components/PlayerImage';
 import PlayerStatusTag from '../components/PlayerStatusTag';
 import BundesligaLogo from '../components/BundesligaLogo';
+
 import { getFullTeamName } from '../lib/teamMapping';
+import { 
+  LEAGUE_AVERAGES, 
+  getPositionAverage, 
+  getTeamAverage, 
+  calculateRelativeScore, 
+  calculateTeamBonus 
+} from '../lib/playerAverages';
 
 interface CacheInfo {
   updatedAt?: string;
@@ -181,6 +190,55 @@ const getStatusWithEmoji = (status?: string | number, isInjured?: boolean): stri
   return null;
 };
 
+// Helper function to get status color for emoji display
+const getStatusEmojiColor = (status?: string | number, isInjured?: boolean): string => {
+  // If we have a status code, use it
+  if (status !== undefined && status !== null) {
+    const statusCode = typeof status === 'string' ? parseInt(status) : status;
+    
+    switch (statusCode) {
+      case 1: // Verletzt
+      case 8: // Glatt Rot
+      case 16: // Gelb-Rote Karte
+        return 'text-red-400';
+      case 2: // Angeschlagen
+      case 4: // Aufbautraining
+        return 'text-yellow-400';
+      case 0: // Fit
+      default:
+        return 'text-green-400';
+    }
+  }
+  
+  // Fallback: use isInjured field if available
+  if (isInjured === true) {
+    return 'text-red-400';
+  }
+  
+  // Default to green
+  return 'text-green-400';
+};
+
+
+
+// Optimierte Startelf-Wahrscheinlichkeitsberechnung
+
+
+// Formatierung der Startelf-Wahrscheinlichkeit mit Farbe
+const formatStartingElevenProbability = (probability: number): { text: string; color: string } => {
+  if (probability === 0) {
+    return { text: '0%', color: 'text-red-400' };
+  } else if (probability < 25) {
+    return { text: `${probability}%`, color: 'text-red-300' };
+  } else if (probability < 50) {
+    return { text: `${probability}%`, color: 'text-yellow-400' };
+  } else if (probability < 75) {
+    return { text: `${probability}%`, color: 'text-green-400' };
+  } else {
+    return { text: `${probability}%`, color: 'text-green-300' };
+  }
+};
+
 export default function HomePage() {
   const [spieltag, setSpieltag] = useState(4);
   const [budget, setBudget] = useState(150_000_000);
@@ -217,12 +275,14 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [positionFilter, setPositionFilter] = useState<string>('');
   const [clubFilter, setClubFilter] = useState<string>('');
-  const [sortColumn, setSortColumn] = useState<string>('');
+  const [sortColumn, setSortColumn] = useState<string>('totalPoints');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [playersPerPage, setPlayersPerPage] = useState(25);
+  
+
   
   const hasMinutes = useMemo(
     () => players?.some((player) => player.minutes_hist && player.minutes_hist.length > 0) || false,
@@ -295,6 +355,15 @@ export default function HomePage() {
     return computeProjections(players, matches, odds, params);
   }, [players, matches, odds, baseMode, weights]);
 
+  // Memoized calculation for Start11 probabilities
+  const newStart11Probabilities = useMemo(() => {
+    if (!projections || projections.length === 0) {
+      return new Map<string, number>();
+    }
+    const nonExcludedPlayers = filterExcludedPlayers(projections);
+    return calculateFormationBasedStart11Probability(nonExcludedPlayers);
+  }, [projections]);
+
   const formationSummary = useMemo(() => {
     const summary: Record<string, number> = {};
     for (const pick of optState.result?.lineup ?? []) {
@@ -364,6 +433,10 @@ export default function HomePage() {
             aValue = aMarketValue > 0 ? (a.punkte_sum || 0) / (aMarketValue / 1_000_000) : 0;
             bValue = bMarketValue > 0 ? (b.punkte_sum || 0) / (bMarketValue / 1_000_000) : 0;
             break;
+          case 'startingElevenProbability':
+             aValue = newStart11Probabilities.get(a.id) || 0;
+             bValue = newStart11Probabilities.get(b.id) || 0;
+             break;
           default:
             return 0;
         }
@@ -512,6 +585,8 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6">
+
+
       <div className="flex gap-2">
         {tabs.map((tab) => (
           <button
@@ -745,7 +820,9 @@ export default function HomePage() {
 
       {activeTab === 'Spieler-Explorer' && (
           <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-            <h2 className="text-xl font-semibold mb-4">Spieler Explorer</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Spieler Explorer</h2>
+            </div>
             
             {/* Search and Filter Controls */}
             <div className="mb-4 grid gap-4 md:grid-cols-3">
@@ -853,6 +930,12 @@ export default function HomePage() {
                     >
                       Punkte/Mio € {getSortIndicator('pointsPerMillion')}
                     </th>
+                    <th 
+                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
+                      onClick={() => handleSort('startingElevenProbability')}
+                    >
+                      Startelf-Chance {getSortIndicator('startingElevenProbability')}
+                    </th>
                     <th className="px-3 py-3">
                       Aktionen
                     </th>
@@ -893,7 +976,7 @@ export default function HomePage() {
                             <span className="text-red-500 text-xs">🤕 Verletzt</span>
                           )}
                           {!player.isInjured && getStatusWithEmoji(player.status, player.isInjured) && (
-                            <span className="text-yellow-400 text-xs">{getStatusWithEmoji(player.status, player.isInjured)}</span>
+                            <span className={`${getStatusEmojiColor(player.status, player.isInjured)} text-xs`}>{getStatusWithEmoji(player.status, player.isInjured)}</span>
                           )}
                         </div>
                       </td>
@@ -927,6 +1010,19 @@ export default function HomePage() {
                       <td className="px-3 py-3 text-yellow-400">
                         {calculatePointsPerMillion(player)}
                       </td>
+                      
+                      {/* Starting Eleven Probability */}
+                       <td className="px-3 py-3">
+                         {(() => {
+                           const probability = newStart11Probabilities.get(player.id) || 0;
+                           const formatted = formatStartingElevenProbability(probability);
+                           return (
+                             <span className={`font-medium ${formatted.color}`}>
+                               {formatted.text}
+                             </span>
+                           );
+                         })()}
+                       </td>
                       
                       {/* Actions */}
                       <td className="px-3 py-3">

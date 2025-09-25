@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getBundesligaLogoUrl, getLogoFallbackText, hasLogo } from '../lib/adapters/BundesligaLogoService';
 
 interface BundesligaLogoProps {
@@ -23,13 +23,73 @@ const textSizeClasses = {
 
 export default function BundesligaLogo({ teamName, size = 'md', className = '' }: BundesligaLogoProps) {
   const [imageError, setImageError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentLogoUrl, setCurrentLogoUrl] = useState<string | null>(null);
+  
   const logoUrl = getBundesligaLogoUrl(teamName);
   const fallbackText = getLogoFallbackText(teamName);
-  
-  // Wenn kein Logo verfügbar ist oder das Bild nicht geladen werden kann, zeige Fallback
-  if (!logoUrl || imageError || !hasLogo(teamName)) {
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadLogo = async () => {
+      setIsLoading(true);
+      setImageError(false);
+
+      // If we have a logo URL, try to load it
+      if (logoUrl && hasLogo(teamName)) {
+        // Test if the image loads successfully
+        const img = new Image();
+        img.onload = () => {
+          if (isMounted) {
+            setCurrentLogoUrl(logoUrl);
+            setIsLoading(false);
+            setImageError(false);
+          }
+        };
+        img.onerror = () => {
+          if (isMounted) {
+            setImageError(true);
+            setCurrentLogoUrl(null);
+            setIsLoading(false);
+          }
+        };
+        img.src = logoUrl;
+      } else {
+        // No logo available, use fallback immediately
+        if (isMounted) {
+          setCurrentLogoUrl(null);
+          setImageError(true);
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadLogo();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [teamName, logoUrl]);
+
+  const handleImageError = () => {
+    setImageError(true);
+    setCurrentLogoUrl(null);
+  };
+
+  // Show loading state
+  if (isLoading) {
     return (
-      <div className={`${sizeClasses[size]} bg-slate-700 rounded-full flex items-center justify-center ${className}`}>
+      <div className={`${sizeClasses[size]} bg-slate-600 flex items-center justify-center animate-pulse ${className}`}>
+        <div className="w-2 h-2 bg-slate-400"></div>
+      </div>
+    );
+  }
+
+  // Show fallback if no logo or error
+  if (!currentLogoUrl || imageError || !hasLogo(teamName)) {
+    return (
+      <div className={`${sizeClasses[size]} bg-slate-700 flex items-center justify-center ${className}`}>
         <span className={`text-white ${textSizeClasses[size]} font-bold`}>
           {fallbackText}
         </span>
@@ -37,14 +97,15 @@ export default function BundesligaLogo({ teamName, size = 'md', className = '' }
     );
   }
 
+  // Show the actual logo
   return (
-    <div className={`${sizeClasses[size]} rounded-full overflow-hidden flex items-center justify-center ${className}`}>
+    <div className={`${sizeClasses[size]} flex items-center justify-center ${className}`}>
       <img
-        src={logoUrl}
+        src={currentLogoUrl}
         alt={`${teamName} Logo`}
         className="w-full h-full object-contain"
-        onError={() => setImageError(true)}
-        onLoad={() => setImageError(false)}
+        onError={handleImageError}
+        loading="lazy"
       />
     </div>
   );

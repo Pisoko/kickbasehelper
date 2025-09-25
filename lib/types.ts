@@ -27,6 +27,8 @@ export interface Player {
   totalMinutesPlayed?: number;   // Total minutes played this season (sec field converted to minutes)
   appearances?: number;          // Number of appearances/games played (smc field)
   jerseyNumber?: number;         // Jersey/shirt number (shn field)
+  yellowCards?: number;          // Yellow cards (y field)
+  redCards?: number;             // Red cards (r field)
   recentPerformance?: number[];  // Points from last 3-5 games
   marketValueHistory?: number[]; // Historical market values
 }

@@ -12,6 +12,32 @@ export interface PlayerImageSources {
 }
 
 /**
+ * Known placeholder/invalid image URLs from Kickbase API
+ * These images return 404 errors and should be skipped
+ */
+const KNOWN_PLACEHOLDER_IMAGES = [
+  'content/file/48622993193e45f09d696908d75ed523.png',
+  'content/file/3b8eae1b9d6d4e8d961bfd3f152db402.png',
+  'content/file/ed209b2ca67c4784a658521f80baa795.png',
+  'content/file/7d6a4935195d414a9119e81aa398222a.png',
+  'content/file/6bd6cf911d5b497e977b3e6a4526aef9.png',
+  'content/file/353820bceb58462590ea1a470cde9cc6.png',
+  'content/file/2dea6714f704489fa0fb302accce4e8a.png',
+  'content/file/1a88a39549924d048294f618079e8437.png',
+  'content/file/a00a1472afdc4462933a364537704b05.png',
+  'content/file/b93977fb3dee4e75af09d67896a1666b.png',
+  'content/file/98159e30baca4a1080128a7a4c32914e.png' // Frederik Rönnow
+];
+
+/**
+ * Check if a playerImageUrl is a known placeholder that should be skipped
+ */
+export function isKnownPlaceholderImage(playerImageUrl?: string): boolean {
+  if (!playerImageUrl) return false;
+  return KNOWN_PLACEHOLDER_IMAGES.includes(playerImageUrl);
+}
+
+/**
  * Get player image URL from Kickbase CDN
  */
 export function getKickbaseImageUrl(playerImageUrl?: string): string | null {

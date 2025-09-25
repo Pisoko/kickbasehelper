@@ -1,0 +1,348 @@
+import pino from 'pino';
+import type { Player, Match } from '../types';
+
+const logger = pino({ name: 'EnhancedKickbaseClient' });
+
+interface KickbaseConfig {
+  lis: string; // League start time
+  lie: string; // League end time
+  cps: CompetitionConfig[];
+}
+
+interface CompetitionConfig {
+  cpi: string; // Competition ID
+  lis: string; // Competition start
+  lie: string; // Competition end
+  rcn: string; // Region code name
+  b: number;   // Base budget
+  ntb: number; // New team budget
+  tv: number;  // Transfer value
+  mds: number; // Match days count
+  lpc: number; // Lineup player count
+  lts: string[]; // Lineup tactics
+}
+
+interface LiveMatch {
+  i: string;    // Match ID
+  h: string;    // Home team
+  a: string;    // Away team
+  ko: string;   // Kickoff time
+  st: number;   // Status
+}
+
+interface KickbasePlayer {
+  i: string;    // Player ID
+  n: string;    // Name
+  fn?: string;  // First name
+  p: number;    // Position (1=GK, 2=DEF, 3=MID, 4=FWD)
+  t: string;    // Team ID
+  mv: number;   // Market value
+  pts: number;  // Total points
+  ap: number;   // Average points
+  g: number;    // Goals
+  a: number;    // Assists
+  mt: number;   // Minutes played
+  smc: number;  // Appearances
+  il: boolean;  // Is injured
+  st: string;   // Status
+  pim?: string; // Player image
+  shn?: number; // Jersey number
+  y?: number;   // Yellow cards
+  r?: number;   // Red cards
+}
+
+/**
+ * Enhanced Kickbase API Client
+ * Implements the official Kickbase API v4 endpoints with proper authentication
+ */
+export class EnhancedKickbaseClient {
+  private readonly baseUrl = 'https://api.kickbase.com';
+
+  /**
+   * Make authenticated request to Kickbase API
+   */
+  private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
+    try {
+      const apiKey = process.env.KICKBASE_KEY;
+      if (!apiKey) {
+        throw new Error('KICKBASE_KEY environment variable is not set');
+      }
+      
+      const response = await fetch(`${this.baseUrl}${path}`, {
+        ...options,
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      });
+
+      if (!response.ok) {
+        logger.error({ 
+          status: response.status, 
+          path,
+          statusText: response.statusText 
+        }, 'Kickbase API request failed');
+        
+        throw new Error(`Kickbase API request failed: ${response.status} ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      logger.error({ error, path }, 'Error making Kickbase API request');
+      throw error;
+    }
+  }
+
+  /**
+   * Get API configuration (public endpoint)
+   */
+  async getConfig(): Promise<KickbaseConfig> {
+    const response = await fetch(`${this.baseUrl}/v4/config`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to get config: ${response.status}`);
+    }
+    
+    return await response.json();
+  }
+
+  /**
+   * Get available leagues for the authenticated user
+   */
+  async getLeagues(): Promise<any> {
+    return this.request('/v4/leagues/selection');
+  }
+
+  /**
+   * Get league overview with current standings
+   */
+  async getLeagueOverview(leagueId: string): Promise<any> {
+    return this.request(`/v4/leagues/${leagueId}/overview`);
+  }
+
+  /**
+   * Get all players from a specific competition
+   */
+  async getCompetitionPlayers(competitionId: string = '1'): Promise<KickbasePlayer[]> {
+    try {
+      const data = await this.request<any>(`/v4/competitions/${competitionId}/players`);
+      
+      if (data && data.it && Array.isArray(data.it)) {
+        return data.it;
+      }
+      
+      logger.warn({ competitionId }, 'No players found in competition response');
+      return [];
+    } catch (error) {
+      logger.error({ error, competitionId }, 'Failed to fetch competition players');
+      return [];
+    }
+  }
+
+  /**
+   * Get detailed player information
+   */
+  async getPlayerDetails(playerId: string, competitionId: string = '1'): Promise<any> {
+    return this.request(`/v4/competitions/${competitionId}/players/${playerId}`);
+  }
+
+  /**
+   * Get player performance data
+   */
+  async getPlayerPerformance(playerId: string, competitionId: string = '1'): Promise<any> {
+    return this.request(`/v4/competitions/${competitionId}/players/${playerId}/performance`);
+  }
+
+  /**
+   * Get player market value history
+   */
+  async getPlayerMarketValue(playerId: string, competitionId: string = '1'): Promise<any> {
+    return this.request(`/v4/competitions/${competitionId}/players/${playerId}/marketvalue`);
+  }
+
+  /**
+   * Get live match data
+   */
+  async getLiveMatches(competitionId: string = '1'): Promise<LiveMatch[]> {
+    try {
+      const data = await this.request<any>(`/v4/competitions/${competitionId}/live`);
+      
+      if (data && Array.isArray(data)) {
+        return data;
+      }
+      
+      return [];
+    } catch (error) {
+      logger.error({ error, competitionId }, 'Failed to fetch live matches');
+      return [];
+    }
+  }
+
+  /**
+   * Get competition matches for a specific matchday
+   */
+  async getCompetitionMatches(competitionId: string = '1', matchday?: number): Promise<any> {
+    const path = matchday 
+      ? `/v4/competitions/${competitionId}/matches?matchday=${matchday}`
+      : `/v4/competitions/${competitionId}/matches`;
+      
+    return this.request(path);
+  }
+
+  /**
+   * Transform Kickbase player data to our Player interface
+   */
+  transformPlayer(kickbasePlayer: KickbasePlayer, teamName?: string): Player {
+    const positionMap: Record<number, 'GK' | 'DEF' | 'MID' | 'FWD'> = {
+      1: 'GK',
+      2: 'DEF', 
+      3: 'MID',
+      4: 'FWD'
+    };
+
+    return {
+      id: kickbasePlayer.i,
+      name: kickbasePlayer.n,
+      firstName: kickbasePlayer.fn,
+      position: positionMap[kickbasePlayer.p] || 'MID',
+      verein: teamName || this.getTeamName(kickbasePlayer.t),
+      kosten: kickbasePlayer.mv,
+      punkte_hist: [], // Will be populated from performance data
+      punkte_avg: kickbasePlayer.ap || 0,
+      punkte_sum: kickbasePlayer.pts || 0,
+      marketValue: kickbasePlayer.mv,
+      totalPoints: kickbasePlayer.pts,
+      averagePoints: kickbasePlayer.ap,
+      goals: kickbasePlayer.g || 0,
+      assists: kickbasePlayer.a || 0,
+      minutesPlayed: kickbasePlayer.mt || 0,
+      totalMinutesPlayed: kickbasePlayer.mt || 0,
+      appearances: kickbasePlayer.smc || 0,
+      jerseyNumber: kickbasePlayer.shn,
+      playerImageUrl: kickbasePlayer.pim,
+      isInjured: kickbasePlayer.il || false,
+      status: kickbasePlayer.st || '0',
+      yellowCards: kickbasePlayer.y || 0,
+      redCards: kickbasePlayer.r || 0,
+    };
+  }
+
+  /**
+   * Transform live match data to our Match interface
+   */
+  transformMatch(liveMatch: LiveMatch, spieltag: number): Match {
+    return {
+      id: liveMatch.i,
+      spieltag,
+      heim: this.getTeamName(liveMatch.h),
+      auswaerts: this.getTeamName(liveMatch.a),
+      kickoff: liveMatch.ko,
+    };
+  }
+
+  /**
+   * Get team name from team ID
+   */
+  private getTeamName(teamId: string): string {
+    const teamMap: Record<string, string> = {
+      '1': 'Bayern München',
+      '2': 'Borussia Dortmund',
+      '3': 'RB Leipzig',
+      '4': 'Bayer Leverkusen',
+      '5': 'Eintracht Frankfurt',
+      '6': 'VfL Wolfsburg',
+      '7': 'Borussia Mönchengladbach',
+      '8': 'TSG Hoffenheim',
+      '9': 'SC Freiburg',
+      '10': 'Union Berlin',
+      '11': 'VfB Stuttgart',
+      '12': 'Werder Bremen',
+      '13': 'FC Augsburg',
+      '14': 'VfL Bochum',
+      '15': 'FSV Mainz 05',
+      '16': 'FC Heidenheim',
+      '17': 'Holstein Kiel',
+      '18': 'FC St. Pauli',
+    };
+
+    return teamMap[teamId] || `Team ${teamId}`;
+  }
+
+  /**
+   * Get enhanced player data with performance history
+   */
+  async getEnhancedPlayerData(playerId: string, competitionId: string = '1'): Promise<Partial<Player>> {
+    try {
+      const [details, performance, marketValue] = await Promise.allSettled([
+        this.getPlayerDetails(playerId, competitionId),
+        this.getPlayerPerformance(playerId, competitionId),
+        this.getPlayerMarketValue(playerId, competitionId),
+      ]);
+
+      const enhancedData: Partial<Player> = {};
+
+      // Process performance data
+      if (performance.status === 'fulfilled' && performance.value) {
+        const perfData = performance.value;
+        if (perfData.pts && Array.isArray(perfData.pts)) {
+          enhancedData.punkte_hist = perfData.pts;
+          enhancedData.recentPerformance = perfData.pts.slice(-5); // Last 5 games
+        }
+        if (perfData.mt && Array.isArray(perfData.mt)) {
+          enhancedData.minutes_hist = perfData.mt;
+        }
+      }
+
+      // Process market value history
+      if (marketValue.status === 'fulfilled' && marketValue.value) {
+        const mvData = marketValue.value;
+        if (mvData.mv && Array.isArray(mvData.mv)) {
+          enhancedData.marketValueHistory = mvData.mv;
+        }
+      }
+
+      return enhancedData;
+    } catch (error) {
+      logger.error({ error, playerId }, 'Failed to get enhanced player data');
+      return {};
+    }
+  }
+
+  /**
+   * Get current season data with live updates
+   */
+  async getCurrentSeasonData(competitionId: string = '1'): Promise<{
+    players: Player[];
+    matches: Match[];
+    config: KickbaseConfig;
+  }> {
+    try {
+      const [config, players, liveMatches] = await Promise.all([
+        this.getConfig(),
+        this.getCompetitionPlayers(competitionId),
+        this.getLiveMatches(competitionId),
+      ]);
+
+      const transformedPlayers = players.map(p => this.transformPlayer(p));
+      const transformedMatches = liveMatches.map(m => this.transformMatch(m, 1)); // Current matchday
+
+      logger.info({
+        playersCount: transformedPlayers.length,
+        matchesCount: transformedMatches.length,
+      }, 'Retrieved current season data');
+
+      return {
+        players: transformedPlayers,
+        matches: transformedMatches,
+        config,
+      };
+    } catch (error) {
+      logger.error({ error }, 'Failed to get current season data');
+      throw error;
+    }
+  }
+}
+
+// Export singleton instance
+export const enhancedKickbaseClient = new EnhancedKickbaseClient();

@@ -1,6 +1,10 @@
 import pino from 'pino';
+import fs from 'fs';
+import path from 'path';
 import type { Match, Player } from '../types';
 import { normalizePlayerName, playerNamesMatch } from '../stringUtils';
+import { enhancedKickbaseClient } from './EnhancedKickbaseClient';
+import { kickbaseAuth } from './KickbaseAuthService';
 
 const logger = pino({ name: 'KickbaseAdapter' });
 
@@ -11,10 +15,103 @@ interface KickbaseResponse<T> {
 export class KickbaseAdapter {
   private readonly baseUrl: string;
   private readonly apiKey: string;
+  private useEnhancedClient = true;
+  private playerNameMapping: Map<string, string> | null = null;
 
   constructor(baseUrl: string, apiKey: string) {
     this.baseUrl = baseUrl;
     this.apiKey = apiKey;
+  }
+
+  /**
+   * Loads player name mappings from the player-image-mapping.json file
+   */
+  private async loadPlayerNameMapping(): Promise<void> {
+    if (this.playerNameMapping !== null) {
+      return; // Already loaded
+    }
+
+    try {
+      const mappingFilePath = path.join(process.cwd(), 'data', 'player-image-mapping.json');
+      const mappingData = JSON.parse(fs.readFileSync(mappingFilePath, 'utf-8'));
+      
+      this.playerNameMapping = new Map();
+      
+      // Create a mapping from normalized player names to actual names
+      for (const entry of mappingData) {
+        if (entry.playerName) {
+          // Create multiple mapping entries for better matching
+          const normalizedName = normalizePlayerName(entry.playerName);
+          this.playerNameMapping.set(normalizedName, entry.playerName);
+          
+          // Also map by last name only (for cases like "Rômulo")
+          const nameParts = entry.playerName.trim().split(' ');
+          if (nameParts.length > 0) {
+            const lastName = nameParts[nameParts.length - 1];
+            const normalizedLastName = normalizePlayerName(lastName);
+            this.playerNameMapping.set(normalizedLastName, entry.playerName);
+          }
+        }
+      }
+      
+      logger.info(`Loaded ${this.playerNameMapping.size} player name mappings`);
+    } catch (error) {
+      logger.warn('Failed to load player name mappings', { error });
+      this.playerNameMapping = new Map(); // Empty map to avoid repeated attempts
+    }
+  }
+
+  /**
+   * Attempts to find the correct player name using the mapping
+   */
+  private async getCorrectPlayerName(playerId: string, currentName: string, firstName: string): Promise<{ firstName: string; lastName: string }> {
+    await this.loadPlayerNameMapping();
+    
+    // If current name is "Spieler #unknown" or similar, try to find correct name
+    if (currentName.includes('unknown') || currentName.includes('#') || !currentName.trim()) {
+      // Try to find by player ID in the mapping (this would require extending the mapping format)
+      // For now, we'll use a hardcoded fix for known cases
+      if (playerId === '11886') {
+        return { firstName: '', lastName: 'Rômulo' };
+      }
+    }
+    
+    // Try to find a better name in the mapping
+    if (this.playerNameMapping && this.playerNameMapping.size > 0) {
+      const normalizedCurrent = normalizePlayerName(currentName);
+      const mappedName = this.playerNameMapping.get(normalizedCurrent);
+      
+      if (mappedName) {
+        const nameParts = mappedName.trim().split(' ');
+        return {
+          firstName: nameParts.slice(0, -1).join(' ') || '',
+          lastName: nameParts[nameParts.length - 1] || mappedName
+        };
+      }
+    }
+    
+    // Return original names if no mapping found
+    return { firstName, lastName: currentName };
+  }
+
+  /**
+   * Provides known name corrections for problematic players (synchronous version)
+   */
+  private getKnownPlayerNameCorrection(playerId: string): { firstName: string; lastName: string } | null {
+    // Known player name corrections
+    const knownCorrections: Record<string, { firstName: string; lastName: string }> = {
+      '11886': { firstName: '', lastName: 'Rômulo' },
+      '3193': { firstName: 'Tiago', lastName: 'Tomás' },
+      '1954': { firstName: '', lastName: 'Bernardo' },
+      '6174': { firstName: '', lastName: 'Arthur' },
+      '9698': { firstName: 'Fábio', lastName: 'Silva' },
+      '7275': { firstName: '', lastName: 'Santos' },
+      '3754': { firstName: '', lastName: 'Vázquez' },
+      '7163': { firstName: '', lastName: 'Rogério' },
+      // Add more corrections here as needed
+    };
+
+    return knownCorrections[playerId] || null;
   }
 
   private async request<T>(path: string): Promise<T> {
@@ -37,12 +134,32 @@ export class KickbaseAdapter {
   }
 
   async getPlayers(spieltag: number): Promise<Player[]> {
-    logger.info({ spieltag }, 'Fetching players from Kickbase API using team-based approach');
+    logger.info({ spieltag }, 'Fetching players from Kickbase API');
     
     let players: Player[] = [];
     
+    // Try enhanced client first
+    if (this.useEnhancedClient) {
+      try {
+        logger.info('Attempting to use enhanced Kickbase client...');
+        const seasonData = await enhancedKickbaseClient.getCurrentSeasonData();
+        
+        if (seasonData.players && seasonData.players.length > 0) {
+          logger.info({ count: seasonData.players.length }, 'Successfully fetched players from enhanced API');
+          
+          // Enhance players with additional live data
+          players = await this.enhancePlayersWithLiveData(seasonData.players);
+          return players;
+        }
+      } catch (enhancedError) {
+        logger.warn({ error: enhancedError }, 'Enhanced client failed, falling back to team-based approach');
+        this.useEnhancedClient = false;
+      }
+    }
+    
     try {
-      // Use the new team-based approach to get all players with detailed data
+      // Fallback to the existing team-based approach
+      logger.info('Using team-based approach to get all players with detailed data');
       players = await this.getAllPlayersFromTeams();
       
       logger.info({ totalPlayersLoaded: players.length }, 'Total players loaded from team-based API');
@@ -85,11 +202,57 @@ export class KickbaseAdapter {
   }
 
   /**
-   * Fetch detailed player performance data from Kickbase API
+   * Enhance players with live performance and market value data
    */
+  private async enhancePlayersWithLiveData(players: Player[]): Promise<Player[]> {
+    const enhancedPlayers: Player[] = [];
+    
+    // Process players in batches to avoid rate limiting
+    const batchSize = 10;
+    for (let i = 0; i < players.length; i += batchSize) {
+      const batch = players.slice(i, i + batchSize);
+      
+      const batchPromises = batch.map(async (player) => {
+        try {
+          const enhancedData = await enhancedKickbaseClient.getEnhancedPlayerData(player.id);
+          
+          return {
+            ...player,
+            ...enhancedData,
+          };
+        } catch (error) {
+          logger.warn({ playerId: player.id, error }, 'Failed to enhance player data');
+          return player;
+        }
+      });
+      
+      const enhancedBatch = await Promise.allSettled(batchPromises);
+      
+      enhancedBatch.forEach((result) => {
+        if (result.status === 'fulfilled') {
+          enhancedPlayers.push(result.value);
+        }
+      });
+      
+      // Small delay between batches
+      if (i + batchSize < players.length) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
+    
+    logger.info({ 
+      originalCount: players.length, 
+      enhancedCount: enhancedPlayers.length 
+    }, 'Enhanced players with live data');
+    
+    return enhancedPlayers;
+  }
+
   async getPlayerPerformance(playerId: string): Promise<any> {
     try {
-      return await this.request<any>(`/v4/competitions/1/players/${playerId}/performance`);
+      // Use the enhanced client with proper authentication
+      // Competition ID 1 is for Bundesliga
+      return await enhancedKickbaseClient.getPlayerPerformance(playerId, '1');
     } catch (error) {
       logger.warn({ playerId, error }, 'Failed to fetch player performance');
       return null;
@@ -513,6 +676,17 @@ export class KickbaseAdapter {
       lastName = `Spieler #${playerId}`;
     }
 
+    // Apply name corrections for known problematic players
+    const playerId = String(detailedPlayer.i || detailedPlayer.id);
+    if (lastName.includes('unknown') || lastName.includes('#')) {
+      const correctedName = this.getKnownPlayerNameCorrection(playerId);
+      if (correctedName) {
+        firstName = correctedName.firstName;
+        lastName = correctedName.lastName;
+        logger.info(`Applied name correction for player ${playerId}: ${lastName}`);
+      }
+    }
+
     // Extract real performance history from 'ph' field
     const pointsHistory = detailedPlayer.ph && Array.isArray(detailedPlayer.ph) 
       ? detailedPlayer.ph.map((ph: any) => ph.p || 0)
@@ -550,7 +724,9 @@ export class KickbaseAdapter {
       jerseyNumber: detailedPlayer.shn || undefined, // Jersey/shirt number
       playerImageUrl: detailedPlayer.pim || detailedPlayer.plpim,
       isInjured: detailedPlayer.st === 1 || detailedPlayer.il === 1,
-      status: detailedPlayer.st?.toString()
+      status: detailedPlayer.st?.toString(),
+      yellowCards: detailedPlayer.y || 0, // Yellow cards
+      redCards: detailedPlayer.r || 0 // Red cards
     };
   }
 
@@ -587,7 +763,9 @@ export class KickbaseAdapter {
       minutesPlayed: 0,
       playerImageUrl: teamPlayer.pim,
       isInjured: false,
-      status: undefined
+      status: undefined,
+      yellowCards: teamPlayer.y || 0, // Yellow cards
+      redCards: teamPlayer.r || 0 // Red cards
     };
   }
 
@@ -651,7 +829,9 @@ export class KickbaseAdapter {
       jerseyNumber: competitionPlayer.shn || undefined,
       playerImageUrl: competitionPlayer.playerImageUrl || competitionPlayer.pim,
       isInjured: competitionPlayer.st === 1 || competitionPlayer.il === 1,
-      status: competitionPlayer.st?.toString()
+      status: competitionPlayer.st?.toString(),
+      yellowCards: competitionPlayer.y || 0, // Yellow cards
+      redCards: competitionPlayer.r || 0 // Red cards
     };
   }
 
@@ -715,7 +895,9 @@ export class KickbaseAdapter {
       jerseyNumber: profilePlayer.shn || undefined,
       playerImageUrl: profilePlayer.playerImageUrl || profilePlayer.pim,
       isInjured: profilePlayer.injured || false,
-      status: profilePlayer.status
+      status: profilePlayer.status,
+      yellowCards: profilePlayer.y || 0, // Yellow cards
+      redCards: profilePlayer.r || 0 // Red cards
     };
   }
 
@@ -782,7 +964,9 @@ export class KickbaseAdapter {
       totalPoints: currentPoints,                      // Current season points
       averagePoints: currentPoints > 0 ? currentPoints / Math.max(1, mockHistory.length) : 0,
       // Market value will be populated by enhanced API calls in getPlayers method
-      marketValue: undefined
+      marketValue: undefined,
+      yellowCards: kickbasePlayer.y || 0,             // Yellow cards
+      redCards: kickbasePlayer.r || 0                 // Red cards
     };
   }
 
@@ -1418,7 +1602,9 @@ export class KickbaseAdapter {
         averagePoints: avg,
         marketValue: playerData.marketValue,
         isInjured: Math.random() < 0.05, // 5% chance of injury
-        status: '0' // Active status
+        status: '0', // Active status
+        yellowCards: Math.floor(Math.random() * 5), // Random yellow cards (0-4)
+        redCards: Math.random() < 0.1 ? 1 : 0 // 10% chance of red card
       };
     });
 

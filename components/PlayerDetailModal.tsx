@@ -3,6 +3,7 @@
 import PlayerImage from './PlayerImage';
 import BundesligaLogo from './BundesligaLogo';
 import PlayerStatusTag from './PlayerStatusTag';
+import { PlayerMatchHistory } from './PlayerMatchHistory';
 import type { Player } from '../lib/types';
 import { getFullTeamName } from '../lib/teamMapping';
 
@@ -232,19 +233,27 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
                   <span className="text-slate-400 text-sm font-normal">Gelbe Karten:</span>
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-6 bg-yellow-500 rounded-sm"></div>
-                    <span className="text-white text-base font-medium">{numberFormatter.format(yellowCards)}</span>
+                    <span className="text-white text-base font-medium">{numberFormatter.format(player.yellowCards || 0)}</span>
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-slate-400 text-sm font-normal">Rote Karten:</span>
                   <div className="flex items-center gap-2">
                     <div className="w-4 h-6 bg-red-500 rounded-sm"></div>
-                    <span className="text-white text-base font-medium">{numberFormatter.format(redCards)}</span>
+                    <span className="text-white text-base font-medium">{numberFormatter.format(player.redCards || 0)}</span>
                   </div>
                 </div>
               </div>
             </div>
 
+            {/* Match History */}
+            <div className="col-span-full">
+              <PlayerMatchHistory 
+                playerId={player.id} 
+                playerName={player.name}
+                currentTeam={player.verein}
+              />
+            </div>
 
           </div>
         </div>

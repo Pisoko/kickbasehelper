@@ -92,7 +92,9 @@ function generateMockData(spieltag: number) {
           punkte_hist: hist,
           punkte_avg: avg,
           punkte_sum: sum,
-          minutes_hist: minutes
+          minutes_hist: minutes,
+          yellowCards: Math.floor(Math.random() * 5), // Random yellow cards (0-4)
+          redCards: Math.random() < 0.1 ? 1 : 0 // 10% chance of red card
         });
         counter += 1;
       }

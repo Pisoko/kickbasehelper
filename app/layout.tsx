@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="de">
       <body className={`${inter.className} min-h-screen bg-slate-950 text-slate-100`}>
-        <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto flex min-h-screen w-full max-w-screen-2xl flex-col px-4 py-6 sm:px-6 lg:px-8">
           <header className="mb-6 border-b border-slate-800 pb-4">
             <h1 className="text-3xl font-bold">ArenaHelper</h1>
             <p className="text-sm text-slate-400">
