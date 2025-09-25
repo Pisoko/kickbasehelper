@@ -86,12 +86,12 @@ export function PlayerMatchHistory({ playerId, playerName, currentTeam }: Player
 
   // Color coding based on performance according to new scale
   const getPerformanceColor = (points: number): string => {
-    if (points >= 160) return 'from-red-500 via-orange-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-violet-500'; // Full rainbow gradient for incredible performance
-    if (points >= 120) return 'from-emerald-600 to-emerald-500'; // Dark green for very good performance
-    if (points >= 80) return 'from-green-500 to-green-400'; // Light green for good performance
-    if (points >= 50) return 'from-yellow-500 to-yellow-400'; // Yellow for solid performance
-    if (points >= 0) return 'from-red-500 to-red-400'; // Red for poor performance
-    return 'from-purple-900 to-purple-800'; // Purple for fatal performance
+    if (points >= 200) return 'from-red-500 via-orange-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-violet-500'; // Regenbogen-Gradient für außergewöhnliche Leistung
+    if (points >= 150) return 'from-emerald-600 to-emerald-500'; // Dunkelgrün für sehr gute Leistung
+    if (points >= 100) return 'from-green-500 to-green-400'; // Hellgrün für gute Leistung
+    if (points >= 50) return 'from-yellow-500 to-yellow-400'; // Gelb für solide Leistung
+    if (points >= 0) return 'from-red-500 to-red-400'; // Rot für schwache Leistung
+    return 'from-red-900 to-red-800'; // Dunkelrot für negative Punkte
   };
 
   const getBarFillPercentage = (points: number) => {
@@ -192,8 +192,8 @@ export function PlayerMatchHistory({ playerId, playerName, currentTeam }: Player
                       minHeight: match.playerPoints > 0 ? '2px' : '0px'
                     }}
                   >
-                    {/* Points label at the top of filled area - 100% transparent background */}
-                    {match.playerPoints > 0 && getBarFillPercentage(match.playerPoints) > 10 && (
+                    {/* Points label at the top of filled area - only for good performance (yellow and above) */}
+                    {match.playerPoints > 0 && match.playerPoints >= 50 && getBarFillPercentage(match.playerPoints) > 15 && (
                       <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
                         <span className="text-[10px] font-semibold text-white drop-shadow-lg">
                           {match.playerPoints}
@@ -202,8 +202,8 @@ export function PlayerMatchHistory({ playerId, playerName, currentTeam }: Player
                     )}
                   </div>
                   
-                  {/* Points label outside bar for very low scores - 100% transparent background */}
-                  {match.playerPoints > 0 && getBarFillPercentage(match.playerPoints) <= 10 && (
+                  {/* Points label outside bar for red bars (poor performance 0-49 points) or very low bars */}
+                  {match.playerPoints > 0 && (match.playerPoints < 50 || getBarFillPercentage(match.playerPoints) <= 15) && (
                     <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
                       <span className="text-xs font-semibold text-white drop-shadow-lg">
                         {match.playerPoints}
@@ -221,7 +221,11 @@ export function PlayerMatchHistory({ playerId, playerName, currentTeam }: Player
                 
                 {/* Minutes below the bar */}
                 <div className="mt-2 text-center">
-                  <div className="text-xs text-slate-400 font-medium">
+                  <div className={`text-xs font-medium ${
+                    match.playerMinutes > 47 
+                      ? 'text-green-400 font-bold' 
+                      : 'text-slate-400'
+                  }`}>
                     {match.playerMinutes}'
                   </div>
                 </div>

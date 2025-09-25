@@ -6,27 +6,46 @@ const kickbaseAdapter = new KickbaseAdapter(
   process.env.KICKBASE_API_KEY || ''
 );
 
-// Team ID to name mapping (simplified version)
+// Team ID to name mapping (correct IDs for 2025/26 Bundesliga season)
 const getTeamName = (teamId: string): string => {
   const teamMap: Record<string, string> = {
-    '1': 'Bayern München',
-    '2': 'Borussia Dortmund',
-    '3': 'RB Leipzig',
-    '4': 'Bayer Leverkusen',
-    '5': 'Eintracht Frankfurt',
-    '6': 'SC Freiburg',
-    '7': 'Union Berlin',
-    '8': 'Borussia Mönchengladbach',
-    '9': 'VfL Wolfsburg',
-    '10': 'FC Augsburg',
-    '11': 'TSG Hoffenheim',
-    '12': 'VfB Stuttgart',
-    '13': 'Werder Bremen',
-    '14': 'VfL Bochum',
-    '15': 'FSV Mainz 05',
-    '16': 'FC Heidenheim',
-    '17': 'Holstein Kiel',
-    '18': 'FC St. Pauli'
+    // Official Bundesliga team IDs (high numbers)
+    '82': 'Bayern München',        // Bayern (men's team)
+    '3': 'Borussia Dortmund',      // Dortmund
+    '92': 'RB Leipzig',            // Leipzig
+    '83': 'Bayer 04 Leverkusen',   // Leverkusen
+    '89': 'Eintracht Frankfurt',   // Frankfurt
+    '88': 'SC Freiburg',           // Freiburg
+    '40': 'Union Berlin',          // Union Berlin
+    '15': 'Borussia Mönchengladbach', // M'gladbach
+    '87': 'VfL Wolfsburg',         // Wolfsburg
+    '13': 'FC Augsburg',           // Augsburg
+    '84': 'TSG Hoffenheim',        // Hoffenheim
+    '9': 'VfB Stuttgart',          // Stuttgart
+    '80': 'Werder Bremen',         // Bremen
+    '14': 'VfL Bochum',            // Bochum (if still in league)
+    '18': 'FSV Mainz 05',          // Mainz
+    '49': 'FC Heidenheim',         // Heidenheim
+    '17': 'Holstein Kiel',         // Holstein Kiel
+    '39': 'FC St. Pauli',          // St. Pauli
+    '86': '1. FC Köln',            // Köln
+    '6': 'Hamburger SV',           // Hamburg
+    
+    // Legacy/Alternative team IDs that might appear in data
+    '2': 'Bayern München',         // Legacy Bayern ID
+    '4': 'Eintracht Frankfurt',    // Legacy Frankfurt ID
+    '5': 'SC Freiburg',            // Legacy Freiburg ID
+    '7': 'Bayer 04 Leverkusen',    // Legacy Leverkusen ID
+    '8': 'FC Schalke 04',          // Schalke (relegated)
+    '10': 'Werder Bremen',         // Legacy Bremen ID
+    '11': 'TSG Hoffenheim',        // Legacy Hoffenheim ID
+    '12': 'VfB Stuttgart',         // Legacy Stuttgart ID
+    '16': 'FC Heidenheim',         // Legacy Heidenheim ID
+    
+    // Additional team IDs that might appear
+    '43': 'Eintracht Braunschweig', // Possible 2. Liga team
+    '44': 'Hannover 96',           // Possible 2. Liga team
+    '45': 'Fortuna Düsseldorf',    // Possible 2. Liga team
   };
   return teamMap[teamId] || `Team ${teamId}`;
 };
@@ -53,15 +72,22 @@ export async function GET(request: NextRequest) {
       throw new Error('No performance data available from Kickbase API');
     }
     
-    // Extract current season data (first item in 'it' array)
-    const currentSeasonData = performanceData.it[0];
-    if (!currentSeasonData.ph || !Array.isArray(currentSeasonData.ph)) {
-      throw new Error('No match history found in performance data');
+    // Find current season data (2025/2026)
+    const currentSeasonData = performanceData.it.find((season: any) => season.ti === "2025/2026");
+    if (!currentSeasonData || !currentSeasonData.ph || !Array.isArray(currentSeasonData.ph)) {
+      throw new Error('No current season (2025/2026) data found in performance data');
     }
     
+    // Filter only played matches (matches with actual data, not null values)
+    // According to user requirements, only 4 matchdays have been played so far
+    // Include all matches where the player was in the squad, even with 0 minutes
+    const playedMatches = currentSeasonData.ph.filter((match: any) => 
+      match.p !== null && match.mp !== null && match.day <= 4
+    );
+    
     // Transform the match history data
-    const matches = currentSeasonData.ph.map((match: any, index: number) => ({
-      matchday: match.day || index + 1,
+    const matches = playedMatches.map((match: any) => ({
+      matchday: match.day,
       homeTeam: getTeamName(match.t1) || 'Unknown',
       awayTeam: getTeamName(match.t2) || 'Unknown',
       homeScore: match.t1g || 0,

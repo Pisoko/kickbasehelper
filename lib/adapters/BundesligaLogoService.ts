@@ -27,36 +27,72 @@ const TEAM_LOGO_MAPPING: Record<string, string> = {
 
 // Mapping zwischen vollständigen Teamnamen und Kurznamen
 const FULL_NAME_TO_SHORT_NAME: Record<string, string> = {
-  'FC Augsburg': 'Augsburg',
+  // Bayern München Varianten
   'FC Bayern München': 'Bayern',
   'Bayern München': 'Bayern',
-  'SV Werder Bremen': 'Bremen',
-  'Werder Bremen': 'Bremen',
+  
+  // Borussia Dortmund Varianten
   'Borussia Dortmund': 'Dortmund',
   'BVB': 'Dortmund',
-  'Eintracht Frankfurt': 'Frankfurt',
-  'SC Freiburg': 'Freiburg',
-  'Hamburger SV': 'Hamburg',
-  'HSV': 'Hamburg',
-  '1. FC Heidenheim 1846': 'Heidenheim',
-  'FC Heidenheim': 'Heidenheim',
-  'TSG 1899 Hoffenheim': 'Hoffenheim',
-  'TSG Hoffenheim': 'Hoffenheim',
-  '1. FC Köln': 'Köln',
-  'FC Köln': 'Köln',
+  
+  // RB Leipzig Varianten
   'RB Leipzig': 'Leipzig',
+  
+  // Bayer Leverkusen Varianten
   'Bayer 04 Leverkusen': 'Leverkusen',
   'Bayer Leverkusen': 'Leverkusen',
+  
+  // Eintracht Frankfurt Varianten
+  'Eintracht Frankfurt': 'Frankfurt',
+  
+  // SC Freiburg Varianten
+  'SC Freiburg': 'Freiburg',
+  
+  // Union Berlin Varianten
+  '1. FC Union Berlin': 'Union Berlin',
+  'FC Union Berlin': 'Union Berlin',
+  'Union Berlin': 'Union Berlin',
+  
+  // Borussia Mönchengladbach Varianten
   'Borussia Mönchengladbach': 'M\'gladbach',
   'Borussia M\'gladbach': 'M\'gladbach',
+  
+  // VfL Wolfsburg Varianten
+  'VfL Wolfsburg': 'Wolfsburg',
+  
+  // FC Augsburg Varianten
+  'FC Augsburg': 'Augsburg',
+  
+  // TSG Hoffenheim Varianten
+  'TSG 1899 Hoffenheim': 'Hoffenheim',
+  'TSG Hoffenheim': 'Hoffenheim',
+  
+  // VfB Stuttgart Varianten
+  'VfB Stuttgart': 'Stuttgart',
+  
+  // Werder Bremen Varianten
+  'SV Werder Bremen': 'Bremen',
+  'Werder Bremen': 'Bremen',
+  
+  // FSV Mainz 05 Varianten
   '1. FSV Mainz 05': 'Mainz',
   'FSV Mainz 05': 'Mainz',
   'Mainz 05': 'Mainz',
+  
+  // FC Heidenheim Varianten
+  '1. FC Heidenheim 1846': 'Heidenheim',
+  'FC Heidenheim': 'Heidenheim',
+  
+  // FC St. Pauli Varianten
   'FC St. Pauli': 'St. Pauli',
-  'VfB Stuttgart': 'Stuttgart',
-  '1. FC Union Berlin': 'Union Berlin',
-  'FC Union Berlin': 'Union Berlin',
-  'VfL Wolfsburg': 'Wolfsburg'
+  
+  // 1. FC Köln Varianten
+  '1. FC Köln': 'Köln',
+  'FC Köln': 'Köln',
+  
+  // Hamburger SV Varianten
+  'Hamburger SV': 'Hamburg',
+  'HSV': 'Hamburg'
 };
 
 /**
