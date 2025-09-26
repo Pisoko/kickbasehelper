@@ -1,10 +1,11 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 
 import { DEFAULT_PARAMS, FORMATION_LIST } from '../lib/constants';
 import { computeProjections } from '../lib/projection';
-import { excludePlayer, getExcludedPlayersWithStats, includePlayer, filterExcludedPlayers } from '../lib/playerExclusion';
+import { excludePlayer, getExcludedPlayersWithStats, includePlayer, filterExcludedPlayers, isPlayerExcluded } from '../lib/playerExclusion';
 import type { Formation, Match, Odds, OptimizationResult, Player, ProjectionParams } from '../lib/types';
 import { calculateFormationBasedStart11Probability } from '../lib/formationBasedStart11';
 import PlayerDetailModal from '../components/PlayerDetailModal';
@@ -35,6 +36,55 @@ interface OptimizeState {
 const tabs = ['Dashboard', 'Spieler Hub', 'Ergebnis'] as const;
 
 const formatter = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+
+// PlayerCard Komponente
+const PlayerCard = ({ player, baseMode, onSelect }: { player: Player; baseMode: string; onSelect: () => void }) => {
+  const pointsValue = baseMode === 'avg' 
+    ? player.punkte_avg 
+    : baseMode === 'sum' 
+      ? player.punkte_sum 
+      : player.punkte_hist.slice(-3).reduce((sum, p) => sum + p, 0) / 3;
+  
+  return (
+    <div 
+      onClick={onSelect}
+      className="rounded-lg border border-slate-700 bg-slate-800/50 p-4 hover:bg-slate-800 transition cursor-pointer"
+    >
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-12 h-12 rounded-full bg-slate-700 overflow-hidden">
+          <PlayerImage
+            playerImageUrl={player.playerImageUrl}
+            playerName={player.name}
+            className="w-full h-full object-cover rounded-full"
+            size="md"
+          />
+        </div>
+        <div>
+          <h3 className={`font-semibold ${getPlayerNameColor(player.status, player.isInjured)}`}>
+            {player.name}
+          </h3>
+          <p className="text-xs text-slate-400">{translatePosition(player.position)} • {getFullTeamName(player.verein)}</p>
+          {getStatusWithEmoji(player.status, player.isInjured) && (
+            <p className="text-xs mt-1 text-slate-300">
+              {getStatusWithEmoji(player.status, player.isInjured)}
+            </p>
+          )}
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-2 text-sm">
+        <div className="flex flex-col">
+          <span className="text-slate-400 text-xs">Marktwert</span>
+          <span className="font-medium">{formatter.format(player.kosten)}</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="text-slate-400 text-xs">Punkte ({baseMode === 'avg' ? 'Ø' : baseMode === 'sum' ? 'Σ' : 'Ø3'})</span>
+          <span className="font-medium">{pointsValue.toFixed(1)}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Function to format market value in millions (without "Mio €")
 const formatMarketValue = (value: number): string => {
@@ -86,6 +136,41 @@ const translatePosition = (position: string): string => {
     'FWD': 'ANG'
   };
   return positionMap[position] || position;
+};
+
+const getPositionColor = (position: string): string => {
+  switch (position) {
+    case 'GK': return 'text-white';
+    case 'DEF': return 'text-green-400';
+    case 'MID': return 'text-yellow-400';
+    case 'FWD': return 'text-red-400';
+    default: return 'text-slate-300';
+  }
+};
+
+const getClubColor = (clubName: string): string => {
+  // Mapping basierend auf dominanten Logo-Farben der Bundesliga-Vereine
+  switch (clubName) {
+    case 'Bayern': return 'text-red-500';           // FC Bayern München - Rot
+    case 'Dortmund': return 'text-yellow-400';      // Borussia Dortmund - Gelb
+    case 'Leipzig': return 'text-red-600';          // RB Leipzig - Rot
+    case 'Leverkusen': return 'text-red-500';       // Bayer 04 Leverkusen - Rot
+    case 'Wolfsburg': return 'text-green-500';      // VfL Wolfsburg - Grün
+    case 'Frankfurt': return 'text-red-600';        // Eintracht Frankfurt - Rot
+    case 'M\'gladbach': return 'text-green-600';    // Borussia Mönchengladbach - Grün
+    case 'Union Berlin': return 'text-red-700';     // 1. FC Union Berlin - Rot
+    case 'Freiburg': return 'text-red-600';         // SC Freiburg - Rot
+    case 'Stuttgart': return 'text-red-500';        // VfB Stuttgart - Rot
+    case 'Mainz': return 'text-red-600';            // 1. FSV Mainz 05 - Rot
+    case 'Hoffenheim': return 'text-blue-500';      // TSG 1899 Hoffenheim - Blau
+    case 'Augsburg': return 'text-red-600';         // FC Augsburg - Rot
+    case 'Köln': return 'text-red-500';             // 1. FC Köln - Rot
+    case 'Bremen': return 'text-green-600';         // Werder Bremen - Grün
+    case 'St. Pauli': return 'text-amber-600';      // FC St. Pauli - Braun
+    case 'Heidenheim': return 'text-red-600';       // 1. FC Heidenheim - Rot
+    case 'Kiel': return 'text-blue-600';            // Holstein Kiel - Blau
+    default: return 'text-slate-300';               // Standard-Farbe
+  }
 };
 
 // Helper function to display full player name
@@ -267,17 +352,57 @@ export default function HomePage() {
   const [excludedPlayers, setExcludedPlayers] = useState<ReturnType<typeof getExcludedPlayersWithStats>>([]);
   const [showExcludedPlayers, setShowExcludedPlayers] = useState(false);
   
+  // Spieler Hub Filter-Zustände
+  const [searchTerm, setSearchTerm] = useState('');
+  const [positionFilter, setPositionFilter] = useState('');
+  const [clubFilter, setClubFilter] = useState('');
+  const [sortColumn, setSortColumn] = useState<string>('punkte_sum');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  
+
+  
+  // Berechne eindeutige Positionen und Vereine für Filter-Dropdowns
+  const uniquePositions = useMemo(() => {
+    const positions = [...new Set(players.map(player => player.position))];
+    // Definiere die gewünschte Reihenfolge: TW, ABW, MF, ANG
+    const positionOrder = ['GK', 'DEF', 'MID', 'FWD'];
+    return positions.sort((a, b) => {
+      const indexA = positionOrder.indexOf(a);
+      const indexB = positionOrder.indexOf(b);
+      // Falls Position nicht in der Liste ist, ans Ende setzen
+      if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
+  }, [players]);
+  
+  const uniqueClubs = useMemo(() => {
+    const clubs = [...new Set(players.map(player => player.verein))];
+    return clubs.sort();
+  }, [players]);
+  
+  // Gefilterte Spielerliste
+  const filteredPlayers = useMemo(() => {
+    // Erst Blacklist-Spieler ausfiltern, dann andere Filter anwenden
+    const nonExcludedPlayers = filterExcludedPlayers(players);
+    
+    return nonExcludedPlayers.filter(player => {
+      const matchesSearch = searchTerm === '' || 
+        player.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (player.firstName && player.firstName.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesPosition = positionFilter === '' || player.position === positionFilter;
+      const matchesClub = clubFilter === '' || player.verein === clubFilter;
+      
+      return matchesSearch && matchesPosition && matchesClub;
+    });
+  }, [players, searchTerm, positionFilter, clubFilter]);
+  
   // Load excluded players on mount and when players change
   useEffect(() => {
     setExcludedPlayers(getExcludedPlayersWithStats());
   }, [players]);
-  
-  // New state variables for player explorer
-  const [searchTerm, setSearchTerm] = useState('');
-  const [positionFilter, setPositionFilter] = useState<string>('');
-  const [clubFilter, setClubFilter] = useState<string>('');
-  const [sortColumn, setSortColumn] = useState<string>('totalPoints');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -328,6 +453,8 @@ export default function HomePage() {
     setIsPlayerModalOpen(true);
   };
 
+  const handlePlayerSelect = handlePlayerClick;
+
   // Player exclusion handlers
   const handleExcludePlayer = (player: Player) => {
     excludePlayer(player);
@@ -346,6 +473,76 @@ export default function HomePage() {
   const closePlayerModal = () => {
     setIsPlayerModalOpen(false);
     setSelectedPlayer(null);
+  };
+
+  // Get sorted players for table display
+  const getSortedPlayers = () => {
+    const sorted = [...filteredPlayers].sort((a: Player, b: Player) => {
+      let aValue: any;
+      let bValue: any;
+
+      switch (sortColumn) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'position':
+          // Use the same order as position filter: GK, DEF, MID, FWD
+          const positionOrder = ['GK', 'DEF', 'MID', 'FWD'];
+          aValue = positionOrder.indexOf(a.position);
+          bValue = positionOrder.indexOf(b.position);
+          // If position not found, put it at the end
+          if (aValue === -1) aValue = 999;
+          if (bValue === -1) bValue = 999;
+          break;
+        case 'verein':
+          aValue = getFullTeamName(a.verein);
+          bValue = getFullTeamName(b.verein);
+          break;
+        case 'kosten':
+          aValue = a.kosten;
+          bValue = b.kosten;
+          break;
+        case 'points':
+          aValue = baseMode === 'avg' 
+            ? a.punkte_avg 
+            : baseMode === 'sum' 
+              ? a.punkte_sum 
+              : a.punkte_hist.slice(-3).reduce((sum: number, p: number) => sum + p, 0) / 3;
+          bValue = baseMode === 'avg' 
+            ? b.punkte_avg 
+            : baseMode === 'sum' 
+              ? b.punkte_sum 
+              : b.punkte_hist.slice(-3).reduce((sum: number, p: number) => sum + p, 0) / 3;
+          break;
+        case 'punkte_sum':
+          aValue = a.punkte_sum;
+          bValue = b.punkte_sum;
+          break;
+        case 'pointsPerMinute':
+          // Parse the calculated values for sorting
+          const aPointsPerMin = parseFloat(calculatePointsPerMinute(a).replace(',', '.'));
+          const bPointsPerMin = parseFloat(calculatePointsPerMinute(b).replace(',', '.'));
+          aValue = isNaN(aPointsPerMin) ? 0 : aPointsPerMin;
+          bValue = isNaN(bPointsPerMin) ? 0 : bPointsPerMin;
+          break;
+        case 'pointsPerMillion':
+          // Parse the calculated values for sorting
+          const aPointsPerMil = parseFloat(calculatePointsPerMillion(a).replace(',', '.'));
+          const bPointsPerMil = parseFloat(calculatePointsPerMillion(b).replace(',', '.'));
+          aValue = isNaN(aPointsPerMil) ? 0 : aPointsPerMil;
+          bValue = isNaN(bPointsPerMil) ? 0 : bPointsPerMil;
+          break;
+        default:
+          return 0;
+      }
+
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return sorted;
   };
 
   const projections = useMemo(() => {
@@ -398,8 +595,13 @@ export default function HomePage() {
         
         switch (sortColumn) {
           case 'position':
-            aValue = a.position;
-            bValue = b.position;
+            // Use the same order as position filter: GK, DEF, MID, FWD
+            const positionOrder = ['GK', 'DEF', 'MID', 'FWD'];
+            aValue = positionOrder.indexOf(a.position);
+            bValue = positionOrder.indexOf(b.position);
+            // If position not found, put it at the end
+            if (aValue === -1) aValue = 999;
+            if (bValue === -1) bValue = 999;
             break;
           case 'name':
             aValue = a.name;
@@ -468,16 +670,7 @@ export default function HomePage() {
     setCurrentPage(1);
   }, [searchTerm, positionFilter, clubFilter, playersPerPage]);
 
-  // Get unique positions and clubs for filters
-  const uniquePositions = useMemo(() => {
-    const positions = [...new Set(projections.map(p => p.position))];
-    return positions.sort();
-  }, [projections]);
 
-  const uniqueClubs = useMemo(() => {
-    const clubs = [...new Set(projections.map(p => p.verein))];
-    return clubs.sort();
-  }, [projections]);
 
   // Handle column sorting
   const handleSort = (column: string) => {
@@ -585,580 +778,484 @@ export default function HomePage() {
   }, [blacklistInput, players]);
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto max-w-7xl space-y-6 py-4 px-4 sm:py-8 sm:px-6">
+      <Tabs defaultValue={activeTab} onValueChange={(value) => setActiveTab(value as typeof tabs[number])}>
+        <TabsList className="w-full mb-6">
+          {tabs.map((tab) => (
+            <TabsTrigger
+              key={tab}
+              value={tab}
+              className="flex-1 text-sm"
+            >
+              {tab}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-
-      <div className="flex gap-2">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => setActiveTab(tab)}
-            className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-              activeTab === tab ? 'bg-emerald-500 text-slate-900' : 'bg-slate-800 text-slate-300'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      {activeTab === 'Dashboard' && (
-        <section className="grid gap-6 lg:grid-cols-3">
-          <div className="space-y-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4 lg:col-span-2">
-            <h2 className="text-xl font-semibold">Konfiguration</h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <label className="flex flex-col gap-2 text-sm">
-                <span>Spieltag</span>
-                <input
-                  type="number"
-                  min={1}
-                  value={spieltag}
-                  onChange={(event) => setSpieltag(Number(event.target.value))}
-                  className="rounded border border-slate-700 bg-slate-950 px-3 py-2"
-                />
-              </label>
-              <label className="flex flex-col gap-2 text-sm">
-                <span>Budget (€)</span>
-                <input
-                  type="number"
-                  min={0}
-                  value={budget}
-                  onChange={(event) => setBudget(Number(event.target.value))}
-                  className="rounded border border-slate-700 bg-slate-950 px-3 py-2"
-                />
-              </label>
-              <label className="flex flex-col gap-2 text-sm">
-                <span>Basis-Modus</span>
-                <select
-                  value={baseMode}
-                  onChange={(event) => setBaseMode(event.target.value as ProjectionParams['baseMode'])}
-                  className="rounded border border-slate-700 bg-slate-950 px-3 py-2"
-                >
-                  <option value="avg">Saison-Durchschnitt</option>
-                  <option value="sum">Saison-Gesamtpunkte</option>
-                  <option value="last3">Letzte 3 Spiele</option>
-                </select>
-              </label>
-              <label className="flex flex-col gap-2 text-sm">
-                <span>Formation</span>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setFormationMode('auto')}
-                    className={`flex-1 rounded border px-3 py-2 ${
-                      formationMode === 'auto' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300' : 'border-slate-700'
-                    }`}
-                  >
-                    Auto
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormationMode('manuell')}
-                    className={`flex-1 rounded border px-3 py-2 ${
-                      formationMode === 'manuell' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300' : 'border-slate-700'
-                    }`}
-                  >
-                    Manuell
-                  </button>
-                </div>
-                {formationMode === 'manuell' && (
+        <TabsContent value="Dashboard">
+          <section className="grid gap-6 lg:grid-cols-3">
+            <div className="space-y-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4 lg:col-span-2">
+              <h2 className="text-xl font-semibold">Konfiguration</h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-2 text-sm">
+                  <span>Spieltag</span>
+                  <input
+                    type="number"
+                    min={1}
+                    value={spieltag}
+                    onChange={(event) => setSpieltag(Number(event.target.value))}
+                    className="rounded border border-slate-700 bg-slate-950 px-3 py-2"
+                  />
+                </label>
+                <label className="flex flex-col gap-2 text-sm">
+                  <span>Budget (€)</span>
+                  <input
+                    type="number"
+                    min={0}
+                    value={budget}
+                    onChange={(event) => setBudget(Number(event.target.value))}
+                    className="rounded border border-slate-700 bg-slate-950 px-3 py-2"
+                  />
+                </label>
+                <label className="flex flex-col gap-2 text-sm">
+                  <span>Basis-Modus</span>
                   <select
-                    value={formation}
-                    onChange={(event) => setFormation(event.target.value as Formation)}
+                    value={baseMode}
+                    onChange={(event) => setBaseMode(event.target.value as ProjectionParams['baseMode'])}
                     className="rounded border border-slate-700 bg-slate-950 px-3 py-2"
                   >
-                    {FORMATION_LIST.map((item) => (
-                      <option key={item} value={item}>
-                        {item}
+                    <option value="avg">Saison-Durchschnitt</option>
+                    <option value="sum">Saison-Gesamtpunkte</option>
+                    <option value="last3">Letzte 3 Spiele</option>
+                  </select>
+                </label>
+                <label className="flex flex-col gap-2 text-sm">
+                  <span>Formation</span>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setFormationMode('auto')}
+                      className={`flex-1 rounded border px-3 py-2 ${
+                        formationMode === 'auto' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300' : 'border-slate-700'
+                      }`}
+                    >
+                      Auto
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormationMode('manuell')}
+                      className={`flex-1 rounded border px-3 py-2 ${
+                        formationMode === 'manuell' ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300' : 'border-slate-700'
+                      }`}
+                    >
+                      Manuell
+                    </button>
+                  </div>
+                  {formationMode === 'manuell' && (
+                    <select
+                      value={formation}
+                      onChange={(event) => setFormation(event.target.value as Formation)}
+                      className="rounded border border-slate-700 bg-slate-950 px-3 py-2"
+                    >
+                      {FORMATION_LIST.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </label>
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+              <h2 className="text-xl font-semibold">Datenstatus</h2>
+              <p className="text-sm text-slate-400">
+                {loadingData && 'Lade Daten ...'}
+                {!loadingData && cacheInfo.updatedAt && (
+                  <>
+                    Datenstand: {new Date(cacheInfo.updatedAt).toLocaleString('de-DE')} •{' '}
+                    {cacheInfo.cacheAgeDays ?? '–'} Tage alt
+                  </>
+                )}
+              </p>
+              <button
+                type="button"
+                onClick={handleRefresh}
+                className="w-full rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-slate-950 transition hover:bg-emerald-400"
+              >
+                Daten aktualisieren
+              </button>
+            </div>
+          </section>
+        </TabsContent>
+
+        <TabsContent value="Spieler Hub">
+          <section className="space-y-6">
+            <div className="space-y-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+              
+              {/* Search and Filter Controls */}
+              <div className="mb-4 grid gap-4 md:grid-cols-3">
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Spieler suchen
+                  </label>
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Name eingeben..."
+                    className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white placeholder-slate-400"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Position filtern
+                  </label>
+                  <select
+                    value={positionFilter}
+                    onChange={(e) => setPositionFilter(e.target.value)}
+                    className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white"
+                  >
+                    <option value="">Alle Positionen</option>
+                    {uniquePositions.map(pos => (
+                      <option 
+                        key={pos} 
+                        value={pos}
+                        className={getPositionColor(pos)}
+                      >
+                        {translatePosition(pos)}
                       </option>
                     ))}
                   </select>
-                )}
-              </label>
-            </div>
-
-            <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <h3 className="font-semibold">Gewichtungen</h3>
-                <button type="button" className="text-xs text-emerald-400" onClick={resetWeights}>
-                  Zurücksetzen
-                </button>
-              </div>
-              <div className="space-y-4">
-                {(
-                  [
-                    ['w_base', 'Basis'],
-                    ['w_form', 'FormBoost'],
-                    ['w_odds', 'OddsModifier'],
-                    ['w_home', 'HomeBonus'],
-                    ['w_minutes', 'MinutesWeight'],
-                    ['w_risk', 'RiskPenalty']
-                  ] as const
-                ).map(([key, label]) => {
-                  const disabled = key === 'w_minutes' && !hasMinutes;
-                  return (
-                    <div key={key} className={`text-sm ${disabled ? 'opacity-50' : ''}`}>
-                    <div className="mb-1 flex justify-between">
-                      <span>{label}</span>
-                      <span className="text-slate-400">{weights[key].toFixed(2)}</span>
-                    </div>
-                    <input
-                      type="range"
-                      min={0}
-                      max={2}
-                      step={0.05}
-                      value={weights[key]}
-                      disabled={disabled}
-                      onChange={(event) =>
-                        setWeights((prev) => ({ ...prev, [key]: Number(event.target.value) }))
-                      }
-                      className="w-full"
-                    />
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="mt-4 grid gap-4 sm:grid-cols-3">
-                {(
-                  [
-                    ['alpha', 'α'],
-                    ['beta', 'β'],
-                    ['gamma', 'γ']
-                  ] as const
-                ).map(([key, symbol]) => (
-                  <label key={key} className="flex flex-col gap-1 text-sm">
-                    <span>Odds-Faktor {symbol}</span>
-                    <input
-                      type="number"
-                      step={0.05}
-                      value={weights[key]}
-                      onChange={(event) =>
-                        setWeights((prev) => ({ ...prev, [key]: Number(event.target.value) }))
-                      }
-                      className="rounded border border-slate-700 bg-slate-950 px-3 py-2"
-                    />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    Verein filtern
                   </label>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-            <h2 className="text-xl font-semibold">Datenstatus</h2>
-            <p className="text-sm text-slate-400">
-              {loadingData && 'Lade Daten ...'}
-              {!loadingData && cacheInfo.updatedAt && (
-                <>
-                  Datenstand: {new Date(cacheInfo.updatedAt).toLocaleString('de-DE')} •{' '}
-                  {cacheInfo.cacheAgeDays ?? '–'} Tage alt
-                </>
-              )}
-            </p>
-            <button
-              type="button"
-              onClick={handleRefresh}
-              className="w-full rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-slate-950 transition hover:bg-emerald-400"
-            >
-              Daten aktualisieren
-            </button>
-            <div>
-              <h3 className="mb-2 font-semibold">Blacklist</h3>
-              <div className="flex gap-2">
-                <input
-                  value={blacklistInput}
-                  onChange={(event) => setBlacklistInput(event.target.value)}
-                  placeholder="Spieler suchen"
-                  className="flex-1 rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleBlacklistAdd(blacklistInput)}
-                  className="rounded bg-slate-700 px-3 py-2 text-sm"
-                  disabled={!blacklistInput}
-                >
-                  Hinzufügen
-                </button>
-              </div>
-              {suggestions.length > 0 && (
-                <ul className="mt-2 space-y-1 text-xs text-slate-400">
-                  {suggestions.map((player) => (
-                    <li key={player.id}>
-                      <button
-                        type="button"
-                        className="hover:text-emerald-300"
-                        onClick={() => handleBlacklistAdd(player.name)}
+                  <select
+                    value={clubFilter}
+                    onChange={(e) => setClubFilter(e.target.value)}
+                    className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white"
+                  >
+                    <option value="">Alle Vereine</option>
+                    {uniqueClubs.map(club => (
+                      <option 
+                        key={club} 
+                        value={club}
+                        className="text-white"
                       >
-                        {player.name} ({getFullTeamName(player.verein)})
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <div className="mt-3 flex flex-wrap gap-2">
-                {blacklist.map((name) => (
-                  <span key={name} className="flex items-center gap-1 rounded-full bg-slate-800 px-3 py-1 text-xs">
-                    {name}
-                    <button type="button" onClick={() => handleBlacklistRemove(name)} className="text-emerald-400">
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={handleOptimize}
-              className="w-full rounded-lg bg-emerald-400 px-4 py-2 font-semibold text-slate-900 transition hover:bg-emerald-300"
-              disabled={optState.loading}
-            >
-              {optState.loading ? 'Rechne ...' : 'Optimieren'}
-            </button>
-            {optState.error && <p className="text-sm text-red-400">{optState.error}</p>}
-          </div>
-        </section>
-      )}
-
-      {activeTab === 'Spieler-Explorer' && (
-          <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Spieler Explorer</h2>
-            </div>
-            
-            {/* Search and Filter Controls */}
-            <div className="mb-4 grid gap-4 md:grid-cols-3">
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Spieler suchen
-                </label>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Name eingeben..."
-                  className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white placeholder-slate-400"
-                />
+                        {getFullTeamName(club)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Position filtern
-                </label>
-                <select
-                  value={positionFilter}
-                  onChange={(e) => setPositionFilter(e.target.value)}
-                  className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white"
-                >
-                  <option value="">Alle Positionen</option>
-                  {uniquePositions.map(pos => (
-                    <option key={pos} value={pos}>{translatePosition(pos)}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  Verein filtern
-                </label>
-                <select
-                  value={clubFilter}
-                  onChange={(e) => setClubFilter(e.target.value)}
-                  className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white"
-                >
-                  <option value="">Alle Vereine</option>
-                  {uniqueClubs.map(club => (
-                    <option key={club} value={club}>{getFullTeamName(club)}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Results count */}
-            <div className="mb-4 text-sm text-slate-400">
-              {filteredAndSortedPlayers.length} von {projections.length} Spielern
-              {filteredAndSortedPlayers.length > 0 && (
-                <span className="ml-2">
-                  (Seite {currentPage} von {totalPages})
-                </span>
-              )}
-            </div>
-
-            {/* Player Table */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="text-left text-xs uppercase tracking-wide text-slate-400 border-b border-slate-700">
-                    <th 
-                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
-                      onClick={() => handleSort('position')}
-                    >
-                      Position {getSortIndicator('position')}
-                    </th>
-                    <th className="px-3 py-3">{/* Image column - no header */}</th>
-                    <th 
-                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
-                      onClick={() => handleSort('name')}
-                    >
-                      Name {getSortIndicator('name')}
-                    </th>
-                    <th 
-                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
-                      onClick={() => handleSort('club')}
-                    >
-                      Verein {getSortIndicator('club')}
-                    </th>
-                    <th 
-                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
-                      onClick={() => handleSort('marketValue')}
-                    >
-                      Marktwert in Mio € {getSortIndicator('marketValue')}
-                    </th>
-                    <th 
-                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
-                      onClick={() => handleSort('totalPoints')}
-                    >
-                      Gesamtpunkte {getSortIndicator('totalPoints')}
-                    </th>
-                    <th 
-                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
-                      onClick={() => handleSort('pointsPerMinute')}
-                    >
-                      Punkte/Min {getSortIndicator('pointsPerMinute')}
-                    </th>
-                    <th 
-                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
-                      onClick={() => handleSort('pointsPerMillion')}
-                    >
-                      Punkte/Mio € {getSortIndicator('pointsPerMillion')}
-                    </th>
-                    <th 
-                      className="px-3 py-3 cursor-pointer hover:text-slate-200 transition-colors"
-                      onClick={() => handleSort('startingElevenProbability')}
-                    >
-                      Startelf-Chance {getSortIndicator('startingElevenProbability')}
-                    </th>
-                    <th className="px-3 py-3">
-                      Aktionen
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedPlayers.map((player) => (
-                    <tr 
-                      key={player.id} 
-                      className="border-t border-slate-800 hover:bg-slate-800 cursor-pointer transition-colors"
-                      onClick={() => handlePlayerClick(player)}
-                    >
-                      {/* Position */}
-                      <td className="px-3 py-3">
-                        <span className="inline-flex items-center justify-center w-8 h-6 bg-slate-700 text-slate-200 rounded text-xs font-medium">
-                          {translatePosition(player.position)}
-                        </span>
-                      </td>
-                      
-                      {/* Player Image */}
-                      <td className="px-3 py-3">
-                        <PlayerImage 
-                          playerImageUrl={player.playerImageUrl}
-                          playerName={getFullPlayerName(player)}
-                          size="md"
-                        />
-                      </td>
-                      
-                      {/* Player Name */}
-                      <td className="px-3 py-3">
-                        <div className="flex flex-col">
-                          <span 
-                            className={`font-medium ${getPlayerNameColor(player.status, player.isInjured)}`}
+              {/* Player Table */}
+              <div className="mt-6">
+                {filteredPlayers.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-slate-700 bg-slate-900/60 rounded-lg">
+                      <thead>
+                        <tr className="bg-slate-800">
+                          <th 
+                            className="border border-slate-700 px-4 py-3 text-left cursor-pointer hover:bg-slate-700 transition"
+                            onClick={() => handleSort('name')}
                           >
-                            {getFullPlayerName(player)}
-                          </span>
-                          {player.isInjured && (
-                            <span className="text-red-500 text-xs">🤕 Verletzt</span>
-                          )}
-                          {!player.isInjured && getStatusWithEmoji(player.status, player.isInjured) && (
-                            <span className={`${getStatusEmojiColor(player.status, player.isInjured)} text-xs`}>{getStatusWithEmoji(player.status, player.isInjured)}</span>
-                          )}
-                        </div>
-                      </td>
-                      
-                      {/* Club */}
-                      <td className="px-3 py-3">
-                        <div className="flex items-center justify-center">
-                          <BundesligaLogo 
-                            teamName={player.verein} 
-                            size="md"
-                          />
-                        </div>
-                      </td>
-                      
-                      {/* Market Value */}
-                      <td className="px-3 py-3 font-medium text-emerald-400">
-                        {player.kosten ? formatMarketValue(player.kosten) : '-'}
-                      </td>
-                      
-                      {/* Total Points */}
-                      <td className="px-3 py-3 font-semibold text-blue-400">
-                        {player.punkte_sum || 0}
-                      </td>
-                      
-                      {/* Points per Minute */}
-                      <td className="px-3 py-3 text-slate-300">
-                        {calculatePointsPerMinute(player)}
-                      </td>
-                      
-                      {/* Points per Million € */}
-                      <td className="px-3 py-3 text-yellow-400">
-                        {calculatePointsPerMillion(player)}
-                      </td>
-                      
-                      {/* Starting Eleven Probability */}
-                       <td className="px-3 py-3">
-                         {(() => {
-                           const probability = newStart11Probabilities.get(player.id) || 0;
-                           const formatted = formatStartingElevenProbability(probability);
-                           return (
-                             <span 
-                               className={`font-medium ${formatted.color} cursor-help`}
-                               title={`${probability.toFixed(1)}% Wahrscheinlichkeit`}
-                             >
-                               {formatted.text}
-                             </span>
-                           );
-                         })()}
-                       </td>
-                      
-                      {/* Actions */}
-                      <td className="px-3 py-3">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation(); // Prevent row click
-                            handleExcludePlayer(player);
-                          }}
-                          className="w-8 h-8 flex items-center justify-center text-lg hover:bg-red-600 hover:text-white rounded transition-colors"
-                          title="auf blacklist setzen"
-                        >
-                          🚫
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              
-              {filteredAndSortedPlayers.length === 0 && (
-                <div className="text-center py-8 text-slate-400">
-                  Keine Spieler gefunden. Versuchen Sie andere Suchkriterien.
-                </div>
-              )}
-              
-              {filteredAndSortedPlayers.length > 0 && paginatedPlayers.length === 0 && (
-                <div className="text-center py-8 text-slate-400">
-                  Keine Spieler auf dieser Seite. Gehen Sie zu einer anderen Seite.
-                </div>
-              )}
-            </div>
+                            <div className="flex items-center gap-2">
+                              Spieler
+                              {sortColumn === 'name' && (
+                                <span className="text-blue-400">
+                                  {sortDirection === 'asc' ? '↑' : '↓'}
+                                </span>
+                              )}
+                            </div>
+                          </th>
+                          <th 
+                            className="border border-slate-700 px-4 py-3 text-center cursor-pointer hover:bg-slate-700 transition"
+                            onClick={() => handleSort('verein')}
+                          >
+                            <div className="flex items-center justify-center gap-2">
+                              Verein
+                              {sortColumn === 'verein' && (
+                                <span className="text-blue-400">
+                                  {sortDirection === 'asc' ? '↑' : '↓'}
+                                </span>
+                              )}
+                            </div>
+                          </th>
+                          <th 
+                            className="border border-slate-700 px-4 py-3 text-center cursor-pointer hover:bg-slate-700 transition"
+                            onClick={() => handleSort('position')}
+                          >
+                            <div className="flex items-center justify-center gap-2">
+                              Position
+                              {sortColumn === 'position' && (
+                                <span className="text-blue-400">
+                                  {sortDirection === 'asc' ? '↑' : '↓'}
+                                </span>
+                              )}
+                            </div>
+                          </th>
+                          <th 
+                            className="border border-slate-700 px-4 py-3 text-center cursor-pointer hover:bg-slate-700 transition"
+                            onClick={() => handleSort('kosten')}
+                          >
+                            <div className="flex items-center justify-center gap-2">
+                              Marktwert
+                              {sortColumn === 'kosten' && (
+                                <span className="text-blue-400">
+                                  {sortDirection === 'asc' ? '↑' : '↓'}
+                                </span>
+                              )}
+                            </div>
+                          </th>
+                          <th 
+                            className="border border-slate-700 px-4 py-3 text-center cursor-pointer hover:bg-slate-700 transition"
+                            onClick={() => handleSort('punkte_sum')}
+                          >
+                            <div className="flex items-center justify-center gap-2">
+                              Gesamtpunkte
+                              {sortColumn === 'punkte_sum' && (
+                                <span className="text-blue-400">
+                                  {sortDirection === 'asc' ? '↑' : '↓'}
+                                </span>
+                              )}
+                            </div>
+                          </th>
+                          <th 
+                            className="border border-slate-700 px-4 py-3 text-center cursor-pointer hover:bg-slate-700 transition"
+                            onClick={() => handleSort('points')}
+                          >
+                            <div className="flex items-center justify-center gap-2">
+                              Punkte ({baseMode === 'avg' ? 'Ø' : baseMode === 'sum' ? 'Σ' : 'Ø3'})
+                              {sortColumn === 'points' && (
+                                <span className="text-blue-400">
+                                  {sortDirection === 'asc' ? '↑' : '↓'}
+                                </span>
+                              )}
+                            </div>
+                          </th>
+                          <th 
+                            className="border border-slate-700 px-4 py-3 text-center cursor-pointer hover:bg-slate-700 transition"
+                            onClick={() => handleSort('pointsPerMinute')}
+                          >
+                            <div className="flex items-center justify-center gap-2">
+                              Punkte/Min
+                              {sortColumn === 'pointsPerMinute' && (
+                                <span className="text-blue-400">
+                                  {sortDirection === 'asc' ? '↑' : '↓'}
+                                </span>
+                              )}
+                            </div>
+                          </th>
+                          <th 
+                            className="border border-slate-700 px-4 py-3 text-center cursor-pointer hover:bg-slate-700 transition"
+                            onClick={() => handleSort('pointsPerMillion')}
+                          >
+                            <div className="flex items-center justify-center gap-2">
+                              Punkte/Mio €
+                              {sortColumn === 'pointsPerMillion' && (
+                                <span className="text-blue-400">
+                                  {sortDirection === 'asc' ? '↑' : '↓'}
+                                </span>
+                              )}
+                            </div>
+                          </th>
+                          <th className="border border-slate-700 px-2 py-3 text-center">
+                            <div className="flex items-center justify-center">
+                              Aktionen
+                            </div>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {getSortedPlayers().map((player, index) => {
+                          const pointsValue = baseMode === 'avg' 
+                            ? player.punkte_avg 
+                            : baseMode === 'sum' 
+                              ? player.punkte_sum 
+                              : player.punkte_hist.slice(-3).reduce((sum, p) => sum + p, 0) / 3;
+                          
+                          return (
+                            <tr 
+                              key={player.id} 
+                              className={`hover:bg-slate-800 transition cursor-pointer ${index % 2 === 0 ? 'bg-slate-900/30' : 'bg-slate-900/60'}`}
+                              onClick={() => handlePlayerSelect(player)}
+                            >
+                              <td className="border border-slate-700 px-4 py-3">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-full bg-slate-700 overflow-hidden flex-shrink-0">
+                                    <PlayerImage
+                                      playerImageUrl={player.playerImageUrl}
+                                      playerName={player.name}
+                                      className="w-full h-full object-cover rounded-full"
+                                      size="sm"
+                                    />
+                                  </div>
+                                  <div>
+                                    <div className={`font-medium ${getPlayerNameColor(player.status, player.isInjured)}`}>
+                                      {player.name}
+                                    </div>
+                                    {getStatusWithEmoji(player.status, player.isInjured) && (
+                                      <div className="text-xs text-slate-400 mt-1">
+                                        {getStatusWithEmoji(player.status, player.isInjured)}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="border border-slate-700 px-4 py-3 text-center">
+                                <div className="flex justify-center">
+                                  <BundesligaLogo teamName={player.verein} className="w-10 h-10" />
+                                </div>
+                              </td>
+                              <td className="border border-slate-700 px-4 py-3 text-center">
+                                <span className={`font-medium ${getPositionColor(player.position)}`}>
+                                  {translatePosition(player.position)}
+                                </span>
+                              </td>
+                              <td className="border border-slate-700 px-4 py-3 text-center font-medium">
+                                <span className={getPlayerNameColor(player.status, player.isInjured)}>
+                                  {formatter.format(player.kosten)}
+                                </span>
+                              </td>
+                              <td className="border border-slate-700 px-4 py-3 text-center font-medium">
+                                <span className={getPlayerNameColor(player.status, player.isInjured)}>
+                                  {Math.round(player.punkte_sum)}
+                                </span>
+                              </td>
+                              <td className="border border-slate-700 px-4 py-3 text-center font-medium">
+                                <span className={getPlayerNameColor(player.status, player.isInjured)}>
+                                  {Math.round(pointsValue)}
+                                </span>
+                              </td>
+                              <td className="border border-slate-700 px-4 py-3 text-center font-medium text-sm">
+                                <span className={getPlayerNameColor(player.status, player.isInjured)}>
+                                  {calculatePointsPerMinute(player)}
+                                </span>
+                              </td>
+                              <td className="border border-slate-700 px-4 py-3 text-center font-medium text-sm">
+                                <span className={getPlayerNameColor(player.status, player.isInjured)}>
+                                  {calculatePointsPerMillion(player)}
+                                </span>
+                              </td>
+                              <td className="border border-slate-700 px-2 py-3 text-center">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation(); // Prevent row click
+                                    if (isPlayerExcluded(player.id)) {
+                                      handleIncludePlayer(player.id);
+                                    } else {
+                                      handleExcludePlayer(player);
+                                    }
+                                  }}
+                                  className="w-8 h-8 flex items-center justify-center text-lg transition-opacity hover:opacity-70 border-0 outline-none bg-transparent"
+                                  title={isPlayerExcluded(player.id) ? 'Spieler wieder einschließen' : 'Spieler ausschließen'}
+                                >
+                                  {isPlayerExcluded(player.id) ? '✅' : '🚫'}
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-slate-400">Keine Spieler gefunden</p>
+                  </div>
+                )}
+              </div>
 
-            {/* Excluded Players Section */}
-            {excludedPlayers.length > 0 && (
-              <div className="mt-8 border-t border-slate-700 pt-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-white">
+              {/* Blacklist Section */}
+              {excludedPlayers.length > 0 && (
+                <div className="mt-8">
+                  <h3 className="text-lg font-semibold text-slate-200 mb-4">
                     Ausgeschlossene Spieler ({excludedPlayers.length})
                   </h3>
-                  <button
-                    onClick={() => setShowExcludedPlayers(!showExcludedPlayers)}
-                    className="px-3 py-1 text-sm bg-slate-700 hover:bg-slate-600 text-white rounded transition-colors"
-                  >
-                    {showExcludedPlayers ? 'Ausblenden' : 'Anzeigen'}
-                  </button>
-                </div>
-                
-                {showExcludedPlayers && (
-                  <div className="bg-slate-800 rounded-lg p-4">
-                    <div className="grid gap-2">
-                      {excludedPlayers.map((excludedPlayer) => (
-                        <div
-                          key={excludedPlayer.id}
-                          className="flex items-center justify-between p-3 bg-slate-700 rounded border border-slate-600"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="inline-flex items-center justify-center w-8 h-6 bg-slate-600 text-slate-200 rounded text-xs font-medium">
-                              {translatePosition(excludedPlayer.position)}
-                            </span>
-                            <div>
-                              <div className="font-medium text-white">{excludedPlayer.name}</div>
-                              <div className="text-sm text-slate-400">
-                                {getFullTeamName(excludedPlayer.verein)} • Ausgeschlossen vor {excludedPlayer.daysSinceExclusion} Tag{excludedPlayer.daysSinceExclusion !== 1 ? 'en' : ''}
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-slate-700 bg-slate-900/60 rounded-lg">
+                      <thead>
+                        <tr className="bg-slate-800">
+                          <th className="border border-slate-700 px-4 py-3 text-left text-slate-200 font-medium">
+                            Spieler
+                          </th>
+                          <th className="border border-slate-700 px-4 py-3 text-center text-slate-200 font-medium">
+                            Verein
+                          </th>
+                          <th className="border border-slate-700 px-4 py-3 text-center text-slate-200 font-medium">
+                            Position
+                          </th>
+                          <th className="border border-slate-700 px-4 py-3 text-center text-slate-200 font-medium">
+                            Ausgeschlossen seit
+                          </th>
+                          <th className="border border-slate-700 px-4 py-3 text-center text-slate-200 font-medium">
+                            Aktion
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {excludedPlayers.map((excludedPlayer) => (
+                          <tr key={excludedPlayer.id} className="hover:bg-slate-800/50 transition-colors">
+                            <td className="border border-slate-700 px-4 py-3">
+                              <div className="flex items-center space-x-3">
+                                <PlayerImage 
+                                  playerId={excludedPlayer.id} 
+                                  playerName={excludedPlayer.name}
+                                  className="w-8 h-8 rounded-full"
+                                />
+                                <span className="text-slate-200 font-medium">
+                                  {excludedPlayer.name}
+                                </span>
                               </div>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => handleIncludePlayer(excludedPlayer.id)}
-                            className="px-3 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
-                          >
-                            Wieder einschließen
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Pagination controls at bottom */}
-            {filteredAndSortedPlayers.length > 0 && (
-              <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  {/* Players per page selector */}
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm text-slate-400">Pro Seite:</label>
-                    <select
-                      value={playersPerPage}
-                      onChange={(e) => setPlayersPerPage(Number(e.target.value))}
-                      className="rounded border border-slate-700 bg-slate-950 px-2 py-1 text-sm text-white"
-                    >
-                      <option value={25}>25</option>
-                      <option value={50}>50</option>
-                      <option value={100}>100</option>
-                    </select>
+                            </td>
+                            <td className="border border-slate-700 px-4 py-3 text-center">
+                              <div className="flex items-center justify-center">
+                                <BundesligaLogo 
+                                  teamName={excludedPlayer.verein} 
+                                  className="w-6 h-6"
+                                />
+                              </div>
+                            </td>
+                            <td className="border border-slate-700 px-4 py-3 text-center">
+                              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${getPositionColor(excludedPlayer.position)}`}>
+                                {translatePosition(excludedPlayer.position)}
+                              </span>
+                            </td>
+                            <td className="border border-slate-700 px-4 py-3 text-center text-slate-400 text-sm">
+                              {excludedPlayer.daysSinceExclusion === 0 
+                                ? 'Heute' 
+                                : `${excludedPlayer.daysSinceExclusion} Tag${excludedPlayer.daysSinceExclusion === 1 ? '' : 'e'}`
+                              }
+                            </td>
+                            <td className="border border-slate-700 px-4 py-3 text-center">
+                              <button
+                                onClick={() => handleIncludePlayer(excludedPlayer.id)}
+                                className="w-8 h-8 flex items-center justify-center text-lg transition-opacity hover:opacity-70 border-0 outline-none bg-transparent"
+                                title="Spieler wieder einschließen"
+                              >
+                                ✅
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
-                
-                {/* Pagination buttons */}
-                {totalPages > 1 && (
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                      disabled={currentPage === 1}
-                      className="px-3 py-1 text-sm rounded border border-slate-700 bg-slate-950 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 transition-colors"
-                    >
-                      ← Zurück
-                    </button>
-                    
-                    <span className="text-sm text-slate-400 px-2">
-                      {currentPage} / {totalPages}
-                    </span>
-                    
-                    <button
-                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                      disabled={currentPage === totalPages}
-                      className="px-3 py-1 text-sm rounded border border-slate-700 bg-slate-950 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-800 transition-colors"
-                    >
-                      Weiter →
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
+              )}
+            </div>
           </section>
-        )}
+        </TabsContent>
 
-      {activeTab === 'Ergebnis' && (
-        <section className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
+        <TabsContent value="Ergebnis">
+          <section className="space-y-6">
+            <div className="space-y-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
               <h2 className="text-xl font-semibold">Optimale Startelf</h2>
               {optState.result ? (
                 <p className="text-sm text-slate-400">
@@ -1169,63 +1266,18 @@ export default function HomePage() {
                 <p className="text-sm text-slate-400">Noch keine Berechnung durchgeführt.</p>
               )}
             </div>
-            {optState.result && (
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => exportJson(optState.result!, budget)}
-                  className="rounded border border-slate-700 px-3 py-2 text-sm"
-                >
-                  JSON Export
-                </button>
-                <button
-                  type="button"
-                  onClick={() => exportCsv(optState.result!, budget)}
-                  className="rounded border border-slate-700 px-3 py-2 text-sm"
-                >
-                  CSV Export
-                </button>
-                <button type="button" className="rounded border border-emerald-500 px-3 py-2 text-sm" onClick={handleOptimize}>
-                  Neu rechnen
-                </button>
-              </div>
-            )}
-          </div>
-
-          {optState.result && (
-            <div className="mt-4 grid gap-4 lg:grid-cols-4">
-              {['GK', 'DEF', 'MID', 'FWD'].map((pos) => (
-                <div key={pos} className="rounded-lg border border-slate-800 bg-slate-950/40 p-3">
-                  <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-400">
-                    {pos} • {formationSummary[pos] ?? 0}
-                  </h3>
-                  <ul className="space-y-2 text-sm">
-                    {optState.result?.lineup
-                      .filter((player) => player.position === pos)
-                      .map((player) => (
-                        <li key={player.playerId} className="rounded bg-slate-800/60 px-3 py-2">
-                          <div className="font-semibold text-emerald-200">{player.name}</div>
-                          <div className="text-xs text-slate-400">{getFullTeamName(player.verein)}</div>
-                          <div className="mt-1 flex justify-between text-xs text-slate-300">
-                            <span>Pᵢ: {player.p_pred.toFixed(2)}</span>
-                            <span>Kosten: {formatter.format(player.kosten)}</span>
-                          </div>
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-      )}
+          </section>
+        </TabsContent>
+      </Tabs>
       
       {/* Player Detail Modal */}
-      <PlayerDetailModal
-        player={selectedPlayer}
-        isOpen={isPlayerModalOpen}
-        onClose={closePlayerModal}
-      />
+      {selectedPlayer && (
+        <PlayerDetailModal
+          player={selectedPlayer}
+          isOpen={isPlayerModalOpen}
+          onClose={closePlayerModal}
+        />
+      )}
     </div>
   );
 }

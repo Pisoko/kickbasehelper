@@ -85,9 +85,13 @@ export async function GET(request: NextRequest) {
     
     // Calculate totals and actual appearances (only games with minutes > 0)
     const actualAppearances = matches.filter((match: any) => match.playerMinutes > 0);
+    const start11Appearances = matches.filter((match: any) => match.playerMinutes >= 45);
     const totalPoints = matches.reduce((sum: number, match: any) => sum + match.playerPoints, 0);
     const totalMinutes = matches.reduce((sum: number, match: any) => sum + match.playerMinutes, 0);
     const averagePoints = actualAppearances.length > 0 ? totalPoints / actualAppearances.length : 0;
+    
+    // Calculate total matchdays played (unique matchdays from all matches)
+    const totalMatchdays = matches.length > 0 ? Math.max(...matches.map((match: any) => match.matchday)) : 4;
     
     // Transform the data to match our expected format
     const transformedData = {
@@ -95,7 +99,10 @@ export async function GET(request: NextRequest) {
       matches,
       totalPoints,
       totalMinutes,
-      averagePoints
+      averagePoints,
+      actualAppearances: actualAppearances.length,
+      start11Count: start11Appearances.length,
+      totalMatchdays
     };
 
     return NextResponse.json(transformedData);
@@ -160,7 +167,10 @@ export async function GET(request: NextRequest) {
       ],
       totalPoints: 1468,
       totalMinutes: 372,
-      averagePoints: 367
+      averagePoints: 367,
+      actualAppearances: 4,
+      start11Count: 4,
+      totalMatchdays: 4
     };
 
     return NextResponse.json(mockData);

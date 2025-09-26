@@ -163,96 +163,149 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
         )}
       </div>
 
-      {/* Scrollable container for matchdays and performance bars */}
-      <div className={`${needsScrolling ? 'overflow-x-auto' : ''} pb-2`}>
-        <div className={`flex ${needsScrolling ? 'w-max' : 'justify-between'} gap-4`}>
-          {sortedMatchHistory.map((match) => (
-            <div key={match.matchday} className={`${needsScrolling ? 'w-20 flex-shrink-0' : 'flex-1'} flex flex-col`}>
-              {/* Matchday Header */}
-              <div className="text-center mb-4">
-                <div className="text-xs font-medium text-slate-400 mb-2">
-                  #{match.matchday}
+      {/* Mobile View (Card Layout) */}
+      <div className="md:hidden space-y-4 mb-4">
+        {sortedMatchHistory.map((match) => {
+          const isHomeTeam = match.playerTeam === match.homeTeam;
+          const opponentTeam = isHomeTeam ? match.awayTeam : match.homeTeam;
+          
+          return (
+            <div key={match.matchday} className="bg-slate-700/30 rounded-lg p-3 border border-slate-600/50">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs font-medium text-slate-400">#{match.matchday}</span>
+                <span className={`text-xs font-medium ${
+                  match.playerMinutes > 47 ? 'text-green-400 font-bold' : 'text-slate-400'
+                }`}>{match.playerMinutes}'</span>
+              </div>
+              
+              <div className="flex justify-between items-center mb-3">
+                <div className="flex items-center space-x-2">
+                  {isHomeTeam ? (
+                    <>
+                      <BundesligaLogo teamName={match.homeTeam} size="sm" />
+                      <span className="text-xs font-medium text-white">vs</span>
+                      <BundesligaLogo teamName={match.awayTeam} size="sm" />
+                    </>
+                  ) : (
+                    <>
+                      <BundesligaLogo teamName={match.awayTeam} size="sm" />
+                      <span className="text-xs font-medium text-white">vs</span>
+                      <BundesligaLogo teamName={match.homeTeam} size="sm" />
+                    </>
+                  )}
                 </div>
-                
-                {/* Team Logos and Score */}
-                <div className="flex flex-col items-center space-y-1 mb-2">
-                  <div className="flex items-center space-x-1">
-                    <BundesligaLogo teamName={match.homeTeam} size="sm" />
-                    <BundesligaLogo teamName={match.awayTeam} size="sm" />
-                  </div>
-                  <div className="text-xs font-medium text-white">
-                    {match.homeScore} : {match.awayScore}
-                  </div>
+                <div className="text-xs font-medium text-white">
+                  {match.homeScore} : {match.awayScore}
                 </div>
               </div>
+              
+              <div className="relative h-10 bg-slate-700/50 rounded overflow-hidden">
+                <div 
+                  className={`absolute bottom-0 left-0 right-0 bg-gradient-to-r ${getPerformanceColor(match.playerPoints)} rounded-b transition-all duration-500 ease-out`}
+                  style={{ height: `${getBarFillPercentage(match.playerPoints)}%` }}
+                ></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-sm font-bold text-white">{match.playerPoints} Pkt</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-              {/* Performance Bar - Fixed height container with variable fill */}
-              <div className="flex flex-col items-center">
-                {/* Fixed height bar container - 50% taller (h-48 instead of h-32), 25% narrower (max-w-9 instead of max-w-12) */}
-                <div className="relative w-full max-w-9 h-48 bg-slate-700/30 rounded border border-slate-600/50 overflow-hidden mx-auto">
-                  {/* Background grid pattern for better visual reference */}
-                  <div className="absolute inset-0 opacity-20">
-                    <div className="h-full w-full bg-gradient-to-t from-transparent via-slate-500/10 to-transparent"></div>
-                    <div className="absolute top-1/4 left-0 right-0 h-px bg-slate-500/20"></div>
-                    <div className="absolute top-1/2 left-0 right-0 h-px bg-slate-500/30"></div>
-                    <div className="absolute top-3/4 left-0 right-0 h-px bg-slate-500/20"></div>
+      {/* Desktop View (Original Layout) */}
+      <div className="hidden md:block">
+        {/* Scrollable container for matchdays and performance bars */}
+        <div className={`${needsScrolling ? 'overflow-x-auto' : ''} pb-2`}>
+          <div className={`flex ${needsScrolling ? 'w-max' : 'justify-between'} gap-4`}>
+            {sortedMatchHistory.map((match) => (
+              <div key={match.matchday} className={`${needsScrolling ? 'w-20 flex-shrink-0' : 'flex-1'} flex flex-col`}>
+                {/* Matchday Header */}
+                <div className="text-center mb-4">
+                  <div className="text-xs font-medium text-slate-400 mb-2">
+                    #{match.matchday}
                   </div>
                   
-                  {/* Filled portion - grows from bottom */}
-                  <div 
-                    className={`absolute bottom-0 left-0 right-0 bg-gradient-to-r ${getPerformanceColor(match.playerPoints)} rounded-b transition-all duration-500 ease-out`}
-                    style={{ 
-                      height: `${getBarFillPercentage(match.playerPoints)}%`,
-                      minHeight: match.playerPoints > 0 ? '2px' : '0px'
-                    }}
-                  >
-                    {/* Points label always centered in the bar regardless of fill height */}
-                    {match.playerPoints > 0 && getBarFillPercentage(match.playerPoints) > 15 && (
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <span className="text-[10px] font-bold text-white">
+                  {/* Team Logos and Score */}
+                  <div className="flex flex-col items-center space-y-1 mb-2">
+                    <div className="flex items-center space-x-1">
+                      <BundesligaLogo teamName={match.homeTeam} size="sm" />
+                      <BundesligaLogo teamName={match.awayTeam} size="sm" />
+                    </div>
+                    <div className="text-xs font-medium text-white">
+                      {match.homeScore} : {match.awayScore}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Performance Bar - Fixed height container with variable fill */}
+                <div className="flex flex-col items-center">
+                  {/* Fixed height bar container - 50% taller (h-48 instead of h-32), 25% narrower (max-w-9 instead of max-w-12) */}
+                  <div className="relative w-full max-w-9 h-48 bg-slate-700/30 rounded border border-slate-600/50 overflow-hidden mx-auto">
+                    {/* Background grid pattern for better visual reference */}
+                    <div className="absolute inset-0 opacity-20">
+                      <div className="h-full w-full bg-gradient-to-t from-transparent via-slate-500/10 to-transparent"></div>
+                      <div className="absolute top-1/4 left-0 right-0 h-px bg-slate-500/20"></div>
+                      <div className="absolute top-1/2 left-0 right-0 h-px bg-slate-500/30"></div>
+                      <div className="absolute top-3/4 left-0 right-0 h-px bg-slate-500/20"></div>
+                    </div>
+                    
+                    {/* Filled portion - grows from bottom */}
+                    <div 
+                      className={`absolute bottom-0 left-0 right-0 bg-gradient-to-r ${getPerformanceColor(match.playerPoints)} rounded-b transition-all duration-500 ease-out`}
+                      style={{ 
+                        height: `${getBarFillPercentage(match.playerPoints)}%`,
+                        minHeight: match.playerPoints > 0 ? '2px' : '0px'
+                      }}
+                    >
+                      {/* Points label always centered in the bar regardless of fill height */}
+                      {match.playerPoints > 0 && getBarFillPercentage(match.playerPoints) > 15 && (
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                          <span className="text-[10px] font-bold text-white">
+                            {match.playerPoints}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Zero points indicator - 100% transparent background */}
+                    {match.playerPoints === 0 && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-xs font-bold text-white">0</span>
+                      </div>
+                    )}
+                    
+                    {/* Negative points indicator */}
+                    {match.playerPoints < 0 && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-xs font-bold text-white">{match.playerPoints}</span>
+                      </div>
+                    )}
+                    
+                    {/* For low points, show outside the bar */}
+                    {match.playerPoints > 0 && getBarFillPercentage(match.playerPoints) <= 15 && (
+                      <div className="absolute bottom-0 left-0 right-0 flex justify-center -mb-5">
+                        <span className="text-xs font-bold text-white">
                           {match.playerPoints}
                         </span>
                       </div>
                     )}
                   </div>
                   
-                  {/* Zero points indicator - 100% transparent background */}
-                  {match.playerPoints === 0 && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-xs font-bold text-white">0</span>
+                  {/* Minutes below the bar */}
+                  <div className="mt-2 text-center">
+                    <div className={`text-xs font-medium ${
+                      match.playerMinutes > 47 
+                        ? 'text-green-400 font-bold' 
+                        : 'text-slate-400'
+                    }`}>
+                      {match.playerMinutes}'
                     </div>
-                  )}
-                  
-                  {/* Negative points indicator */}
-                  {match.playerPoints < 0 && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-xs font-bold text-white">{match.playerPoints}</span>
-                    </div>
-                  )}
-                  
-                  {/* For low points, show outside the bar */}
-                  {match.playerPoints > 0 && getBarFillPercentage(match.playerPoints) <= 15 && (
-                    <div className="absolute bottom-0 left-0 right-0 flex justify-center -mb-5">
-                      <span className="text-xs font-bold text-white">
-                        {match.playerPoints}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                
-                {/* Minutes below the bar */}
-                <div className="mt-2 text-center">
-                  <div className={`text-xs font-medium ${
-                    match.playerMinutes > 47 
-                      ? 'text-green-400 font-bold' 
-                      : 'text-slate-400'
-                  }`}>
-                    {match.playerMinutes}'
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
