@@ -95,14 +95,23 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
   };
 
   const getBarFillPercentage = (points: number) => {
-    if (points <= 0) return 0; // No fill for negative or zero points
+    // Für negative Punkte: Minimale Höhe von 10% mit rotem Balken
+    if (points < 0) return 10;
     
-    // Fixed scale: 300 points = 100% fill, 150 points = 50% fill
+    // Für 0 Punkte: Minimale Höhe von 5%
+    if (points === 0) return 5;
+    
+    // Für niedrige Punktzahlen (1-30): Mindesthöhe von 15% + zusätzliche Höhe basierend auf Punkten
+    if (points > 0 && points <= 30) {
+      return 15 + (points / 30) * 10; // 15% bis 25% für 1-30 Punkte
+    }
+    
+    // Für normale Punktzahlen: Skalierte Höhe
     const maxPoints = 300;
     const percentage = (points / maxPoints) * 100;
     
-    // Cap at 100% for points above 300, minimum 2% for very low scores to show something
-    return Math.min(Math.max(percentage, 2), 100);
+    // Cap at 100% for points above 300
+    return Math.min(percentage, 100);
   };
 
   if (loading) {
@@ -197,29 +206,36 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
                       minHeight: match.playerPoints > 0 ? '2px' : '0px'
                     }}
                   >
-                    {/* Points label centered in filled area - only for good performance (yellow and above) */}
-                    {match.playerPoints > 0 && match.playerPoints >= 50 && getBarFillPercentage(match.playerPoints) > 15 && (
+                    {/* Points label always centered in the bar regardless of fill height */}
+                    {match.playerPoints > 0 && getBarFillPercentage(match.playerPoints) > 15 && (
                       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <span className="text-[10px] font-semibold text-white drop-shadow-lg">
+                        <span className="text-[10px] font-bold text-white">
                           {match.playerPoints}
                         </span>
                       </div>
                     )}
                   </div>
                   
-                  {/* Points label outside bar for red bars (poor performance 0-49 points) or very low bars */}
-                  {match.playerPoints > 0 && (match.playerPoints < 50 || getBarFillPercentage(match.playerPoints) <= 15) && (
-                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2">
-                      <span className="text-xs font-semibold text-white drop-shadow-lg">
-                        {match.playerPoints}
-                      </span>
-                    </div>
-                  )}
-                  
                   {/* Zero points indicator - 100% transparent background */}
                   {match.playerPoints === 0 && (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-xs font-medium text-slate-300 drop-shadow-lg">0</span>
+                      <span className="text-xs font-bold text-white">0</span>
+                    </div>
+                  )}
+                  
+                  {/* Negative points indicator */}
+                  {match.playerPoints < 0 && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-xs font-bold text-white">{match.playerPoints}</span>
+                    </div>
+                  )}
+                  
+                  {/* For low points, show outside the bar */}
+                  {match.playerPoints > 0 && getBarFillPercentage(match.playerPoints) <= 15 && (
+                    <div className="absolute bottom-0 left-0 right-0 flex justify-center -mb-5">
+                      <span className="text-xs font-bold text-white">
+                        {match.playerPoints}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -237,28 +253,6 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Summary Statistics */}
-      <div className="border-t border-slate-600 pt-4">
-        <div className="flex justify-between items-center text-center">
-          <div className="flex-1">
-            <div className="text-lg font-semibold text-white">{actualAppearances.length}/{matchHistory.length}</div>
-            <div className="text-xs text-slate-400">Einsätze</div>
-          </div>
-          <div className="flex-1">
-            <div className="text-lg font-semibold text-white">{totalPoints}</div>
-            <div className="text-xs text-slate-400">Gesamtpunkte</div>
-          </div>
-          <div className="flex-1">
-            <div className="text-lg font-semibold text-white">{actualAppearances.length > 0 ? Math.round(totalPoints / actualAppearances.length) : 0}</div>
-            <div className="text-xs text-slate-400">Ø Punkte</div>
-          </div>
-          <div className="flex-1">
-            <div className="text-lg font-semibold text-white">{actualAppearances.length > 0 ? Math.round(totalMinutes / actualAppearances.length) : 0}</div>
-            <div className="text-xs text-slate-400">Ø Minuten</div>
-          </div>
         </div>
       </div>
     </div>

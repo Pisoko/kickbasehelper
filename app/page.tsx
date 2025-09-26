@@ -32,7 +32,7 @@ interface OptimizeState {
   result?: OptimizationResult;
 }
 
-const tabs = ['Dashboard', 'Spieler-Explorer', 'Ergebnis'] as const;
+const tabs = ['Dashboard', 'Spieler Hub', 'Ergebnis'] as const;
 
 const formatter = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
