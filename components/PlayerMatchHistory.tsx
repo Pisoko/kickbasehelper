@@ -197,9 +197,9 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
                       minHeight: match.playerPoints > 0 ? '2px' : '0px'
                     }}
                   >
-                    {/* Points label at the top of filled area - only for good performance (yellow and above) */}
+                    {/* Points label centered in filled area - only for good performance (yellow and above) */}
                     {match.playerPoints > 0 && match.playerPoints >= 50 && getBarFillPercentage(match.playerPoints) > 15 && (
-                      <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
+                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <span className="text-[10px] font-semibold text-white drop-shadow-lg">
                           {match.playerPoints}
                         </span>

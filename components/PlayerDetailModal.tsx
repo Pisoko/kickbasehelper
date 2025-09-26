@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import PlayerImage from './PlayerImage';
 import BundesligaLogo from './BundesligaLogo';
 import PlayerStatusTag from './PlayerStatusTag';
@@ -46,14 +47,49 @@ interface PlayerDetailModalProps {
 }
 
 export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDetailModalProps) {
+  const [start11Count, setStart11Count] = useState<number>(0);
+  const [loadingS11, setLoadingS11] = useState<boolean>(false);
+  const [actualAppearances, setActualAppearances] = useState<number>(0);
+  const [loadingAppearances, setLoadingAppearances] = useState<boolean>(false);
+
+  // Load S11 data and actual appearances when modal opens
+  useEffect(() => {
+    if (!isOpen || !player) return;
+
+    const fetchPerformanceData = async () => {
+      setLoadingS11(true);
+      setLoadingAppearances(true);
+      try {
+        const response = await fetch(`/api/player-performance?playerId=${player.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          // Count matches with more than 48 minutes (Start11 rule)
+          const s11Games = data.matches?.filter((match: any) => match.playerMinutes > 48).length || 0;
+          setStart11Count(s11Games);
+          
+          // Count actual appearances (matches with minutes > 0)
+          const appearances = data.matches?.filter((match: any) => match.playerMinutes > 0).length || 0;
+          setActualAppearances(appearances);
+        }
+      } catch (error) {
+        console.error('Error fetching performance data:', error);
+        setStart11Count(0);
+        setActualAppearances(0);
+      } finally {
+        setLoadingS11(false);
+        setLoadingAppearances(false);
+      }
+    };
+
+    fetchPerformanceData();
+  }, [isOpen, player?.id]);
+
   if (!isOpen || !player) return null;
 
   // Use the correct fields from the API
   const totalMinutes = player.totalMinutesPlayed || player.minutesPlayed || 0;
   
-  // Calculate games played and total games
-  // Use punkte_hist length instead of unreliable API appearances data
-  const gamesPlayed = player.punkte_hist?.length || 0;
+  // Calculate total games (current matchday)
   const totalGames = 4; // Current matchday
   
   // Calculate total goals and assists
@@ -67,12 +103,12 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
   if (totalMinutes > 0) {
     // Use actual minutes data if available
     pointsPerMinute = (player.punkte_sum || 0) / totalMinutes;
-    avgMinutesPerGame = gamesPlayed > 0 ? Math.round(totalMinutes / gamesPlayed) : 0;
-  } else if (gamesPlayed > 0) {
+    avgMinutesPerGame = actualAppearances > 0 ? Math.round(totalMinutes / actualAppearances) : 0;
+  } else if (actualAppearances > 0) {
      // Fallback: estimate based on games played
      // Assume average of 70 minutes per game for field players, 90 for goalkeepers
      avgMinutesPerGame = player.position === 'GK' ? 90 : 70;
-     const estimatedTotalMinutes = gamesPlayed * avgMinutesPerGame;
+     const estimatedTotalMinutes = actualAppearances * avgMinutesPerGame;
      pointsPerMinute = (player.punkte_sum || 0) / estimatedTotalMinutes;
    }
   
@@ -211,7 +247,23 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-slate-400 text-sm font-normal">Einsätze:</span>
-                  <span className="text-white text-base font-medium">{numberFormatter.format(gamesPlayed)} von {numberFormatter.format(totalGames)}</span>
+                  <span className="text-white text-base font-medium">
+                    {loadingAppearances ? (
+                      <span className="text-slate-400">...</span>
+                    ) : (
+                      `${numberFormatter.format(actualAppearances)} von ${numberFormatter.format(totalGames)}`
+                    )}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400 text-sm font-normal">Start11:</span>
+                  <span className="text-white text-base font-medium">
+                    {loadingS11 ? (
+                      <span className="text-slate-400">...</span>
+                    ) : (
+                      `${numberFormatter.format(start11Count)} von ${numberFormatter.format(totalGames)}`
+                    )}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400 text-sm font-normal">Ø Spielminuten:</span>

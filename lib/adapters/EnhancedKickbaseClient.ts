@@ -242,29 +242,31 @@ export class EnhancedKickbaseClient {
   }
 
   /**
-   * Get team name from team ID
+   * Get team name from team ID - Legacy IDs for 2025/26 Bundesliga
    */
   private getTeamName(teamId: string): string {
     const teamMap: Record<string, string> = {
-      '1': 'Bayern München',
-      '2': 'Borussia Dortmund',
-      '3': 'RB Leipzig',
-      '4': 'Bayer Leverkusen',
-      '5': 'Eintracht Frankfurt',
-      '6': 'VfL Wolfsburg',
-      '7': 'Borussia Mönchengladbach',
-      '8': 'TSG Hoffenheim',
-      '9': 'SC Freiburg',
-      '10': 'Union Berlin',
-      '11': 'VfB Stuttgart',
-      '12': 'Werder Bremen',
-      '13': 'FC Augsburg',
-      '14': 'VfL Bochum',
-      '15': 'FSV Mainz 05',
-      '16': 'FC Heidenheim',
-      '17': 'Holstein Kiel',
-      '18': 'FC St. Pauli',
-    };
+      '2': 'Bayern München',         // Bayern (Legacy ID)
+      '3': 'Borussia Dortmund',      // Dortmund
+      '4': 'Eintracht Frankfurt',    // Frankfurt (Legacy ID)
+      '5': 'SC Freiburg',            // Freiburg (Legacy ID)
+      '6': 'Hamburger SV',           // Hamburg (Promoted for 2025/26)
+      '7': 'Bayer 04 Leverkusen',    // Leverkusen (Legacy ID)
+      '8': 'FC Schalke 04',          // Schalke (relegated)
+      '9': 'VfB Stuttgart',          // Stuttgart
+      '10': 'Werder Bremen',         // Bremen (Legacy ID)
+      '11': 'VfL Wolfsburg',         // Wolfsburg (Legacy ID)
+      '12': 'TSG Hoffenheim',        // Hoffenheim (Legacy ID)
+      '13': 'FC Augsburg',           // Augsburg
+      '14': 'VfL Bochum',            // Bochum (relegated)
+      '15': 'Borussia Mönchengladbach', // M'gladbach
+      '18': 'FSV Mainz 05',          // Mainz
+      '28': '1. FC Köln',            // Köln (Promoted for 2025/26)
+      '39': 'FC St. Pauli',          // St. Pauli (Promoted for 2025/26)
+      '40': '1. FC Union Berlin',    // Union Berlin
+      '43': 'RB Leipzig',            // Leipzig (Legacy ID)
+      '50': '1. FC Heidenheim'       // Heidenheim (only ID 50)
+    } as const;
 
     return teamMap[teamId] || `Team ${teamId}`;
   }

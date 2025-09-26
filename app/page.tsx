@@ -224,18 +224,19 @@ const getStatusEmojiColor = (status?: string | number, isInjured?: boolean): str
 // Optimierte Startelf-Wahrscheinlichkeitsberechnung
 
 
-// Formatierung der Startelf-Wahrscheinlichkeit mit Farbe
+// Formatierung der Startelf-Wahrscheinlichkeit mit Ampelsystem
 const formatStartingElevenProbability = (probability: number): { text: string; color: string } => {
-  if (probability === 0) {
-    return { text: '0%', color: 'text-red-400' };
-  } else if (probability < 25) {
-    return { text: `${probability}%`, color: 'text-red-300' };
-  } else if (probability < 50) {
-    return { text: `${probability}%`, color: 'text-yellow-400' };
-  } else if (probability < 75) {
-    return { text: `${probability}%`, color: 'text-green-400' };
+  if (probability >= 0 && probability <= 30) {
+    return { text: '🔴', color: 'text-red-500' }; // Rot: 0-30%
+  } else if (probability >= 31 && probability <= 60) {
+    return { text: '🟠', color: 'text-orange-500' }; // Orange: 31-60%
+  } else if (probability >= 61 && probability <= 79) {
+    return { text: '🟡', color: 'text-yellow-500' }; // Gelb: 61-79%
+  } else if (probability >= 80 && probability <= 100) {
+    return { text: '🟢', color: 'text-green-500' }; // Grün: 80-100%
   } else {
-    return { text: `${probability}%`, color: 'text-green-300' };
+    // Fallback für unerwartete Werte
+    return { text: '⚪', color: 'text-gray-500' };
   }
 };
 
@@ -1017,7 +1018,10 @@ export default function HomePage() {
                            const probability = newStart11Probabilities.get(player.id) || 0;
                            const formatted = formatStartingElevenProbability(probability);
                            return (
-                             <span className={`font-medium ${formatted.color}`}>
+                             <span 
+                               className={`font-medium ${formatted.color} cursor-help`}
+                               title={`${probability.toFixed(1)}% Wahrscheinlichkeit`}
+                             >
                                {formatted.text}
                              </span>
                            );

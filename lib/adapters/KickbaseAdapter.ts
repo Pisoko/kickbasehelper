@@ -469,27 +469,29 @@ export class KickbaseAdapter {
   async getAllPlayersFromTeams(): Promise<Player[]> {
     const allPlayers: Player[] = [];
     
-    // Get all team IDs from our team mapping - Updated with CORRECT men's team IDs (≤ 55) for 2025/26 Bundesliga
+    // Get all team IDs from our team mapping - Legacy IDs for 2025/26 Bundesliga
     const teamIds = Object.keys({
-      '2': 'Bayern München',         // Bayern (men's team, corrected ID)
+      '2': 'Bayern München',         // Bayern (Legacy ID)
       '3': 'Borussia Dortmund',      // Dortmund
-      '4': 'Eintracht Frankfurt',    // Frankfurt (corrected ID)
-      '5': 'SC Freiburg',            // Freiburg (corrected ID)
+      '4': 'Eintracht Frankfurt',    // Frankfurt (Legacy ID)
+      '5': 'SC Freiburg',            // Freiburg (Legacy ID)
       '6': 'Hamburger SV',           // Hamburg (Promoted for 2025/26)
-      '7': 'Bayer 04 Leverkusen',    // Leverkusen (corrected ID)
+      '7': 'Bayer 04 Leverkusen',    // Leverkusen (Legacy ID)
+      '8': 'FC Schalke 04',          // Schalke (relegated)
       '9': 'VfB Stuttgart',          // Stuttgart
-      '10': 'Werder Bremen',         // Bremen (corrected ID)
-      '11': 'VfL Wolfsburg',         // Wolfsburg (corrected ID)
+      '10': 'Werder Bremen',         // Bremen (Legacy ID)
+      '11': 'VfL Wolfsburg',         // Wolfsburg (Legacy ID)
+      '12': 'TSG Hoffenheim',        // Hoffenheim (Legacy ID)
       '13': 'FC Augsburg',           // Augsburg
-      '14': 'TSG Hoffenheim',        // Hoffenheim (corrected ID)
+      '14': 'VfL Bochum',            // Bochum (relegated)
       '15': 'Borussia Mönchengladbach', // M'gladbach
       '18': 'FSV Mainz 05',          // Mainz
-      '28': '1. FC Köln',            // Köln (Promoted for 2025/26, corrected ID)
-      '39': 'FC St. Pauli',          // St. Pauli (Promoted for 2025/26, corrected ID)
+      '28': '1. FC Köln',            // Köln (Promoted for 2025/26)
+      '39': 'FC St. Pauli',          // St. Pauli (Promoted for 2025/26)
       '40': '1. FC Union Berlin',    // Union Berlin
-      '43': 'RB Leipzig',            // Leipzig (corrected ID)
-      '50': '1. FC Heidenheim'       // Heidenheim
-    });
+      '43': 'RB Leipzig',            // Leipzig (Legacy ID)
+      '50': '1. FC Heidenheim'       // Heidenheim (only ID 50)
+    } as const);
 
     logger.info({ teamCount: teamIds.length }, 'Starting to fetch players from all teams');
 
@@ -544,27 +546,29 @@ export class KickbaseAdapter {
   async getAllPlayersFromTeamsOptimized(leagueId: string = '7389547'): Promise<Player[]> {
     const allPlayers: Player[] = [];
     
-    // Get all team IDs from our team mapping - Updated with CORRECT men's team IDs (≤ 55) for 2025/26 Bundesliga
+    // Get all team IDs from our team mapping - Legacy IDs for 2025/26 Bundesliga
     const teamIds = Object.keys({
-      '2': 'Bayern München',         // Bayern (men's team, corrected ID)
+      '2': 'Bayern München',         // Bayern (Legacy ID)
       '3': 'Borussia Dortmund',      // Dortmund
-      '4': 'Eintracht Frankfurt',    // Frankfurt (corrected ID)
-      '5': 'SC Freiburg',            // Freiburg (corrected ID)
+      '4': 'Eintracht Frankfurt',    // Frankfurt (Legacy ID)
+      '5': 'SC Freiburg',            // Freiburg (Legacy ID)
       '6': 'Hamburger SV',           // Hamburg (Promoted for 2025/26)
-      '7': 'Bayer 04 Leverkusen',    // Leverkusen (corrected ID)
+      '7': 'Bayer 04 Leverkusen',    // Leverkusen (Legacy ID)
+      '8': 'FC Schalke 04',          // Schalke (relegated)
       '9': 'VfB Stuttgart',          // Stuttgart
-      '10': 'Werder Bremen',         // Bremen (corrected ID)
-      '11': 'VfL Wolfsburg',         // Wolfsburg (corrected ID)
+      '10': 'Werder Bremen',         // Bremen (Legacy ID)
+      '11': 'VfL Wolfsburg',         // Wolfsburg (Legacy ID)
+      '12': 'TSG Hoffenheim',        // Hoffenheim (Legacy ID)
       '13': 'FC Augsburg',           // Augsburg
-      '14': 'TSG Hoffenheim',        // Hoffenheim (corrected ID)
+      '14': 'VfL Bochum',            // Bochum (relegated)
       '15': 'Borussia Mönchengladbach', // M'gladbach
       '18': 'FSV Mainz 05',          // Mainz
-      '28': '1. FC Köln',            // Köln (Promoted for 2025/26, corrected ID)
-      '39': 'FC St. Pauli',          // St. Pauli (Promoted for 2025/26, corrected ID)
+      '28': '1. FC Köln',            // Köln (Promoted for 2025/26)
+      '39': 'FC St. Pauli',          // St. Pauli (Promoted for 2025/26)
       '40': '1. FC Union Berlin',    // Union Berlin
-      '43': 'RB Leipzig',            // Leipzig (corrected ID)
-      '50': '1. FC Heidenheim'       // Heidenheim
-    });
+      '43': 'RB Leipzig',            // Leipzig (Legacy ID)
+      '50': '1. FC Heidenheim'       // Heidenheim (only ID 50)
+    } as const);
 
     console.log(`[OPTIMIZED] Starting fetch for ${teamIds.length} teams using new endpoints`);
     logger.info({ teamCount: teamIds.length }, 'Starting optimized fetch of players from all teams using new endpoints');
@@ -1061,27 +1065,29 @@ export class KickbaseAdapter {
   }
 
   private getTeamName(teamId: string | number): string {
-    // Map team IDs to team names - Updated with CORRECT men's team IDs (≤ 55) for 2025/26 Bundesliga teams
+    // Map team IDs to team names - Legacy IDs for 2025/26 Bundesliga teams
     const teamMap: Record<string, string> = {
-      '2': 'Bayern München',         // Bayern (corrected ID)
+      '2': 'Bayern München',         // Bayern (Legacy ID)
       '3': 'Borussia Dortmund',      // Dortmund
-      '4': 'Eintracht Frankfurt',    // Frankfurt (corrected ID)
-      '5': 'SC Freiburg',            // Freiburg (corrected ID)
+      '4': 'Eintracht Frankfurt',    // Frankfurt (Legacy ID)
+      '5': 'SC Freiburg',            // Freiburg (Legacy ID)
       '6': 'Hamburger SV',           // Hamburg (Promoted for 2025/26)
-      '7': 'Bayer 04 Leverkusen',    // Leverkusen (corrected ID)
+      '7': 'Bayer 04 Leverkusen',    // Leverkusen (Legacy ID)
+      '8': 'FC Schalke 04',          // Schalke (relegated)
       '9': 'VfB Stuttgart',          // Stuttgart
-      '10': 'Werder Bremen',         // Bremen (corrected ID)
-      '11': 'VfL Wolfsburg',         // Wolfsburg (corrected ID)
+      '10': 'Werder Bremen',         // Bremen (Legacy ID)
+      '11': 'VfL Wolfsburg',         // Wolfsburg (Legacy ID)
+      '12': 'TSG Hoffenheim',        // Hoffenheim (Legacy ID)
       '13': 'FC Augsburg',           // Augsburg
-      '14': 'TSG Hoffenheim',        // Hoffenheim (corrected ID)
+      '14': 'VfL Bochum',            // Bochum (relegated)
       '15': 'Borussia Mönchengladbach', // M'gladbach
       '18': 'FSV Mainz 05',          // Mainz
-      '28': '1. FC Köln',            // Köln (Promoted for 2025/26, corrected ID)
-      '39': 'FC St. Pauli',          // St. Pauli (Promoted for 2025/26, corrected ID)
+      '28': '1. FC Köln',            // Köln (Promoted for 2025/26)
+      '39': 'FC St. Pauli',          // St. Pauli (Promoted for 2025/26)
       '40': '1. FC Union Berlin',    // Union Berlin
-      '43': 'RB Leipzig',            // Leipzig (corrected ID)
-      '50': '1. FC Heidenheim'       // Heidenheim
-    };
+      '43': 'RB Leipzig',            // Leipzig (Legacy ID)
+      '50': '1. FC Heidenheim'       // Heidenheim (only ID 50)
+    } as const;
     
     return teamMap[String(teamId)] || `Team ${teamId}`;
   }

@@ -14,6 +14,8 @@ interface PlayerStart11Data {
   teamId: string;
   position: 'GK' | 'DEF' | 'MID' | 'FWD';
   isHealthy: boolean;
+  isInjured: boolean; // Separate field for injured status (status 1, 8, 16)
+  isAngeschlagen: boolean; // Separate field for "angeschlagen" status (status 2)
   minutesPlayed: number;
   appearances: number;
   totalMinutes: number;
@@ -254,6 +256,11 @@ export class FormationBasedStart11Calculator {
         probability += lastMatchBonus;
       }
       
+      // Apply reduction by factor 0.55 for "angeschlagen" players (status 2)
+      if (player.isAngeschlagen) {
+        probability *= 0.55; // Reduce to 55% of original value (45% reduction)
+      }
+      
       probabilities.push([player.id, Math.max(0, Math.min(0.98, probability))]);
     }
     
@@ -469,11 +476,21 @@ export class FormationBasedStart11Calculator {
     // Extract last match minutes - use minutesPlayed if available, otherwise estimate
     const lastMatchMinutes = player.minutesPlayed || 0;
     
+    // Determine player status
+    const statusCode = typeof player.status === 'string' ? parseInt(player.status) : (player.status || 0);
+    const isInjured = player.isInjured || [1, 8, 16].includes(statusCode); // Verletzt, Glatt Rot, Gelb-Rote Karte
+    const isAngeschlagen = statusCode === 2; // Angeschlagen
+    
+    // Player is healthy if not injured (angeschlagen players are considered healthy but with reduced chance)
+    const isHealthy = !isInjured;
+    
     return {
       id: player.id,
       teamId: this.getPlayerTeamId(player),
       position: player.position as 'GK' | 'DEF' | 'MID' | 'FWD',
-      isHealthy: !player.isInjured && (!player.status || player.status === '0'),
+      isHealthy,
+      isInjured,
+      isAngeschlagen,
       minutesPlayed: player.minutesPlayed || 0,
       appearances,
       totalMinutes,

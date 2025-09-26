@@ -1,9 +1,25 @@
 /**
  * Service für die Integration der offiziellen Bundesliga-Vereinslogos
  * Basiert auf den DFL-CLU-IDs von bundesliga.com
+ * 
+ * @deprecated Verwende stattdessen die neuen Funktionen aus ../teamMapping.ts
+ * Diese Datei wird für Rückwärtskompatibilität beibehalten.
  */
 
-// Mapping zwischen Vereins-Kurznamen und DFL-CLU-IDs
+import {
+  getBundesligaLogoUrlByTeamName,
+  getBundesligaLogoUrlByKickbaseId,
+  hasLogoByTeamName,
+  hasLogoByKickbaseId,
+  getTeamByFullName,
+  getTeamByShortName,
+  getTeamsWithLogos,
+  getDflIdByTeamName,
+  type TeamInfo
+} from '../teamMapping';
+
+// Legacy-Mapping für Rückwärtskompatibilität
+// @deprecated Verwende TEAM_MAPPING aus ../teamMapping.ts
 const TEAM_LOGO_MAPPING: Record<string, string> = {
   'Augsburg': 'DFL-CLU-000010',        // FC Augsburg
   'Bayern': 'DFL-CLU-00000G',          // FC Bayern München
@@ -44,6 +60,9 @@ const FULL_NAME_TO_SHORT_NAME: Record<string, string> = {
   
   // Eintracht Frankfurt Varianten
   'Eintracht Frankfurt': 'Frankfurt',
+  
+  // Eintracht Braunschweig Varianten (2. Liga)
+  'Eintracht Braunschweig': 'Eintracht Braunschweig',
   
   // SC Freiburg Varianten
   'SC Freiburg': 'Freiburg',
@@ -93,7 +112,15 @@ const FULL_NAME_TO_SHORT_NAME: Record<string, string> = {
   
   // Hamburger SV Varianten
   'Hamburger SV': 'Hamburg',
-  'HSV': 'Hamburg'
+  'HSV': 'Hamburg',
+  
+  // FC Schalke 04 Varianten (2. Liga)
+  'FC Schalke 04': 'Schalke',
+  'Schalke 04': 'Schalke',
+  
+  // VfL Bochum Varianten (2. Liga)
+  'VfL Bochum': 'Bochum',
+  
 };
 
 /**
@@ -105,8 +132,13 @@ const BUNDESLIGA_LOGO_BASE_URL = 'https://www.bundesliga.com/assets/clublogo/';
  * Konvertiert einen vollständigen Teamnamen zu einem Kurznamen
  * @param fullTeamName Der vollständige Teamname (z.B. "FC Bayern München")
  * @returns Der Kurzname (z.B. "Bayern") oder der ursprüngliche Name falls keine Zuordnung gefunden wird
+ * @deprecated Verwende getTeamByFullName() aus ../teamMapping.ts
  */
 export function getShortTeamName(fullTeamName: string): string {
+  const team = getTeamByFullName(fullTeamName);
+  if (team) return team.shortName;
+  
+  // Fallback auf Legacy-Mapping
   return FULL_NAME_TO_SHORT_NAME[fullTeamName] || fullTeamName;
 }
 
@@ -114,51 +146,50 @@ export function getShortTeamName(fullTeamName: string): string {
  * Generiert die vollständige Logo-URL für einen Verein
  * @param teamName Der Team-Name (kann vollständig oder kurz sein)
  * @returns Die vollständige URL zum SVG-Logo oder null wenn nicht gefunden
+ * @deprecated Verwende getBundesligaLogoUrlByTeamName() aus ../teamMapping.ts
  */
 export function getBundesligaLogoUrl(teamName: string): string | null {
-  // Erst versuchen, den Namen als Kurznamen zu verwenden
-  let shortName = teamName;
+  console.log(`[DEBUG] getBundesligaLogoUrl called with teamName: "${teamName}"`);
   
-  // Falls es ein vollständiger Name ist, zu Kurzname konvertieren
-  if (FULL_NAME_TO_SHORT_NAME[teamName]) {
-    shortName = FULL_NAME_TO_SHORT_NAME[teamName];
+  // Verwende die neue teamMapping-Funktion
+  const logoUrl = getBundesligaLogoUrlByTeamName(teamName);
+  if (logoUrl) {
+    console.log(`[DEBUG] Found logo URL for "${teamName}": ${logoUrl}`);
+    return logoUrl;
   }
   
-  const dflId = TEAM_LOGO_MAPPING[shortName];
-  if (!dflId) {
-    console.warn(`Kein Logo gefunden für Team: ${teamName} (Kurzname: ${shortName})`);
-    return null;
-  }
-  
-  return `${BUNDESLIGA_LOGO_BASE_URL}${dflId}.svg`;
+  console.warn(`Kein Logo gefunden für Team: ${teamName}`);
+  return null;
 }
 
 /**
  * Überprüft ob für einen Verein ein Logo verfügbar ist
  * @param teamName Der Team-Name (kann vollständig oder kurz sein)
  * @returns true wenn ein Logo verfügbar ist, false sonst
+ * @deprecated Verwende hasLogoByTeamName() aus ../teamMapping.ts
  */
 export function hasLogo(teamName: string): boolean {
-  const shortName = FULL_NAME_TO_SHORT_NAME[teamName] || teamName;
-  return shortName in TEAM_LOGO_MAPPING;
+  return hasLogoByTeamName(teamName);
 }
 
 /**
  * Gibt alle verfügbaren Team-Kurznamen mit Logos zurück
  * @returns Array aller Team-Kurznamen für die Logos verfügbar sind
+ * @deprecated Verwende getTeamsWithLogos() aus ../teamMapping.ts
  */
 export function getAvailableTeamsWithLogos(): string[] {
-  return Object.keys(TEAM_LOGO_MAPPING);
+  const teams = getTeamsWithLogos();
+  return teams.map(team => team.shortName);
 }
 
 /**
  * Gibt das DFL-CLU-ID für einen Verein zurück
  * @param teamName Der Team-Name (kann vollständig oder kurz sein)
  * @returns Die DFL-CLU-ID oder null wenn nicht gefunden
+ * @deprecated Verwende getDflIdByTeamName() aus ../teamMapping.ts
  */
 export function getDflId(teamName: string): string | null {
-  const shortName = FULL_NAME_TO_SHORT_NAME[teamName] || teamName;
-  return TEAM_LOGO_MAPPING[shortName] || null;
+  return getDflIdByTeamName(teamName) || null;
 }
 
 /**
@@ -167,6 +198,11 @@ export function getDflId(teamName: string): string | null {
  * @returns Kurzer Text für die Anzeige (max. 3 Zeichen)
  */
 export function getLogoFallbackText(teamName: string): string {
-  const shortName = FULL_NAME_TO_SHORT_NAME[teamName] || teamName;
-  return shortName.substring(0, 3).toUpperCase();
+  // Versuche zuerst über teamMapping
+  const team = getTeamByFullName(teamName) || getTeamByShortName(teamName);
+  const shortName = team ? team.shortName : teamName;
+  
+  const fallbackText = shortName.substring(0, 3).toUpperCase();
+  console.log(`[DEBUG] getLogoFallbackText for "${teamName}" -> shortName: "${shortName}" -> fallback: "${fallbackText}"`);
+  return fallbackText;
 }

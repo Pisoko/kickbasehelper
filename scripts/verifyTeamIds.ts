@@ -115,26 +115,29 @@ class TeamIdVerifier {
   async verifyCurrentTeamIds() {
     console.log('🔍 Verifying current team IDs...\n');
     
-    // Current team mapping from KickbaseAdapter.ts
+    // Current team mapping from KickbaseAdapter.ts - Legacy IDs for 2025/26 Bundesliga
     const currentTeamMap: Record<string, string> = {
-      '2': 'Bayern München',
-      '3': 'Borussia Dortmund', 
-      '4': 'RB Leipzig',
-      '5': 'SC Freiburg',
-      '7': 'Eintracht Frankfurt',
-      '9': 'Borussia Mönchengladbach',
-      '10': 'FC Augsburg',
-      '11': 'TSG Hoffenheim',
-      '13': 'Werder Bremen',
-      '14': '1. FC Köln',
-      '15': '1. FC Union Berlin',
-      '16': 'Hamburger SV',
-      '17': 'FC St. Pauli',
-      '40': 'FSV Mainz 05',
-      '43': 'Bayer 04 Leverkusen',
-      '50': 'VfL Wolfsburg',
-      '51': '1. FC Heidenheim'
-    };
+      '2': 'Bayern München',         // Bayern (Legacy ID)
+      '3': 'Borussia Dortmund',      // Dortmund
+      '4': 'Eintracht Frankfurt',    // Frankfurt (Legacy ID)
+      '5': 'SC Freiburg',            // Freiburg (Legacy ID)
+      '6': 'Hamburger SV',           // Hamburg (Promoted for 2025/26)
+      '7': 'Bayer 04 Leverkusen',    // Leverkusen (Legacy ID)
+      '8': 'FC Schalke 04',          // Schalke (relegated)
+      '9': 'VfB Stuttgart',          // Stuttgart
+      '10': 'Werder Bremen',         // Bremen (Legacy ID)
+      '11': 'VfL Wolfsburg',         // Wolfsburg (Legacy ID)
+      '12': 'TSG Hoffenheim',        // Hoffenheim (Legacy ID)
+      '13': 'FC Augsburg',           // Augsburg
+      '14': 'VfL Bochum',            // Bochum (relegated)
+      '15': 'Borussia Mönchengladbach', // M'gladbach
+      '18': 'FSV Mainz 05',          // Mainz
+      '28': '1. FC Köln',            // Köln (Promoted for 2025/26)
+      '39': 'FC St. Pauli',          // St. Pauli (Promoted for 2025/26)
+      '40': '1. FC Union Berlin',    // Union Berlin
+      '43': 'RB Leipzig',            // Leipzig (Legacy ID)
+      '50': '1. FC Heidenheim'       // Heidenheim (only ID 50)
+    } as const;
 
     const results: { [key: string]: TeamResponse | null } = {};
     

@@ -2,9 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { getBundesligaLogoUrl, getLogoFallbackText, hasLogo } from '../lib/adapters/BundesligaLogoService';
+import { 
+  getBundesligaLogoUrlByTeamName, 
+  getBundesligaLogoUrlByKickbaseId,
+  hasLogoByTeamName,
+  hasLogoByKickbaseId,
+  getTeamByKickbaseId,
+  getTeamByFullName
+} from '../lib/teamMapping';
 
 interface BundesligaLogoProps {
-  teamName: string;
+  teamName?: string;
+  kickbaseId?: string;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
@@ -21,13 +30,40 @@ const textSizeClasses = {
   lg: 'text-xs'
 };
 
-export default function BundesligaLogo({ teamName, size = 'md', className = '' }: BundesligaLogoProps) {
+export default function BundesligaLogo({ teamName, kickbaseId, size = 'md', className = '' }: BundesligaLogoProps) {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentLogoUrl, setCurrentLogoUrl] = useState<string | null>(null);
   
-  const logoUrl = getBundesligaLogoUrl(teamName);
-  const fallbackText = getLogoFallbackText(teamName);
+  // Validate that either teamName or kickbaseId is provided
+  if (!teamName && !kickbaseId) {
+    throw new Error('BundesligaLogo: Either teamName or kickbaseId must be provided');
+  }
+  
+  // Get team info and logo URL using new mapping functions
+  let logoUrl: string | undefined;
+  let hasTeamLogo: boolean;
+  let displayName: string;
+  let fallbackText: string;
+  
+  if (kickbaseId) {
+    const teamInfo = getTeamByKickbaseId(kickbaseId);
+    logoUrl = getBundesligaLogoUrlByKickbaseId(kickbaseId);
+    hasTeamLogo = hasLogoByKickbaseId(kickbaseId);
+    displayName = teamInfo?.fullName || `Team ${kickbaseId}`;
+    fallbackText = teamInfo?.shortName || kickbaseId.slice(-2).toUpperCase();
+  } else if (teamName) {
+    logoUrl = getBundesligaLogoUrlByTeamName(teamName);
+    hasTeamLogo = hasLogoByTeamName(teamName);
+    displayName = teamName;
+    // Fallback to old function for backward compatibility
+    fallbackText = getLogoFallbackText(teamName);
+  } else {
+    logoUrl = undefined;
+    hasTeamLogo = false;
+    displayName = 'Unknown Team';
+    fallbackText = '??';
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -37,7 +73,7 @@ export default function BundesligaLogo({ teamName, size = 'md', className = '' }
       setImageError(false);
 
       // If we have a logo URL, try to load it
-      if (logoUrl && hasLogo(teamName)) {
+      if (logoUrl && hasTeamLogo) {
         // Test if the image loads successfully
         const img = new Image();
         img.onload = () => {
@@ -70,7 +106,7 @@ export default function BundesligaLogo({ teamName, size = 'md', className = '' }
     return () => {
       isMounted = false;
     };
-  }, [teamName, logoUrl]);
+  }, [teamName, kickbaseId, logoUrl, hasTeamLogo]);
 
   const handleImageError = () => {
     setImageError(true);
@@ -87,7 +123,7 @@ export default function BundesligaLogo({ teamName, size = 'md', className = '' }
   }
 
   // Show fallback if no logo or error
-  if (!currentLogoUrl || imageError || !hasLogo(teamName)) {
+  if (!currentLogoUrl || imageError || !hasTeamLogo) {
     return (
       <div className={`${sizeClasses[size]} bg-slate-700 flex items-center justify-center ${className}`}>
         <span className={`text-white ${textSizeClasses[size]} font-bold`}>
@@ -102,7 +138,7 @@ export default function BundesligaLogo({ teamName, size = 'md', className = '' }
     <div className={`${sizeClasses[size]} flex items-center justify-center ${className}`}>
       <img
         src={currentLogoUrl}
-        alt={`${teamName} Logo`}
+        alt={`${displayName} Logo`}
         className="w-full h-full object-contain"
         onError={handleImageError}
         loading="lazy"

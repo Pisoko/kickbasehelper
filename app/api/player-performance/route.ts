@@ -1,59 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { KickbaseAdapter } from '../../../lib/adapters/KickbaseAdapter';
+import { getTeamByKickbaseId } from '../../../lib/teamMapping';
 
 const kickbaseAdapter = new KickbaseAdapter(
-  process.env.KICKBASE_API_URL || 'https://api.kickbase.com',
-  process.env.KICKBASE_API_KEY || ''
+  process.env.KICKBASE_BASE || 'https://api.kickbase.de',
+  process.env.KICKBASE_KEY || ''
 );
 
-// Team ID to name mapping (correct IDs for 2025/26 Bundesliga season)
-const getTeamName = (teamId: string): string => {
-  const teamMap: Record<string, string> = {
-    // Official Bundesliga team IDs (high numbers)
-    '82': 'Bayern München',        // Bayern (men's team)
-    '3': 'Borussia Dortmund',      // Dortmund
-    '92': 'RB Leipzig',            // Leipzig
-    '83': 'Bayer 04 Leverkusen',   // Leverkusen
-    '89': 'Eintracht Frankfurt',   // Frankfurt
-    '88': 'SC Freiburg',           // Freiburg
-    '40': 'Union Berlin',          // Union Berlin
-    '15': 'Borussia Mönchengladbach', // M'gladbach
-    '87': 'VfL Wolfsburg',         // Wolfsburg
-    '13': 'FC Augsburg',           // Augsburg
-    '84': 'TSG Hoffenheim',        // Hoffenheim
-    '9': 'VfB Stuttgart',          // Stuttgart
-    '80': 'Werder Bremen',         // Bremen
-    '14': 'VfL Bochum',            // Bochum (if still in league)
-    '18': 'FSV Mainz 05',          // Mainz
-    '49': '1. FC Heidenheim 1846', // Heidenheim
-    '17': 'Holstein Kiel',         // Holstein Kiel
-    '39': 'FC St. Pauli',          // St. Pauli
-    '86': '1. FC Köln',            // Köln
-    '6': 'Hamburger SV',           // Hamburg
-    
-    // Legacy/Alternative team IDs that might appear in data
-    '2': 'Bayern München',         // Legacy Bayern ID
-    '4': 'Eintracht Frankfurt',    // Legacy Frankfurt ID
-    '5': 'SC Freiburg',            // Legacy Freiburg ID
-    '7': 'Bayer 04 Leverkusen',    // Legacy Leverkusen ID
-    '8': 'FC Schalke 04',          // Schalke (relegated)
-    '10': 'Werder Bremen',         // Legacy Bremen ID
-    '11': 'TSG Hoffenheim',        // Legacy Hoffenheim ID
-    '12': 'VfB Stuttgart',         // Legacy Stuttgart ID
-    '16': '1. FC Heidenheim 1846', // Legacy Heidenheim ID
-    
-    // Additional team IDs that might appear
-    '43': 'Eintracht Braunschweig', // Possible 2. Liga team
-    '44': 'Hannover 96',           // Possible 2. Liga team
-    '45': 'Fortuna Düsseldorf',    // Possible 2. Liga team
-  };
-  return teamMap[teamId] || `Team ${teamId}`;
+const getTeamName = (teamId: string | number): string => {
+  const teamInfo = getTeamByKickbaseId(teamId);
+  return teamInfo?.fullName || `Team ${teamId}`;
 };
 
 export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const playerId = searchParams.get('playerId');
+  
   try {
-    const { searchParams } = new URL(request.url);
-    const playerId = searchParams.get('playerId');
 
     if (!playerId) {
       return NextResponse.json(
@@ -62,8 +25,30 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Fetch player performance data from Kickbase API
-    const performanceData = await kickbaseAdapter.getPlayerPerformance(playerId);
+    // Fetch performance data directly from Kickbase API
+    console.log('Fetching performance data for player:', playerId);
+    
+    const apiKey = process.env.KICKBASE_KEY;
+    if (!apiKey) {
+      throw new Error('KICKBASE_KEY environment variable is not set');
+    }
+    
+    const response = await fetch(`https://api.kickbase.com/v4/competitions/1/players/${playerId}/performance`, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Kickbase API request failed: ${response.status} ${response.statusText}`);
+    }
+    
+    const performanceData = await response.json();
+    console.log('Raw performance data:', performanceData);
+    console.log('Performance data type:', typeof performanceData);
+    console.log('Performance data is null:', performanceData === null);
+    console.log('Performance data is undefined:', performanceData === undefined);
     
     console.log(`[DEBUG] Raw performance data for player ${playerId}:`, JSON.stringify(performanceData, null, 2));
     
@@ -78,11 +63,11 @@ export async function GET(request: NextRequest) {
       throw new Error('No current season (2025/2026) data found in performance data');
     }
     
-    // Filter all squad appearances (matches with actual data, not null values)
-    // According to user requirements, only 4 matchdays have been played so far
-    // Include all matches where the player was in the squad (even with 0 minutes for transparency)
+    // Filter all matches up to matchday 4 (according to user requirements)
+    // Include all matches where the player was potentially available, even with 0 minutes
+    // This ensures transparency and shows all games, not just those with playing time
     const squadAppearances = currentSeasonData.ph.filter((match: any) => 
-      match.p !== null && match.mp !== null && match.day <= 4
+      match.day <= 4 && match.day >= 1
     );
     
     // Transform the match history data
@@ -92,7 +77,7 @@ export async function GET(request: NextRequest) {
       awayTeam: getTeamName(match.t2) || 'Unknown',
       homeScore: match.t1g || 0,
       awayScore: match.t2g || 0,
-      playerMinutes: parseInt(match.mp?.replace("'", "") || "0"),
+      playerMinutes: match.mp ? parseInt(match.mp.replace("'", "")) : 0,
       playerPoints: match.p || 0,
       matchDate: match.md || new Date().toISOString(),
       playerTeam: match.pt === match.t1 ? getTeamName(match.t1) : getTeamName(match.t2)
@@ -116,6 +101,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(transformedData);
   } catch (error) {
     console.error('Error fetching player performance:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : 'No stack trace',
+      playerId,
+      baseUrl: process.env.KICKBASE_BASE,
+      hasApiKey: !!process.env.KICKBASE_KEY
+    });
     
     // Return mock data for demonstration
     const mockData = {
