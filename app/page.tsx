@@ -8,6 +8,7 @@ import { computeProjections } from '../lib/projection';
 import { excludePlayer, getExcludedPlayersWithStats, includePlayer, filterExcludedPlayers, isPlayerExcluded } from '../lib/playerExclusion';
 import type { Formation, Match, Odds, OptimizationResult, Player, ProjectionParams } from '../lib/types';
 import { calculateFormationBasedStart11Probability } from '../lib/formationBasedStart11';
+import { optimizeArena } from '../lib/optimization';
 import PlayerDetailModal from '../components/PlayerDetailModal';
 import PlayerImage from '../components/PlayerImage';
 import PlayerStatusTag from '../components/PlayerStatusTag';
@@ -28,6 +29,12 @@ interface CacheInfo {
 }
 
 interface OptimizeState {
+  loading: boolean;
+  error?: string;
+  result?: OptimizationResult;
+}
+
+interface ArenaOptimizeState {
   loading: boolean;
   error?: string;
   result?: OptimizationResult;
@@ -325,6 +332,108 @@ const formatStartingElevenProbability = (probability: number): { text: string; c
   }
 };
 
+// Position grouping functions
+const getPositionOrder = (): ('GK' | 'DEF' | 'MID' | 'FWD')[] => {
+  return ['GK', 'DEF', 'MID', 'FWD'];
+};
+
+const groupPlayersByPosition = (lineup: OptimizationResult['lineup']) => {
+  const grouped = lineup.reduce((acc, player) => {
+    if (!acc[player.position]) {
+      acc[player.position] = [];
+    }
+    acc[player.position].push(player);
+    return acc;
+  }, {} as Record<string, typeof lineup>);
+
+  // Sortiere Spieler innerhalb jeder Position nach erwarteten Punkten (absteigend)
+  Object.keys(grouped).forEach(position => {
+    grouped[position].sort((a, b) => b.p_pred - a.p_pred);
+  });
+
+  return grouped;
+};
+
+const PositionSection = ({ 
+  position, 
+  players, 
+  colorScheme 
+}: { 
+  position: 'GK' | 'DEF' | 'MID' | 'FWD'; 
+  players: OptimizationResult['lineup']; 
+  colorScheme: 'standard' | 'arena';
+}) => {
+  const positionColors = {
+    standard: {
+      GK: 'bg-yellow-800/30 border-yellow-700',
+      DEF: 'bg-blue-800/30 border-blue-700', 
+      MID: 'bg-green-800/30 border-green-700',
+      FWD: 'bg-red-800/30 border-red-700'
+    },
+    arena: {
+      GK: 'bg-yellow-800/20 border-yellow-600',
+      DEF: 'bg-blue-800/20 border-blue-600',
+      MID: 'bg-green-800/20 border-green-600', 
+      FWD: 'bg-red-800/20 border-red-600'
+    }
+  } as const;
+
+  const headerColors = {
+    standard: {
+      GK: 'text-yellow-400',
+      DEF: 'text-blue-400',
+      MID: 'text-green-400', 
+      FWD: 'text-red-400'
+    },
+    arena: {
+      GK: 'text-yellow-300',
+      DEF: 'text-blue-300',
+      MID: 'text-green-300',
+      FWD: 'text-red-300'
+    }
+  } as const;
+
+  const totalCost = players.reduce((sum, player) => sum + player.kosten, 0);
+  const totalPoints = players.reduce((sum, player) => sum + player.p_pred, 0);
+
+  return (
+    <div className={`rounded-lg border p-4 ${positionColors[colorScheme][position]}`}>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className={`text-lg font-semibold ${headerColors[colorScheme][position]}`}>
+          {translatePosition(position)} ({players.length})
+        </h3>
+        <div className="text-sm text-slate-400">
+          <span className="mr-3">{formatter.format(totalCost)}</span>
+          <span className="text-green-400">{totalPoints.toFixed(1)}p</span>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 gap-2">
+        {players.map((player) => (
+          <div key={player.playerId} className={`${colorScheme === 'arena' ? 'bg-purple-800/20' : 'bg-slate-800/30'} p-3 rounded border ${colorScheme === 'arena' ? 'border-purple-700' : 'border-slate-700'}`}>
+            <div className="flex items-center space-x-3">
+              <PlayerImage 
+                playerImageUrl={player.playerImageUrl} 
+                playerName={player.name}
+                className="w-10 h-10 rounded-full"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-slate-200 truncate">{player.name}</div>
+                <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <span className="text-slate-300">{player.verein}</span>
+                  <span>{formatter.format(player.kosten)}</span>
+                  <span className="text-green-400">{player.p_pred.toFixed(1)}p</span>
+                  <span className="text-blue-400">{player.value.toFixed(2)} P/M€</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export default function HomePage() {
   const [spieltag, setSpieltag] = useState(4);
   const [budget, setBudget] = useState(150_000_000);
@@ -342,6 +451,7 @@ export default function HomePage() {
   const [loadingData, setLoadingData] = useState(false);
   const [cacheInfo, setCacheInfo] = useState<CacheInfo>({});
   const [optState, setOptState] = useState<OptimizeState>({ loading: false });
+  const [arenaOptState, setArenaOptState] = useState<ArenaOptimizeState>({ loading: false });
   const [blacklist, setBlacklist] = useState<string[]>([]);
   const [blacklistInput, setBlacklistInput] = useState('');
   const [activeTab, setActiveTab] = useState<(typeof tabs)[number]>('Dashboard');
@@ -475,6 +585,97 @@ export default function HomePage() {
     setSelectedPlayer(null);
   };
 
+  // Optimization handlers
+  const handleOptimize = async () => {
+    setOptState({ loading: true, error: undefined, result: undefined });
+    
+    try {
+      const projections = computeProjections(players, matches, odds, weights);
+      
+      // Use the excludedPlayers system instead of the old blacklist
+      const excludedPlayerIds = getExcludedPlayersWithStats().map(ep => ep.id);
+      
+      const response = await fetch('/api/optimize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          spieltag,
+          formation: formationMode === 'auto' ? undefined : formation,
+          budget,
+          baseMode,
+          weights,
+          blacklist: excludedPlayerIds
+        })
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Optimierung fehlgeschlagen');
+      }
+      
+      setOptState({ loading: false, result });
+      setActiveTab('Ergebnis');
+    } catch (error) {
+      setOptState({ 
+        loading: false, 
+        error: error instanceof Error ? error.message : 'Unbekannter Fehler' 
+      });
+    }
+  };
+
+  const handleArenaOptimize = async () => {
+    console.log('=== HANDLE ARENA OPTIMIZE CALLED ===');
+    console.log('arenaOptState before:', arenaOptState);
+    console.log('setArenaOptState function:', typeof setArenaOptState);
+    console.log('arenaOptState keys:', arenaOptState ? Object.keys(arenaOptState) : 'undefined');
+    console.log('players.length:', players.length);
+    console.log('handleArenaOptimize function:', typeof handleArenaOptimize);
+    
+    try {
+      console.log('Setting arenaOptState to loading...');
+      setArenaOptState({ loading: true, error: undefined, result: undefined });
+      console.log('arenaOptState set to loading successfully');
+      
+      console.log('Starting arena optimization...');
+      console.log('players:', players.length);
+      console.log('matches:', matches.length);
+      console.log('odds:', odds.length);
+      console.log('weights:', weights);
+      console.log('blacklist:', blacklist);
+      
+      const projections = computeProjections(players, matches, odds, weights);
+      console.log('Projections computed:', projections.length);
+      
+      // Use the excludedPlayers system instead of the old blacklist
+      const excludedPlayerIds = getExcludedPlayersWithStats().map(ep => ep.id);
+      
+      console.log('Calling optimizeArena...');
+      const result = await optimizeArena(players, projections, excludedPlayerIds);
+      console.log('Arena optimization result:', result);
+      
+      console.log('Setting final result...');
+      setArenaOptState({ loading: false, result });
+      setActiveTab('Ergebnis');
+      console.log('Arena optimization completed successfully');
+    } catch (error) {
+      console.error('=== ARENA OPTIMIZATION ERROR ===');
+      console.error('Error:', error);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      
+      try {
+        setArenaOptState({ 
+          loading: false, 
+          error: error instanceof Error ? error.message : 'Arena-Optimierung fehlgeschlagen' 
+        });
+        console.log('Error state set successfully');
+      } catch (setStateError) {
+        console.error('Error setting error state:', setStateError);
+      }
+    }
+  };
+
   // Get sorted players for table display
   const getSortedPlayers = () => {
     const sorted = [...filteredPlayers].sort((a: Player, b: Player) => {
@@ -521,17 +722,17 @@ export default function HomePage() {
           break;
         case 'pointsPerMinute':
           // Parse the calculated values for sorting
-          const aPointsPerMin = parseFloat(calculatePointsPerMinute(a).replace(',', '.'));
-          const bPointsPerMin = parseFloat(calculatePointsPerMinute(b).replace(',', '.'));
-          aValue = isNaN(aPointsPerMin) ? 0 : aPointsPerMin;
-          bValue = isNaN(bPointsPerMin) ? 0 : bPointsPerMin;
+          const aMinutes = a.totalMinutesPlayed || a.minutesPlayed || 0;
+          const bMinutes = b.totalMinutesPlayed || b.minutesPlayed || 0;
+          aValue = aMinutes > 0 ? (a.punkte_sum || 0) / aMinutes : 0;
+          bValue = bMinutes > 0 ? (b.punkte_sum || 0) / bMinutes : 0;
           break;
         case 'pointsPerMillion':
           // Parse the calculated values for sorting
-          const aPointsPerMil = parseFloat(calculatePointsPerMillion(a).replace(',', '.'));
-          const bPointsPerMil = parseFloat(calculatePointsPerMillion(b).replace(',', '.'));
-          aValue = isNaN(aPointsPerMil) ? 0 : aPointsPerMil;
-          bValue = isNaN(bPointsPerMil) ? 0 : bPointsPerMil;
+          const aMarketValue = a.kosten || 0;
+          const bMarketValue = b.kosten || 0;
+          aValue = aMarketValue > 0 ? (a.punkte_sum || 0) / (aMarketValue / 1_000_000) : 0;
+          bValue = bMarketValue > 0 ? (b.punkte_sum || 0) / (bMarketValue / 1_000_000) : 0;
           break;
         default:
           return 0;
@@ -715,42 +916,7 @@ export default function HomePage() {
     }
   }
 
-  async function handleOptimize() {
-    setOptState({ loading: true });
-    try {
-      const body = {
-        spieltag,
-        formation: formationMode === 'auto' ? 'auto' : formation,
-        budget,
-        baseMode,
-        weights: {
-          w_base: weights.w_base,
-          w_form: weights.w_form,
-          w_odds: weights.w_odds,
-          w_home: weights.w_home,
-          w_minutes: weights.w_minutes,
-          w_risk: weights.w_risk,
-          alpha: weights.alpha,
-          beta: weights.beta,
-          gamma: weights.gamma
-        },
-        blacklist
-      };
-      const res = await fetch('/api/optimize', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error ?? 'Optimierung fehlgeschlagen');
-      }
-      setOptState({ loading: false, result: data });
-      setActiveTab('Ergebnis');
-    } catch (error) {
-      setOptState({ loading: false, error: (error as Error).message });
-    }
-  }
+
 
   function handleBlacklistAdd(name: string) {
     if (!blacklist.includes(name)) {
@@ -886,6 +1052,54 @@ export default function HomePage() {
               >
                 Daten aktualisieren
               </button>
+            </div>
+
+            <div className="space-y-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+              <h2 className="text-xl font-semibold">Optimierung</h2>
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={handleOptimize}
+                  disabled={optState.loading || players.length === 0}
+                  className="w-full rounded-lg bg-blue-500 px-4 py-2 font-semibold text-white transition hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {optState.loading ? 'Optimiere...' : 'Standard Optimierung'}
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => {
+                    console.log('=== ARENA BUTTON CLICKED ===');
+                    console.log('arenaOptState:', arenaOptState);
+                    console.log('arenaOptState type:', typeof arenaOptState);
+                    console.log('arenaOptState keys:', arenaOptState ? Object.keys(arenaOptState) : 'undefined');
+                    console.log('players.length:', players.length);
+                    console.log('handleArenaOptimize function:', typeof handleArenaOptimize);
+                    
+                    try {
+                      handleArenaOptimize();
+                    } catch (error) {
+                      console.error('Error calling handleArenaOptimize:', error);
+                      console.error('Error stack:', error.stack);
+                    }
+                  }}
+                  disabled={arenaOptState?.loading || players.length === 0}
+                  className="w-full rounded-lg bg-purple-500 px-4 py-2 font-semibold text-white transition hover:bg-purple-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {arenaOptState?.loading ? 'Optimiere Arena...' : 'Arena Optimierung (150M €)'}
+                </button>
+                
+                {(optState.error || arenaOptState?.error) && (
+                  <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded p-2">
+                    {optState.error || arenaOptState?.error}
+                  </div>
+                )}
+                
+                <div className="text-xs text-slate-400 space-y-1">
+                  <p><strong>Standard:</strong> Verwendet dein Budget und deine Konfiguration</p>
+                  <p><strong>Arena:</strong> Festes Budget 150M €, filtert automatisch verletzte/gesperrte Spieler</p>
+                </div>
+              </div>
             </div>
           </section>
         </TabsContent>
@@ -1255,17 +1469,120 @@ export default function HomePage() {
 
         <TabsContent value="Ergebnis">
           <section className="space-y-6">
-            <div className="space-y-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-              <h2 className="text-xl font-semibold">Optimale Startelf</h2>
-              {optState.result ? (
+            {/* Standard Optimierung Ergebnis */}
+            {optState.result && (
+              <div className="space-y-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-blue-400">Standard Optimierung</h2>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => exportJson(optState.result!, budget)}
+                      className="px-3 py-1 text-xs bg-slate-700 hover:bg-slate-600 rounded transition-colors"
+                    >
+                      JSON Export
+                    </button>
+                    <button
+                      onClick={() => exportCsv(optState.result!, budget)}
+                      className="px-3 py-1 text-xs bg-slate-700 hover:bg-slate-600 rounded transition-colors"
+                    >
+                      CSV Export
+                    </button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="bg-slate-800/50 p-3 rounded">
+                    <div className="text-slate-400">Formation</div>
+                    <div className="text-lg font-semibold">{optState.result.formation}</div>
+                  </div>
+                  <div className="bg-slate-800/50 p-3 rounded">
+                    <div className="text-slate-400">Erwartete Punkte</div>
+                    <div className="text-lg font-semibold text-green-400">{optState.result.objective.toFixed(2)}</div>
+                  </div>
+                  <div className="bg-slate-800/50 p-3 rounded">
+                    <div className="text-slate-400">Restbudget</div>
+                    <div className="text-lg font-semibold">{formatter.format(optState.result.restbudget)}</div>
+                  </div>
+                </div>
+                
+                {/* Position-based Lineup Display */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {Object.entries(groupPlayersByPosition(optState.result.lineup))
+                    .sort(([a], [b]) => getPositionOrder(a) - getPositionOrder(b))
+                    .map(([position, players]) => (
+                      <PositionSection
+                        key={position}
+                        position={position}
+                        players={players}
+                        colorScheme="standard"
+                      />
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/* Arena Optimierung Ergebnis */}
+            {arenaOptState?.result && (
+              <div className="space-y-4 rounded-xl border border-purple-800 bg-purple-900/20 p-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-purple-400">Arena Optimierung (150M €)</h2>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => exportJson(arenaOptState.result!, 150_000_000)}
+                      className="px-3 py-1 text-xs bg-purple-700 hover:bg-purple-600 rounded transition-colors"
+                    >
+                      JSON Export
+                    </button>
+                    <button
+                      onClick={() => exportCsv(arenaOptState.result!, 150_000_000)}
+                      className="px-3 py-1 text-xs bg-purple-700 hover:bg-purple-600 rounded transition-colors"
+                    >
+                      CSV Export
+                    </button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div className="bg-purple-800/30 p-3 rounded">
+                    <div className="text-purple-300">Formation</div>
+                    <div className="text-lg font-semibold">{arenaOptState.result.formation}</div>
+                  </div>
+                  <div className="bg-purple-800/30 p-3 rounded">
+                    <div className="text-purple-300">Erwartete Punkte</div>
+                    <div className="text-lg font-semibold text-green-400">{arenaOptState.result.objective.toFixed(2)}</div>
+                  </div>
+                  <div className="bg-purple-800/30 p-3 rounded">
+                    <div className="text-purple-300">Restbudget</div>
+                    <div className="text-lg font-semibold">{formatter.format(arenaOptState.result.restbudget)}</div>
+                  </div>
+                </div>
+                
+                {/* Position-based Lineup Display */}
+                <div className="space-y-4">
+                  {getPositionOrder().map(position => {
+                    const positionPlayers = groupPlayersByPosition(arenaOptState.result.lineup)[position];
+                    if (!positionPlayers || positionPlayers.length === 0) return null;
+                    
+                    return (
+                      <PositionSection
+                        key={position}
+                        position={position as 'GK' | 'DEF' | 'MID' | 'FWD'}
+                        players={positionPlayers}
+                        colorScheme="arena"
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Keine Ergebnisse */}
+            {!optState.result && !arenaOptState?.result && (
+              <div className="space-y-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+                <h2 className="text-xl font-semibold">Optimierungsergebnisse</h2>
                 <p className="text-sm text-slate-400">
-                  Auto-Formation gewählt: {optState.result.formation} • Gesamt: {optState.result.objective.toFixed(2)} • Restbudget:{' '}
-                  {formatter.format(optState.result.restbudget)}
+                  Noch keine Optimierung durchgeführt. Verwende die Buttons im Dashboard-Tab, um eine Optimierung zu starten.
                 </p>
-              ) : (
-                <p className="text-sm text-slate-400">Noch keine Berechnung durchgeführt.</p>
-              )}
-            </div>
+              </div>
+            )}
           </section>
         </TabsContent>
       </Tabs>

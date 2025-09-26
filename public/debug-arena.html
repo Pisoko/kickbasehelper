@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arena Debug Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 20px;
+        }
+        .debug-section {
+            background: #2a2a2a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5855eb;
+        }
+        .error {
+            background: #dc2626;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #16a34a;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .log {
+            background: #374151;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Arena Debug Tool</h1>
+    
+    <div class="debug-section">
+        <h2>1. Hauptanwendung testen</h2>
+        <button onclick="testMainApp()">Hauptanwendung öffnen</button>
+        <button onclick="checkMainAppErrors()">Konsole der Hauptanwendung prüfen</button>
+        <div id="main-app-result"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>2. Arena Button simulieren</h2>
+        <button onclick="simulateArenaClick()">Arena Button Klick simulieren</button>
+        <div id="arena-simulation-result"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>3. JavaScript Fehler abfangen</h2>
+        <button onclick="setupErrorCatching()">Globale Fehlerüberwachung aktivieren</button>
+        <div id="error-catching-result"></div>
+    </div>
+
+    <div class="debug-section">
+        <h2>4. Logs</h2>
+        <button onclick="clearLogs()">Logs löschen</button>
+        <div id="logs"></div>
+    </div>
+
+    <script>
+        let mainAppWindow = null;
+        let errorCount = 0;
+
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log';
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${type.toUpperCase()}: ${message}`;
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(`[DEBUG] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+            log('Logs gelöscht');
+        }
+
+        function testMainApp() {
+            try {
+                log('Öffne Hauptanwendung...');
+                mainAppWindow = window.open('http://localhost:3000', '_blank');
+                
+                setTimeout(() => {
+                    if (mainAppWindow && !mainAppWindow.closed) {
+                        document.getElementById('main-app-result').innerHTML = 
+                            '<div class="success">Hauptanwendung erfolgreich geöffnet</div>';
+                        log('Hauptanwendung erfolgreich geöffnet');
+                    } else {
+                        document.getElementById('main-app-result').innerHTML = 
+                            '<div class="error">Fehler beim Öffnen der Hauptanwendung</div>';
+                        log('Fehler beim Öffnen der Hauptanwendung', 'error');
+                    }
+                }, 1000);
+            } catch (error) {
+                log(`Fehler beim Öffnen der Hauptanwendung: ${error.message}`, 'error');
+                document.getElementById('main-app-result').innerHTML = 
+                    `<div class="error">Fehler: ${error.message}</div>`;
+            }
+        }
+
+        function checkMainAppErrors() {
+            if (!mainAppWindow || mainAppWindow.closed) {
+                log('Hauptanwendung ist nicht geöffnet', 'error');
+                document.getElementById('main-app-result').innerHTML = 
+                    '<div class="error">Hauptanwendung ist nicht geöffnet. Bitte zuerst öffnen.</div>';
+                return;
+            }
+
+            try {
+                // Versuche auf die Konsole der anderen Seite zuzugreifen
+                log('Prüfe Konsole der Hauptanwendung...');
+                
+                // Da wir nicht direkt auf die Konsole zugreifen können, 
+                // injizieren wir ein Skript das Fehler an uns zurücksendet
+                const script = `
+                    window.addEventListener('error', function(e) {
+                        console.error('CAUGHT ERROR:', e.error);
+                        window.postMessage({
+                            type: 'ERROR_REPORT',
+                            message: e.message,
+                            filename: e.filename,
+                            lineno: e.lineno,
+                            colno: e.colno,
+                            error: e.error ? e.error.toString() : 'Unknown error'
+                        }, '*');
+                    });
+                    
+                    window.addEventListener('unhandledrejection', function(e) {
+                        console.error('UNHANDLED PROMISE REJECTION:', e.reason);
+                        window.postMessage({
+                            type: 'PROMISE_REJECTION',
+                            reason: e.reason ? e.reason.toString() : 'Unknown rejection'
+                        }, '*');
+                    });
+                    
+                    console.log('Error monitoring activated');
+                `;
+                
+                mainAppWindow.eval(script);
+                log('Fehlerüberwachung in Hauptanwendung aktiviert');
+                
+                document.getElementById('main-app-result').innerHTML = 
+                    '<div class="success">Fehlerüberwachung aktiviert. Teste jetzt den Arena Button.</div>';
+                    
+            } catch (error) {
+                log(`Fehler beim Zugriff auf Hauptanwendung: ${error.message}`, 'error');
+                document.getElementById('main-app-result').innerHTML = 
+                    `<div class="error">Cross-Origin Fehler: ${error.message}</div>`;
+            }
+        }
+
+        function simulateArenaClick() {
+            if (!mainAppWindow || mainAppWindow.closed) {
+                log('Hauptanwendung ist nicht geöffnet', 'error');
+                document.getElementById('arena-simulation-result').innerHTML = 
+                    '<div class="error">Hauptanwendung ist nicht geöffnet. Bitte zuerst öffnen.</div>';
+                return;
+            }
+
+            try {
+                log('Simuliere Arena Button Klick...');
+                
+                // Versuche den Arena Button zu finden und zu klicken
+                const script = `
+                    try {
+                        console.log('=== ARENA BUTTON SIMULATION ===');
+                        
+                        // Suche nach Arena Button
+                        const buttons = Array.from(document.querySelectorAll('button'));
+                        const arenaButton = buttons.find(btn => 
+                            btn.textContent.includes('Arena Optimierung') || 
+                            btn.textContent.includes('Arena')
+                        );
+                        
+                        if (arenaButton) {
+                            console.log('Arena Button gefunden:', arenaButton);
+                            console.log('Button disabled:', arenaButton.disabled);
+                            console.log('Button onclick:', arenaButton.onclick);
+                            
+                            // Klicke den Button
+                            arenaButton.click();
+                            console.log('Arena Button geklickt');
+                            
+                            window.postMessage({
+                                type: 'ARENA_CLICK_SUCCESS',
+                                message: 'Arena Button erfolgreich geklickt'
+                            }, '*');
+                        } else {
+                            console.error('Arena Button nicht gefunden');
+                            window.postMessage({
+                                type: 'ARENA_CLICK_ERROR',
+                                message: 'Arena Button nicht gefunden'
+                            }, '*');
+                        }
+                    } catch (error) {
+                        console.error('Fehler beim Arena Button Klick:', error);
+                        window.postMessage({
+                            type: 'ARENA_CLICK_ERROR',
+                            message: error.toString()
+                        }, '*');
+                    }
+                `;
+                
+                mainAppWindow.eval(script);
+                log('Arena Button Simulation gestartet');
+                
+            } catch (error) {
+                log(`Fehler bei Arena Simulation: ${error.message}`, 'error');
+                document.getElementById('arena-simulation-result').innerHTML = 
+                    `<div class="error">Fehler: ${error.message}</div>`;
+            }
+        }
+
+        function setupErrorCatching() {
+            log('Aktiviere globale Fehlerüberwachung...');
+            
+            // Überwache Nachrichten von der Hauptanwendung
+            window.addEventListener('message', function(event) {
+                if (event.origin !== 'http://localhost:3000') return;
+                
+                const data = event.data;
+                
+                switch (data.type) {
+                    case 'ERROR_REPORT':
+                        errorCount++;
+                        log(`FEHLER #${errorCount}: ${data.message} (${data.filename}:${data.lineno}:${data.colno})`, 'error');
+                        log(`Fehler Details: ${data.error}`, 'error');
+                        
+                        document.getElementById('error-catching-result').innerHTML = 
+                            `<div class="error">Fehler gefangen: ${data.message}</div>`;
+                        break;
+                        
+                    case 'PROMISE_REJECTION':
+                        errorCount++;
+                        log(`PROMISE REJECTION #${errorCount}: ${data.reason}`, 'error');
+                        
+                        document.getElementById('error-catching-result').innerHTML = 
+                            `<div class="error">Promise Rejection: ${data.reason}</div>`;
+                        break;
+                        
+                    case 'ARENA_CLICK_SUCCESS':
+                        log(`Arena Klick erfolgreich: ${data.message}`, 'success');
+                        document.getElementById('arena-simulation-result').innerHTML = 
+                            `<div class="success">${data.message}</div>`;
+                        break;
+                        
+                    case 'ARENA_CLICK_ERROR':
+                        log(`Arena Klick Fehler: ${data.message}`, 'error');
+                        document.getElementById('arena-simulation-result').innerHTML = 
+                            `<div class="error">${data.message}</div>`;
+                        break;
+                }
+            });
+            
+            document.getElementById('error-catching-result').innerHTML = 
+                '<div class="success">Globale Fehlerüberwachung aktiviert</div>';
+            log('Globale Fehlerüberwachung aktiviert');
+        }
+
+        // Automatisch beim Laden aktivieren
+        window.addEventListener('load', function() {
+            setupErrorCatching();
+            log('Debug Tool geladen und bereit');
+        });
+    </script>
+</body>
+</html>

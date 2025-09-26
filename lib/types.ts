@@ -80,6 +80,7 @@ export interface PlayerPick {
   kosten: number;
   p_pred: number;
   value: number;
+  playerImageUrl?: string;
 }
 
 export interface OptimizationResult {

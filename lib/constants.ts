@@ -27,3 +27,6 @@ export const DEFAULT_PARAMS: ProjectionParams = {
 };
 
 export const FORMATION_LIST = Object.keys(FORMATIONS) as (keyof typeof FORMATIONS)[];
+
+// Arena Modus Konstanten
+export const ARENA_BUDGET = 150_000_000; // 150 Millionen Euro für Arena Modus

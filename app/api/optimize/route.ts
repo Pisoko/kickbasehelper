@@ -21,7 +21,7 @@ const weightSchema = z.object({
 
 const requestSchema = z.object({
   spieltag: z.number().min(1),
-  formation: z.union([z.literal('auto'), z.enum(FORMATION_LIST)]),
+  formation: z.union([z.literal('auto'), z.enum(FORMATION_LIST)]).optional(),
   budget: z.number().positive(),
   baseMode: z.enum(['avg', 'sum', 'last3']),
   weights: weightSchema,
@@ -46,12 +46,14 @@ export async function POST(request: Request) {
   };
   const odds = cache.odds ?? [];
   const projections = computeProjections(cache.players, cache.matches, odds, params);
+  
+  // Always compare all formations to find the best one
   const result = await optimizeAuto(
     cache.players,
     projections,
     budget,
     blacklist,
-    formation === 'auto' ? undefined : formation
+    undefined // Always use auto mode to compare all formations
   );
   if (!result) {
     return NextResponse.json({ error: 'Keine Lösung gefunden' }, { status: 422 });
