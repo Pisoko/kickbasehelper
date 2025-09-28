@@ -1,6 +1,6 @@
-# ArenaHelper
+# KickbaseHelper
 
-ArenaHelper ist eine lokale Next.js-Anwendung, die die optimale Startelf für den Kickbase Arena Mode ermittelt. Die App nutzt wöchentliche Daten-Updates, berechnet Projektionen mit einstellbaren Gewichten und löst ein MILP zur Team-Optimierung.
+KickbaseHelper ist eine lokale Next.js-Anwendung, die die optimale Startelf für Kickbase ermittelt. Die App nutzt wöchentliche Daten-Updates, berechnet Projektionen mit einstellbaren Gewichten und löst ein MILP zur Team-Optimierung.
 
 ## Voraussetzungen
 

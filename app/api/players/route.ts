@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 import { cacheAgeDays, readCache, validatePlayerDataWithTeamCheck } from '../../../lib/data';
-import { filterExcludedPlayers } from '../../../lib/playerExclusion';
 import type { Player } from '../../../lib/types';
 
 export async function GET(request: Request) {
@@ -15,15 +14,14 @@ export async function GET(request: Request) {
     }
 
     const validatedPlayers = validatePlayerDataWithTeamCheck(cache.players);
-  const filteredPlayers = filterExcludedPlayers(validatedPlayers);
   
   // Fix punkte_avg calculation - ensure it's calculated from punkte_hist
-  const correctedPlayers = filteredPlayers.map(player => {
+  const correctedPlayers = validatedPlayers.map((player: Player) => {
     if (player.punkte_hist && Array.isArray(player.punkte_hist) && player.punkte_hist.length > 0) {
       // Calculate correct average from punkte_hist
-      const validPoints = player.punkte_hist.filter(p => typeof p === 'number' && !isNaN(p));
+      const validPoints = player.punkte_hist.filter((p: number) => typeof p === 'number' && !isNaN(p));
       if (validPoints.length > 0) {
-        const correctAvg = Math.round(validPoints.reduce((sum, points) => sum + points, 0) / validPoints.length);
+        const correctAvg = Math.round(validPoints.reduce((sum: number, points: number) => sum + points, 0) / validPoints.length);
         
         // Only update if the current punkte_avg is wrong
         if (player.punkte_avg !== correctAvg) {
