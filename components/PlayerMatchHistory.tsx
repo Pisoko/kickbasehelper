@@ -15,6 +15,8 @@ interface MatchHistoryData {
   playerTeam: string;
   goals: number;
   assists: number;
+  yellowCards: number;
+  redCards: number;
   marketValue: number;
 }
 
@@ -63,6 +65,8 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
           playerTeam: match.playerTeam || currentTeam,
           goals: match.goals || 0,
           assists: match.assists || 0,
+          yellowCards: match.yellowCards || 0,
+          redCards: match.redCards || 0,
           marketValue: match.marketValue || 0
         }));
 
@@ -141,9 +145,9 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
 
   if (error && matchHistory.length === 0) {
     return (
-      <div className="bg-slate-800 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Vergangene Spiele 2025/2026</h3>
-        <div className="text-center text-slate-400 py-8">
+      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Vergangene Spiele 2025/2026</h3>
+        <div className="text-center text-gray-600 dark:text-gray-300 py-8">
           <p>{error}</p>
         </div>
       </div>
@@ -162,16 +166,16 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
   // Sort matchHistory by matchday to ensure proper order
   const sortedMatchHistory = [...matchHistory].sort((a, b) => a.matchday - b.matchday);
   
-  // Determine if we need scrolling (more than 4 matchdays)
-  const needsScrolling = sortedMatchHistory.length > 4;
+  // Determine if we need scrolling (more than 9 matchdays)
+  const needsScrolling = sortedMatchHistory.length > 9;
 
   return (
-    <div className="bg-slate-800 rounded-lg p-6">
+    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-white mb-2">Vergangene Spiele</h3>
-        <p className="text-sm text-slate-400">2025/2026</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Vergangene Spiele</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300">2025/2026</p>
         {needsScrolling && (
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {sortedMatchHistory.length} Spieltage • Scroll für alle Spiele →
           </p>
         )}
@@ -188,13 +192,19 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-medium text-slate-400">#{match.matchday}</span>
                 <div className="flex items-center space-x-2">
-                  {(match.goals > 0 || match.assists > 0) && (
+                  {(match.goals > 0 || match.assists > 0 || match.yellowCards > 0 || match.redCards > 0) && (
                     <div className="flex items-center space-x-1 text-xs">
                       {match.goals > 0 && (
-                        <span className="text-green-400 font-bold">⚽{match.goals}</span>
+                        <span className="text-green-400 font-bold">⚽{match.goals > 1 ? match.goals : ''}</span>
                       )}
                       {match.assists > 0 && (
-                        <span className="text-blue-400 font-bold">🅰️{match.assists}</span>
+                        <span className="text-blue-400 font-bold">⚡{match.assists > 1 ? match.assists : ''}</span>
+                      )}
+                      {match.yellowCards > 0 && (
+                        <span className="text-yellow-400 font-bold">🟨{match.yellowCards > 1 ? match.yellowCards : ''}</span>
+                      )}
+                      {match.redCards > 0 && (
+                        <span className="text-red-400 font-bold">🟥{match.redCards > 1 ? match.redCards : ''}</span>
                       )}
                     </div>
                   )}
@@ -287,7 +297,7 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
                       {/* Points label always centered in the bar regardless of fill height */}
                       {match.playerPoints > 0 && getBarFillPercentage(match.playerPoints) > 15 && (
                         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                          <span className="text-[10px] font-bold text-white">
+                          <span className="text-sm font-bold text-white">
                             {match.playerPoints}
                           </span>
                         </div>
@@ -297,21 +307,21 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
                     {/* Zero points indicator - 100% transparent background */}
                     {match.playerPoints === 0 && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-xs font-bold text-white">0</span>
+                        <span className="text-sm font-bold text-white">0</span>
                       </div>
                     )}
                     
                     {/* Negative points indicator */}
                     {match.playerPoints < 0 && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-xs font-bold text-white">{match.playerPoints}</span>
+                        <span className="text-sm font-bold text-white">{match.playerPoints}</span>
                       </div>
                     )}
                     
                     {/* For low points, show outside the bar */}
                     {match.playerPoints > 0 && getBarFillPercentage(match.playerPoints) <= 15 && (
                       <div className="absolute bottom-0 left-0 right-0 flex justify-center -mb-5">
-                        <span className="text-xs font-bold text-white">
+                        <span className="text-sm font-bold text-white">
                           {match.playerPoints}
                         </span>
                       </div>
@@ -327,13 +337,19 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
                     }`}>
                       {match.playerMinutes}&apos;
                     </div>
-                    {(match.goals > 0 || match.assists > 0) && (
+                    {(match.goals > 0 || match.assists > 0 || match.yellowCards > 0 || match.redCards > 0) && (
                       <div className="flex justify-center space-x-1 text-xs">
                         {match.goals > 0 && (
-                          <span className="text-green-400 font-bold">⚽{match.goals}</span>
+                          <span className="text-green-400 font-bold">⚽{match.goals > 1 ? match.goals : ''}</span>
                         )}
                         {match.assists > 0 && (
-                          <span className="text-blue-400 font-bold">🅰️{match.assists}</span>
+                          <span className="text-blue-400 font-bold">⚡{match.assists > 1 ? match.assists : ''}</span>
+                        )}
+                        {match.yellowCards > 0 && (
+                          <span className="text-yellow-400 font-bold">🟨{match.yellowCards > 1 ? match.yellowCards : ''}</span>
+                        )}
+                        {match.redCards > 0 && (
+                          <span className="text-red-400 font-bold">🟥{match.redCards > 1 ? match.redCards : ''}</span>
                         )}
                       </div>
                     )}

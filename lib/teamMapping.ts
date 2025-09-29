@@ -83,8 +83,8 @@ export const TEAM_MAPPING: Record<string, TeamInfo> = {
     shortName: 'Wolfsburg',
     isActive: true
   },
-  '12': {
-    kickbaseId: '12',
+  '14': {
+    kickbaseId: '14',
     dflId: 'DFL-CLU-000002',
     fullName: 'TSG Hoffenheim',
     shortName: 'Hoffenheim',
@@ -155,13 +155,8 @@ export const TEAM_MAPPING: Record<string, TeamInfo> = {
     shortName: 'Schalke',
     isActive: false
   },
-  '14': {
-    kickbaseId: '14',
-    dflId: 'DFL-CLU-000005',
-    fullName: 'VfL Bochum',
-    shortName: 'Bochum',
-    isActive: false
-  }
+  // VfL Bochum entfernt, da ID '14' jetzt für TSG Hoffenheim verwendet wird
+  // '14': VfL Bochum (nicht mehr in der aktuellen Bundesliga)
 
 } as const;
 
@@ -205,8 +200,7 @@ export const TEAM_NAME_MAPPING: Record<string, string> = {
   'SGE': 'Eintracht Frankfurt',
   'FCB': 'Bayern München',
   
-  // API-spezifische Team-Namen (z.B. "Team 14" für TSG Hoffenheim)
-  'Team 14': 'TSG Hoffenheim'
+  // API-spezifische Team-Namen werden automatisch über getTeamByKickbaseId aufgelöst
 };
 
 /**

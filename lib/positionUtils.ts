@@ -50,10 +50,13 @@ export function getEnglishPosition(germanPosition: GermanPosition): PositionKey 
  * Get position color classes
  */
 export function getPositionColorClasses(position: PositionKey | GermanPosition): string {
-  const germanPos = typeof position === 'string' && position.length <= 3 
-    ? position as GermanPosition 
-    : getGermanPosition(position as PositionKey);
+  // Check if it's already a German position
+  if (position in positionColors) {
+    return positionColors[position as GermanPosition];
+  }
   
+  // Otherwise, convert from English to German
+  const germanPos = getGermanPosition(position as PositionKey);
   return positionColors[germanPos] || positionColors['TW'];
 }
 

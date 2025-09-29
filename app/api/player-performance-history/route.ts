@@ -21,6 +21,8 @@ interface MatchHistoryData {
   playerTeam: string;
   goals: number;
   assists: number;
+  yellowCards: number;
+  redCards: number;
   marketValue: number;
 }
 
@@ -130,6 +132,8 @@ export async function GET(request: NextRequest) {
           playerTeam: 'Bayern München',
           goals: 2,
           assists: 1,
+          yellowCards: 0,
+          redCards: 0,
           marketValue: 62500000
         }
       ];
@@ -180,8 +184,10 @@ export async function GET(request: NextRequest) {
                 playerPoints: match.p || 0,
                 matchDate: match.md,
                 playerTeam: player.verein,
-                goals: match.k ? match.k.filter(k => k === 1).length : 0, // Goals are in k array as 1s
-                assists: match.k ? match.k.filter(k => k === 2).length : 0, // Assists are in k array as 2s
+                goals: match.k ? match.k.filter((k: number) => k === 1).length : 0, // Goals are in k array as 1s
+                assists: match.k ? match.k.filter((k: number) => k === 2 || k === 3).length : 0, // Assists are in k array as 2s or 3s
+                yellowCards: match.k ? match.k.filter((k: number) => k === 4).length : 0, // Yellow cards are in k array as 4s
+                redCards: 0, // Red card data in API is unreliable (shows impossible multiple red cards), setting to 0
                 marketValue: player.marketValue || 0
               });
             }

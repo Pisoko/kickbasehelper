@@ -1,5 +1,5 @@
 import './globals.css';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import ServiceWorkerProvider from '../components/ServiceWorkerProvider';
 
@@ -9,8 +9,6 @@ export const metadata: Metadata = {
   title: 'KickbaseHelper',
   description: 'KickbaseHelper – Optimiere deine Kickbase Startelf',
   manifest: '/manifest.json',
-  themeColor: '#0f172a',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
@@ -21,6 +19,13 @@ export const metadata: Metadata = {
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent'
   }
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#0f172a'
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -40,7 +40,7 @@ const formatCurrency = (amount: number): string => {
 
 // Dialog variants with mobile-first approach and dark mode support
 const dialogVariants = cva(
-  "fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background text-foreground shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] p-4 sm:p-6 sm:rounded-lg dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100",
+  "fixed left-[50%] top-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-4 border border-border bg-background text-foreground shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] p-4 sm:p-6 sm:rounded-lg dark:border-gray-700 dark:text-gray-100",
   {
     variants: {
       size: {
@@ -67,7 +67,7 @@ interface StatCardProps {
 const StatCard: React.FC<StatCardProps> = ({ title, value, className }) => (
   <div 
     className={cn(
-      "bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors",
+      "bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors text-center",
       className
     )}
     role="group"
@@ -286,6 +286,17 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
                  />
                </div>
               <div className="flex flex-col">
+                {/* Position mit Farbkodierung - über dem Vornamen */}
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`px-2 py-1 rounded-full text-sm font-medium ${getPositionColorClasses(player.position as any)}`}>
+                    {getGermanPosition(player.position as any)}
+                  </span>
+                  {player.isInjured && (
+                    <Badge variant="destructive" className="flex items-center gap-1">
+                      ⚠️ Verletzt
+                    </Badge>
+                  )}
+                </div>
                 {/* Vorname */}
                 {player.firstName && (
                   <p className="text-sm sm:text-base text-muted-foreground mb-1">
@@ -308,22 +319,11 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
                     {player.id}
                   </span>
                 </div>
-                {/* Position mit Farbkodierung */}
-                <div className="flex items-center gap-2">
-                  <span className={`px-2 py-1 rounded-full text-sm font-medium ${getPositionColorClasses(player.position as any)}`}>
-                    {getGermanPosition(player.position as any)}
-                  </span>
-                  {player.isInjured && (
-                    <Badge variant="destructive" className="flex items-center gap-1">
-                      ⚠️ Verletzt
-                    </Badge>
-                  )}
-                </div>
               </div>
             </div>
             <Dialog.Close asChild>
               <button 
-                className="h-11 w-11 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                className="h-8 w-8 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
                 aria-label="Schließen"
               >
                 <span className="sr-only">Schließen</span>
@@ -359,17 +359,16 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
              </div>
            </section>
 
-          {/* Additional Stats - Reduced spacing */}
-           <section aria-labelledby="additional-stats-heading" className="mb-4">
-             <h3 id="additional-stats-heading" className="text-lg font-semibold mb-3">Weitere Statistiken</h3>
+          {/* Additional Stats */}
+           <section className="mb-4">
              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
                <StatCard
                  title="Einsätze"
-                 value={actualAppearances > 0 ? `${actualAppearances} von ${currentMatchday}` : "Keine Daten"}
+                 value={`${actualAppearances} von ${currentMatchday}`}
                />
                <StatCard
                  title="Start-11"
-                 value={start11Count > 0 ? `${start11Count} von ${currentMatchday}` : "Keine Daten"}
+                 value={`${start11Count} von ${currentMatchday}`}
                />
                <StatCard
                  title="Spielzeit"
@@ -378,8 +377,31 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
              </div>
            </section>
 
-          {/* Match History - Reduced spacing */}
-           <section aria-labelledby="match-history-heading">
+          {/* Game Statistics */}
+           <section aria-labelledby="game-stats-heading" className="mb-4">
+             <h3 id="game-stats-heading" className="sr-only">Spielstatistiken</h3>
+             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+               <StatCard
+                 title="⚽ Tore"
+                 value={String(player.goals || 0)}
+               />
+               <StatCard
+                 title="🅰️ Assists"
+                 value={String(player.assists || 0)}
+               />
+               <StatCard
+                 title="🟨 Gelbe Karten"
+                 value={String(player.yellowCards || 0)}
+               />
+               <StatCard
+                 title="🟥 Rote Karten"
+                 value={String(player.redCards || 0)}
+               />
+             </div>
+           </section>
+
+          {/* Match History */}
+           <section>
              <PlayerMatchHistory 
                playerId={player.id} 
                playerName={player.name}
