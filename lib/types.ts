@@ -40,3 +40,13 @@ export interface Match {
   auswaerts: string;
   kickoff?: string;
 }
+
+export interface Odds {
+  matchId: string;
+  heim: number;
+  unentschieden: number;
+  auswaerts: number;
+  format: 'decimal' | 'fractional' | 'american';
+}
+
+export type OddsProvider = 'none' | 'external';

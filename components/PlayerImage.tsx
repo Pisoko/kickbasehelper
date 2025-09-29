@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
+import Image from 'next/image';
 import { getKickbaseImageUrl, generateInitialsUrl, searchTheSportsDBImage, getBundesligaImageUrl, testImageUrl, isKnownPlaceholderImage } from '../lib/imageUtils';
 
 interface PlayerImageProps {
@@ -17,7 +18,14 @@ const sizeClasses = {
   xl: 'h-32 w-32'
 };
 
-export default function PlayerImage({ 
+const sizeDimensions = {
+  sm: { width: 32, height: 32 },
+  md: { width: 48, height: 48 },
+  lg: { width: 64, height: 64 },
+  xl: { width: 128, height: 128 }
+};
+
+const PlayerImage = memo(function PlayerImage({ 
   playerImageUrl, 
   playerName, 
   className = '', 
@@ -134,13 +142,23 @@ export default function PlayerImage({
     );
   }
 
+  const imageUrl = currentImageUrl || generateInitialsUrl(playerName);
+  const dimensions = sizeDimensions[size];
+
   return (
-    <img
-      src={currentImageUrl || generateInitialsUrl(playerName)}
-      alt={playerName}
-      className={`${baseClasses} ${className}`}
-      onError={handleImageError}
-      loading="lazy"
-    />
+    <div className={`${baseClasses} ${className} relative overflow-hidden`}>
+      <Image
+        src={imageUrl}
+        alt={playerName}
+        width={dimensions.width}
+        height={dimensions.height}
+        className="object-cover"
+        onError={handleImageError}
+        unoptimized={imageUrl.startsWith('data:')} // Don't optimize SVG data URLs
+        sizes={`${dimensions.width}px`}
+      />
+    </div>
   );
-}
+});
+
+export default PlayerImage;

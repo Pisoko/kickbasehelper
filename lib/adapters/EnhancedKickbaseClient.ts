@@ -31,20 +31,17 @@ interface LiveMatch {
 }
 
 interface KickbasePlayer {
-  i: string;    // Player ID
+  pi: string;   // Player ID
   n: string;    // Name
   fn?: string;  // First name
-  p: number;    // Position (1=GK, 2=DEF, 3=MID, 4=FWD)
-  t: string;    // Team ID
-  mv: number;   // Market value
-  pts: number;  // Total points
-  ap: number;   // Average points
+  pos: number;  // Position (1=GK, 2=DEF, 3=MID, 4=FWD)
+  tid: string;  // Team ID
+  p: number;    // Points
   g: number;    // Goals
   a: number;    // Assists
   mt: number;   // Minutes played
-  smc: number;  // Appearances
   il: boolean;  // Is injured
-  st: string;   // Status
+  st: number;   // Status
   pim?: string; // Player image
   shn?: number; // Jersey number
   y?: number;   // Yellow cards
@@ -202,27 +199,27 @@ export class EnhancedKickbaseClient {
     };
 
     return {
-      id: kickbasePlayer.i,
+      id: kickbasePlayer.pi,
       name: kickbasePlayer.n,
       firstName: kickbasePlayer.fn,
-      position: positionMap[kickbasePlayer.p] || 'MID',
-      verein: teamName || this.getTeamName(kickbasePlayer.t),
-      kosten: kickbasePlayer.mv,
+      position: positionMap[kickbasePlayer.pos] || 'MID',
+      verein: teamName || this.getTeamName(kickbasePlayer.tid),
+      kosten: 0, // Market value not available in this endpoint
       punkte_hist: [], // Will be populated from performance data
-      punkte_avg: kickbasePlayer.ap || 0,
-      punkte_sum: kickbasePlayer.pts || 0,
-      marketValue: kickbasePlayer.mv,
-      totalPoints: kickbasePlayer.pts,
-      averagePoints: kickbasePlayer.ap,
+      punkte_avg: 0, // Average points not available in this endpoint
+      punkte_sum: kickbasePlayer.p || 0,
+      marketValue: 0, // Market value not available in this endpoint
+      totalPoints: kickbasePlayer.p || 0,
+      averagePoints: 0, // Average points not available in this endpoint
       goals: kickbasePlayer.g || 0,
       assists: kickbasePlayer.a || 0,
       minutesPlayed: kickbasePlayer.mt || 0,
       totalMinutesPlayed: kickbasePlayer.mt || 0,
-      appearances: kickbasePlayer.smc || 0,
+      appearances: 0, // Appearances not available in this endpoint
       jerseyNumber: kickbasePlayer.shn,
       playerImageUrl: kickbasePlayer.pim,
       isInjured: kickbasePlayer.il || false,
-      status: kickbasePlayer.st || '0',
+      status: kickbasePlayer.st?.toString() || '0',
       yellowCards: kickbasePlayer.y || 0,
       redCards: kickbasePlayer.r || 0,
     };

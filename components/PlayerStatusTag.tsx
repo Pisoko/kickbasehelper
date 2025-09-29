@@ -1,5 +1,7 @@
 'use client';
 
+import { memo } from 'react';
+
 interface PlayerStatusTagProps {
   status?: string | number;
   isInjured?: boolean;
@@ -87,7 +89,34 @@ const getStatusInfoByCode = (statusCode: number) => {
   }
 };
 
-export default function PlayerStatusTag({ status, isInjured, className = '' }: PlayerStatusTagProps) {
+// Helper function to check if player is fit
+export const isPlayerFit = (status?: string | number, isInjured?: boolean): boolean => {
+  if (status !== undefined && status !== null) {
+    const statusCode = typeof status === 'string' ? parseInt(status) : status;
+    return statusCode === 0;
+  }
+  
+  if (isInjured === true) {
+    return false;
+  }
+  
+  return true; // Default to fit
+};
+
+// Helper function to get row text color based on status
+export const getRowTextColor = (status?: string | number, isInjured?: boolean): string => {
+  if (isPlayerFit(status, isInjured)) {
+    return ''; // No special color for fit players
+  }
+  
+  const statusInfo = getStatusInfo(status, isInjured);
+  return statusInfo.textColor;
+};
+
+// Export the getStatusInfo function for external use
+export { getStatusInfo };
+
+const PlayerStatusTag = memo(function PlayerStatusTag({ status, isInjured, className = '' }: PlayerStatusTagProps) {
   const statusInfo = getStatusInfo(status, isInjured);
   
   return (
@@ -101,4 +130,6 @@ export default function PlayerStatusTag({ status, isInjured, className = '' }: P
       {statusInfo.label}
     </span>
   );
-}
+});
+
+export default PlayerStatusTag;

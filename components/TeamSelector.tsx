@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { BundesligaLogo } from "./BundesligaLogo"
+import BundesligaLogo from "./BundesligaLogo"
 
 const BUNDESLIGA_TEAMS = [
   "FC Bayern München",
@@ -59,7 +59,7 @@ export function TeamSelector({
       <Select value={selectedTeam} onValueChange={handleValueChange}>
         <SelectTrigger className="w-full">
           <div className="flex items-center gap-2">
-            <BundesligaLogo teamName={selectedTeam} size="xs" />
+            <BundesligaLogo teamName={selectedTeam} size="sm" />
             <SelectValue placeholder="Team auswählen" />
           </div>
         </SelectTrigger>
@@ -67,7 +67,7 @@ export function TeamSelector({
           {BUNDESLIGA_TEAMS.map((team) => (
             <SelectItem key={team} value={team} className="flex items-center gap-2">
               <div className="flex items-center gap-2">
-                <BundesligaLogo teamName={team} size="xs" />
+                <BundesligaLogo teamName={team} size="sm" />
                 <span>{team}</span>
               </div>
             </SelectItem>

@@ -13,6 +13,9 @@ interface MatchHistoryData {
   playerPoints: number;
   matchDate: string;
   playerTeam: string;
+  goals: number;
+  assists: number;
+  marketValue: number;
 }
 
 interface PlayerMatchHistoryProps {
@@ -34,19 +37,21 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
 
         console.log(`[PlayerMatchHistory] Fetching data for playerId: ${playerId}`);
 
-        // Fetch player performance data from Kickbase API
-        const response = await fetch(`/api/player-performance?playerId=${playerId}`);
+        // Fetch enhanced player performance data from new API endpoint
+        const response = await fetch(`/api/player-performance-history?playerId=${playerId}`);
         console.log(`[PlayerMatchHistory] Response status: ${response.status}`);
         
         if (!response.ok) {
-          throw new Error(`Failed to fetch player performance data: ${response.status}`);
+          throw new Error(`Failed to fetch player performance history: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log(`[PlayerMatchHistory] Received data:`, data);
+        console.log(`[PlayerMatchHistory] Received enhanced data:`, data);
         
-        // Transform the data to match our interface
-        const transformedHistory: MatchHistoryData[] = data.matches?.map((match: any) => ({
+        // Use the enhanced data structure - check both possible data formats
+        let matchesArray = data.data?.matches || data.matchHistory || [];
+        
+        const transformedHistory: MatchHistoryData[] = matchesArray.map((match: any) => ({
           matchday: match.matchday || 0,
           homeTeam: match.homeTeam || 'Heimteam',
           awayTeam: match.awayTeam || 'Auswärtsteam',
@@ -55,14 +60,23 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
           playerMinutes: match.playerMinutes || 0,
           playerPoints: match.playerPoints || 0,
           matchDate: match.matchDate || new Date().toISOString(),
-          playerTeam: match.playerTeam || currentTeam
-        })) || [];
+          playerTeam: match.playerTeam || currentTeam,
+          goals: match.goals || 0,
+          assists: match.assists || 0,
+          marketValue: match.marketValue || 0
+        }));
 
         console.log(`[PlayerMatchHistory] Transformed history:`, transformedHistory);
         setMatchHistory(transformedHistory);
       } catch (err) {
         console.error('[PlayerMatchHistory] Error fetching match history:', err);
-        setError('Fehler beim Laden der Spielhistorie');
+        
+        // Check if it's an authentication error
+        if (err instanceof Error && err.message.includes('401')) {
+          setError('Authentifizierung erforderlich - Bitte melde dich bei Kickbase an');
+        } else {
+          setError('Spielhistorie nicht verfügbar - Verwende Mock-Daten');
+        }
         
         // Set empty array instead of mock data to see if real data loads
         setMatchHistory([]);
@@ -173,9 +187,21 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
             <div key={match.matchday} className="bg-slate-700/30 rounded-lg p-3 border border-slate-600/50">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-medium text-slate-400">#{match.matchday}</span>
-                <span className={`text-xs font-medium ${
-                  match.playerMinutes > 47 ? 'text-green-400 font-bold' : 'text-slate-400'
-                }`}>{match.playerMinutes}'</span>
+                <div className="flex items-center space-x-2">
+                  {(match.goals > 0 || match.assists > 0) && (
+                    <div className="flex items-center space-x-1 text-xs">
+                      {match.goals > 0 && (
+                        <span className="text-green-400 font-bold">⚽{match.goals}</span>
+                      )}
+                      {match.assists > 0 && (
+                        <span className="text-blue-400 font-bold">🅰️{match.assists}</span>
+                      )}
+                    </div>
+                  )}
+                  <span className={`text-xs font-medium ${
+                    match.playerMinutes > 47 ? 'text-green-400 font-bold' : 'text-slate-400'
+                  }`}>{match.playerMinutes}&apos;</span>
+                </div>
               </div>
               
               <div className="flex justify-between items-center mb-3">
@@ -292,15 +318,25 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
                     )}
                   </div>
                   
-                  {/* Minutes below the bar */}
-                  <div className="mt-2 text-center">
+                  {/* Minutes and stats below the bar */}
+                  <div className="mt-2 text-center space-y-1">
                     <div className={`text-xs font-medium ${
                       match.playerMinutes > 47 
                         ? 'text-green-400 font-bold' 
                         : 'text-slate-400'
                     }`}>
-                      {match.playerMinutes}'
+                      {match.playerMinutes}&apos;
                     </div>
+                    {(match.goals > 0 || match.assists > 0) && (
+                      <div className="flex justify-center space-x-1 text-xs">
+                        {match.goals > 0 && (
+                          <span className="text-green-400 font-bold">⚽{match.goals}</span>
+                        )}
+                        {match.assists > 0 && (
+                          <span className="text-blue-400 font-bold">🅰️{match.assists}</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

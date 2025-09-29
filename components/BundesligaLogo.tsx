@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
+import Image from 'next/image';
 import { getBundesligaLogoUrl, getLogoFallbackText, hasLogo } from '../lib/adapters/BundesligaLogoService';
 import { 
   getBundesligaLogoUrlByTeamName, 
@@ -30,7 +31,13 @@ const textSizeClasses = {
   lg: 'text-xs'
 };
 
-export default function BundesligaLogo({ teamName, kickbaseId, size = 'md', className = '' }: BundesligaLogoProps) {
+const sizeDimensions = {
+  sm: { width: 32, height: 32 },
+  md: { width: 48, height: 48 },
+  lg: { width: 64, height: 64 }
+};
+
+const BundesligaLogo = memo(function BundesligaLogo({ teamName, kickbaseId, size = 'md', className = '' }: BundesligaLogoProps) {
   const [imageError, setImageError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentLogoUrl, setCurrentLogoUrl] = useState<string | null>(null);
@@ -75,7 +82,7 @@ export default function BundesligaLogo({ teamName, kickbaseId, size = 'md', clas
       // If we have a logo URL, try to load it
       if (logoUrl && hasTeamLogo) {
         // Test if the image loads successfully
-        const img = new Image();
+        const img = new window.Image();
         img.onload = () => {
           if (isMounted) {
             setCurrentLogoUrl(logoUrl);
@@ -134,15 +141,21 @@ export default function BundesligaLogo({ teamName, kickbaseId, size = 'md', clas
   }
 
   // Show the actual logo
+  const dimensions = sizeDimensions[size];
+  
   return (
-    <div className={`${sizeClasses[size]} flex items-center justify-center ${className}`}>
-      <img
+    <div className={`${sizeClasses[size]} flex items-center justify-center ${className} relative overflow-hidden`}>
+      <Image
         src={currentLogoUrl}
         alt={`${displayName} Logo`}
-        className="w-full h-full object-contain"
+        width={dimensions.width}
+        height={dimensions.height}
+        className="object-contain"
         onError={handleImageError}
-        loading="lazy"
+        sizes={`${dimensions.width}px`}
       />
     </div>
   );
-}
+});
+
+export default BundesligaLogo;

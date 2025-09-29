@@ -6,6 +6,8 @@ import { cn } from '../lib/utils';
 import PlayerImage from './PlayerImage';
 import BundesligaLogo from './BundesligaLogo';
 import { getFullTeamName } from '../lib/teamMapping';
+import { optimizedFetch } from '../lib/requestDeduplication';
+import { getGermanPosition, getPositionColorClasses } from '../lib/positionUtils';
 
 // Dynamic import for PlayerMatchHistory with loading skeleton
 const PlayerMatchHistory = dynamic(() => import('./PlayerMatchHistory'), {
@@ -34,27 +36,7 @@ const formatCurrency = (amount: number): string => {
   }).format(amount)
 }
 
-// Function to translate positions to German
-const translatePosition = (position: string): string => {
-  const positionMap: Record<string, string> = {
-    'GK': 'TW',
-    'DEF': 'ABW',
-    'MID': 'MF',
-    'FWD': 'ANG'
-  };
-  return positionMap[position] || position;
-};
-
-// Helper function to get position color
-const getPositionColor = (position: string): string => {
-  switch (position) {
-    case 'GK': return 'bg-blue-500 text-white';
-    case 'DEF': return 'bg-green-500 text-white';
-    case 'MID': return 'bg-yellow-500 text-black';
-    case 'FWD': return 'bg-red-500 text-white';
-    default: return 'bg-gray-500 text-white';
-  }
-};
+// Use the centralized position utilities
 
 // Dialog variants with mobile-first approach and dark mode support
 const dialogVariants = cva(
@@ -171,47 +153,102 @@ export interface PlayerDetailModalProps {
 export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDetailModalProps) {
   const [start11Count, setStart11Count] = useState<number>(0);
   const [actualAppearances, setActualAppearances] = useState<number>(0);
-  const [totalMatchdays, setTotalMatchdays] = useState<number>(4);
+  const [currentMatchday, setCurrentMatchday] = useState<number>(5); // Aktueller Spieltag
+  const [apiTotalMinutes, setApiTotalMinutes] = useState<number>(0);
+  const [apiTotalPoints, setApiTotalPoints] = useState<number>(0);
 
   useEffect(() => {
     if (player?.id) {
       // Fetch performance data with proper typing
       const fetchPerformanceData = async (): Promise<void> => {
         try {
-          // Fix: Use query parameter instead of path parameter
-          const response = await fetch(`/api/player-performance?playerId=${player.id}`);
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          const data = await response.json();
-          console.log('Performance data received:', data);
+          // Verwende die player-performance-history API-Route, die zuverlässigere Daten liefert
+          const response = await optimizedFetch(`/api/player-performance-history?playerId=${player.id}`);
+          console.log('Performance history data received:', response);
           
-          // Use the new API response format
-          if (data.actualAppearances !== undefined && data.start11Count !== undefined && data.totalMatchdays !== undefined) {
-            setActualAppearances(data.actualAppearances);
-            setStart11Count(data.start11Count);
-            setTotalMatchdays(data.totalMatchdays);
-          } else if (data.matches && Array.isArray(data.matches)) {
-            // Fallback to old calculation method
-            const actualAppearances = data.matches.filter((match: any) => match.playerMinutes > 0).length;
-            const start11Count = data.matches.filter((match: any) => match.playerMinutes >= 45).length;
-            const totalMatchdays = data.matches.length > 0 ? Math.max(...data.matches.map((match: any) => match.matchday)) : 4;
+          if (response.success && response.data) {
+            const data = response.data;
             
-            setActualAppearances(actualAppearances);
-            setStart11Count(start11Count);
-            setTotalMatchdays(totalMatchdays);
+            // Verwende die Statistiken aus der API-Antwort
+            if (data.statistics) {
+              setActualAppearances(data.statistics.actualAppearances || 0);
+              setStart11Count(data.statistics.start11Count || 0);
+              setApiTotalMinutes(data.statistics.totalMinutes || 0);
+              setApiTotalPoints(data.statistics.totalPoints || 0);
+            }
+            
+            // Verwende currentMatchday aus API oder hole ihn separat
+            if (data.currentMatchday !== undefined) {
+              setCurrentMatchday(data.currentMatchday);
+            }
           } else {
-            // Fallback to mock data if no matches found
-            setActualAppearances(3);
-            setStart11Count(2);
-            setTotalMatchdays(4);
+            // Fallback zur alten API-Route
+            const data = await optimizedFetch(`/api/player-performance?playerId=${player.id}`);
+            console.log('Fallback performance data received:', data);
+            
+            // Use the new API response format
+            if (data.actualAppearances !== undefined && data.start11Count !== undefined) {
+              setActualAppearances(data.actualAppearances);
+              setStart11Count(data.start11Count);
+              // Verwende currentMatchday aus API oder hole ihn separat
+              if (data.currentMatchday !== undefined) {
+                setCurrentMatchday(data.currentMatchday);
+              }
+              setApiTotalMinutes(data.totalMinutes || 0);
+              setApiTotalPoints(data.totalPoints || 0);
+            } else if (data.matches && Array.isArray(data.matches)) {
+              // Fallback to old calculation method
+              const actualAppearances = data.matches.filter((match: any) => match.playerMinutes > 0).length;
+              const start11Count = data.matches.filter((match: any) => match.playerMinutes >= 45).length;
+              const totalMinutes = data.matches.reduce((sum: number, match: any) => sum + (match.playerMinutes || 0), 0);
+              const totalPoints = data.matches.reduce((sum: number, match: any) => sum + (match.playerPoints || 0), 0);
+              
+              setActualAppearances(actualAppearances);
+              setStart11Count(start11Count);
+              setApiTotalMinutes(totalMinutes);
+              setApiTotalPoints(totalPoints);
+            } else {
+              // Keine Mockdaten mehr verwenden, stattdessen Nullwerte setzen
+              setActualAppearances(0);
+              setStart11Count(0);
+              setApiTotalMinutes(0);
+              setApiTotalPoints(0);
+            }
           }
         } catch (error) {
           console.error('Error fetching performance data:', error);
-          // Set mock values for demonstration
-          setStart11Count(2);
-          setActualAppearances(3);
-          setTotalMatchdays(4);
+          
+          // Versuche es mit der Fallback-API-Route, falls die erste fehlschlägt
+          try {
+            const data = await optimizedFetch(`/api/player-performance?playerId=${player.id}`);
+            console.log('Fallback after error - performance data received:', data);
+            
+            if (data.matches && Array.isArray(data.matches)) {
+              // Fallback to old calculation method
+              const actualAppearances = data.matches.filter((match: any) => match.playerMinutes > 0).length;
+              const start11Count = data.matches.filter((match: any) => match.playerMinutes >= 45).length;
+              const totalMinutes = data.matches.reduce((sum: number, match: any) => sum + (match.playerMinutes || 0), 0);
+              const totalPoints = data.matches.reduce((sum: number, match: any) => sum + (match.playerPoints || 0), 0);
+              
+              setActualAppearances(actualAppearances);
+              setStart11Count(start11Count);
+              setApiTotalMinutes(totalMinutes);
+              setApiTotalPoints(totalPoints);
+            } else {
+              // Keine Mockdaten mehr verwenden, stattdessen Nullwerte setzen
+              setStart11Count(0);
+              setActualAppearances(0);
+              setApiTotalMinutes(0);
+              setApiTotalPoints(0);
+            }
+          } catch (fallbackError) {
+            console.error('Error fetching fallback performance data:', fallbackError);
+            // Keine Mockdaten mehr verwenden, stattdessen Nullwerte setzen
+            setStart11Count(0);
+            setActualAppearances(0);
+            setApiTotalMinutes(0);
+            setApiTotalPoints(0);
+          }
         }
       };
       
@@ -221,9 +258,9 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
 
   if (!player) return null;
 
-  // Calculate derived stats
-  const totalMinutes = actualAppearances * 90;
-  const totalPoints = player.totalPoints || player.punkte_sum || 0;
+  // Calculate derived stats - verwende API-Daten wenn verfügbar, sonst Fallback
+  const totalMinutes = apiTotalMinutes > 0 ? apiTotalMinutes : (actualAppearances * 90);
+  const totalPoints = apiTotalPoints > 0 ? apiTotalPoints : (player.totalPoints || player.punkte_sum || 0);
   const marketValue = player.marketValue || player.kosten || 0;
   const pointsPerMinute = totalMinutes > 0 ? totalPoints / totalMinutes : 0;
   const pointsPerMillion = marketValue > 0 ? (totalPoints / (marketValue / 1000000)) : 0;
@@ -264,10 +301,17 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
                   {player.verein && <BundesligaLogo teamName={player.verein} size="sm" />}
                   <span className="text-sm text-muted-foreground">{getFullTeamName(player.verein || '') || 'Unbekanntes Team'}</span>
                 </div>
+                {/* Kickbase Spieler-ID */}
+                <div className="flex items-center gap-1 mb-2">
+                  <span className="text-xs text-muted-foreground">ID:</span>
+                  <span className="text-xs font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-gray-700 dark:text-gray-300">
+                    {player.id}
+                  </span>
+                </div>
                 {/* Position mit Farbkodierung */}
                 <div className="flex items-center gap-2">
-                  <span className={`px-2 py-1 rounded-full text-sm font-medium ${getPositionColor(player.position)}`}>
-                    {translatePosition(player.position)}
+                  <span className={`px-2 py-1 rounded-full text-sm font-medium ${getPositionColorClasses(player.position as any)}`}>
+                    {getGermanPosition(player.position as any)}
                   </span>
                   {player.isInjured && (
                     <Badge variant="destructive" className="flex items-center gap-1">
@@ -306,7 +350,7 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
                />
                <StatCard
                  title="Punkte/Min"
-                 value={pointsPerMinute.toFixed(2)}
+                 value={pointsPerMinute.toFixed(1)}
                />
                <StatCard
                  title="Punkte/Mio €"
@@ -321,15 +365,15 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
                <StatCard
                  title="Einsätze"
-                 value={`${actualAppearances} von ${totalMatchdays}`}
+                 value={actualAppearances > 0 ? `${actualAppearances} von ${currentMatchday}` : "Keine Daten"}
                />
                <StatCard
                  title="Start-11"
-                 value={`${start11Count} von ${totalMatchdays}`}
+                 value={start11Count > 0 ? `${start11Count} von ${currentMatchday}` : "Keine Daten"}
                />
                <StatCard
                  title="Spielzeit"
-                 value={`${totalMinutes} Min`}
+                 value={totalMinutes > 0 ? `${totalMinutes} Min` : "Keine Daten"}
                />
              </div>
            </section>

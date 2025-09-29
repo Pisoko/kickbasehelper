@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { optimizedFetch } from '../lib/requestDeduplication';
 
 interface MatchEvent {
   type: 'goal' | 'yellow_card' | 'red_card' | 'substitution' | 'penalty';
@@ -42,15 +43,7 @@ export function LiveMatchData({
     setError(null);
     
     try {
-      const response = await fetch('/api/live-matches', {
-        method: 'GET',
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await optimizedFetch('/api/live-matches');
       setMatches(data.matches || []);
       setLastUpdate(new Date());
     } catch (err) {
@@ -177,7 +170,7 @@ export function LiveMatchData({
                   </span>
                   {match.status === 'live' && (
                     <span className="text-sm text-green-600 font-bold">
-                      {match.minute}'
+                      {match.minute}&apos;
                     </span>
                   )}
                 </div>
@@ -224,7 +217,7 @@ export function LiveMatchData({
                           className="flex items-center space-x-2 text-sm"
                         >
                           <span className="w-8 text-center text-gray-500">
-                            {event.minute}'
+                            {event.minute}&apos;
                           </span>
                           <span>{getEventIcon(event.type)}</span>
                           <span className="text-gray-700">

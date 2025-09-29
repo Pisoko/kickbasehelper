@@ -1,178 +1,186 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { KickbaseAdapter } from '../../../lib/adapters/KickbaseAdapter';
 import { getTeamByKickbaseId } from '../../../lib/teamMapping';
+import fs from 'fs/promises';
+import path from 'path';
 
 const kickbaseAdapter = new KickbaseAdapter(
-  process.env.KICKBASE_BASE || 'https://api.kickbase.de',
+  process.env.KICKBASE_BASE || 'https://api.kickbase.com',
   process.env.KICKBASE_KEY || ''
 );
+
+async function getCurrentMatchday(): Promise<number> {
+  try {
+    const matchdayStatePath = path.join(process.cwd(), 'data', 'matchday-state.json');
+    const data = await fs.readFile(matchdayStatePath, 'utf-8');
+    const matchdayState = JSON.parse(data);
+    return matchdayState.currentMatchday || 5; // Fallback auf Spieltag 5
+  } catch (error) {
+    console.error('Fehler beim Lesen des aktuellen Spieltags:', error);
+    return 5; // Fallback auf Spieltag 5
+  }
+}
 
 const getTeamName = (teamId: string | number): string => {
   const teamInfo = getTeamByKickbaseId(teamId);
   return teamInfo?.fullName || `Team ${teamId}`;
 };
 
+// Typdefinitionen
+interface MatchPerformance {
+  matchday: number;
+  homeTeam: string;
+  awayTeam: string;
+  homeScore: number;
+  awayScore: number;
+  playerMinutes: number;
+  playerPoints: number;
+  matchDate: string;
+  playerTeam: string;
+}
+
+interface PlayerPerformanceData {
+  playerId: string;
+  matches: MatchPerformance[];
+  totalPoints: number;
+  totalMinutes: number;
+  averagePoints: number;
+  actualAppearances: number;
+  start11Count: number;
+  currentMatchday: number;
+}
+
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const playerId = searchParams.get('playerId');
-  
   try {
+    const { searchParams } = new URL(request.url);
+    const playerId = searchParams.get('playerId');
 
     if (!playerId) {
       return NextResponse.json(
-        { error: 'Player ID is required' },
+        { error: 'Player ID ist erforderlich' },
         { status: 400 }
       );
     }
 
-    // Fetch performance data directly from Kickbase API
-    console.log('Fetching performance data for player:', playerId);
+    // Debug: Log environment variables
+    console.log('Environment variables check:');
+    console.log('KICKBASE_KEY:', process.env.KICKBASE_KEY ? 'SET' : 'NOT SET');
+    console.log('KICKBASE_API_KEY:', process.env.KICKBASE_API_KEY ? 'SET' : 'NOT SET');
+    console.log('KICKBASE_BASE:', process.env.KICKBASE_BASE ? 'SET' : 'NOT SET');
+
+    console.log(`Fetching performance data for player ${playerId}`);
     
-    const apiKey = process.env.KICKBASE_KEY;
-    if (!apiKey) {
-      throw new Error('KICKBASE_KEY environment variable is not set');
+    // Aktuellen Spieltag abrufen
+    const currentMatchday = await getCurrentMatchday();
+    
+    // Versuche, echte Daten von der Kickbase API zu holen
+    const performanceData = await kickbaseAdapter.getPlayerPerformance(playerId);
+    
+    // Wenn wir Daten haben, verarbeite sie
+    if (performanceData) {
+      console.log('Kickbase API data received:', Object.keys(performanceData));
+      
+      // Direkter Ansatz zur Verarbeitung der Kickbase-Daten
+      if (performanceData.it && Array.isArray(performanceData.it)) {
+        console.log('Verarbeite echte Kickbase-Daten...');
+        
+        const result: PlayerPerformanceData = {
+          playerId,
+          matches: [],
+          totalPoints: 0,
+          totalMinutes: 0,
+          averagePoints: 0,
+          actualAppearances: 0,
+          start11Count: 0,
+          currentMatchday
+        };
+        
+        // Durchlaufe alle Saisons in der 'it' Array
+        for (const season of performanceData.it) {
+          // Jede Saison hat ein eigenes 'it' Array mit Spielen
+          if (season.it && Array.isArray(season.it)) {
+            console.log(`Gefundene Spiele: ${season.it.length}`);
+            
+            for (const match of season.it) {
+              // Extrahiere Spieldaten
+              const matchday = match.day || 0;
+              const playerMinutes = match.ap || 0;
+              const playerPoints = match.tp || 0;
+              
+              // Team-IDs und Namen
+              const homeTeamId = match.t1 || '';
+              const awayTeamId = match.t2 || '';
+              const homeTeam = getTeamName(homeTeamId);
+              const awayTeam = getTeamName(awayTeamId);
+              
+              // Spielobjekt erstellen
+              const matchObj: MatchPerformance = {
+                matchday,
+                homeTeam,
+                awayTeam,
+                homeScore: 0, // Nicht in den Performance-Daten enthalten
+                awayScore: 0, // Nicht in den Performance-Daten enthalten
+                playerMinutes,
+                playerPoints,
+                matchDate: match.md || new Date().toISOString(),
+                playerTeam: match.st === 1 ? homeTeam : awayTeam // st=1 bedeutet Heimteam
+              };
+              
+              // Zum Ergebnis hinzufügen
+              result.matches.push(matchObj);
+              
+              // Gesamtwerte aktualisieren
+              result.totalPoints += playerPoints;
+              result.totalMinutes += playerMinutes;
+              
+              if (playerMinutes > 0) {
+                result.actualAppearances++;
+              }
+              
+              if (playerMinutes > 48) {
+                result.start11Count++;
+              }
+            }
+          }
+        }
+        
+        // Durchschnitt berechnen
+        if (result.actualAppearances > 0) {
+          result.averagePoints = Math.round(result.totalPoints / result.actualAppearances);
+        }
+        
+        // Sortiere Spiele nach Spieltag
+        result.matches.sort((a, b) => a.matchday - b.matchday);
+        
+        // Begrenze auf aktuellen Spieltag
+        result.matches = result.matches.filter(match => match.matchday <= currentMatchday);
+        
+        console.log(`Verarbeitete Spiele: ${result.matches.length}`);
+        
+        // Prüfe, ob tatsächlich Spiele gefunden wurden
+        if (result.matches.length > 0) {
+          return NextResponse.json(result);
+        }
+      }
     }
     
-    const response = await fetch(`https://api.kickbase.com/v4/competitions/1/players/${playerId}/performance`, {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Kickbase API request failed: ${response.status} ${response.statusText}`);
-    }
-    
-    const performanceData = await response.json();
-    console.log('Raw performance data:', performanceData);
-    console.log('Performance data type:', typeof performanceData);
-    console.log('Performance data is null:', performanceData === null);
-    console.log('Performance data is undefined:', performanceData === undefined);
-    
-    console.log(`[DEBUG] Raw performance data for player ${playerId}:`, JSON.stringify(performanceData, null, 2));
-    
-    // If no data is returned, throw an error to trigger mock data fallback
-    if (!performanceData || !performanceData.it || !Array.isArray(performanceData.it) || performanceData.it.length === 0) {
-      throw new Error('No performance data available from Kickbase API');
-    }
-    
-    // Find current season data (2025/2026)
-    const currentSeasonData = performanceData.it.find((season: any) => season.ti === "2025/2026");
-    if (!currentSeasonData || !currentSeasonData.ph || !Array.isArray(currentSeasonData.ph)) {
-      throw new Error('No current season (2025/2026) data found in performance data');
-    }
-    
-    // Filter all matches up to matchday 4 (according to user requirements)
-    // Include all matches where the player was potentially available, even with 0 minutes
-    // This ensures transparency and shows all games, not just those with playing time
-    const squadAppearances = currentSeasonData.ph.filter((match: any) => 
-      match.day <= 4 && match.day >= 1
+    // Keine Livedaten verfügbar - Fehlermeldung zurückgeben
+    console.log('Keine Livedaten für Spieler verfügbar');
+    return NextResponse.json(
+      { 
+        error: 'Keine Leistungsdaten verfügbar', 
+        message: 'Für diesen Spieler sind aktuell keine Leistungsdaten in der Kickbase API verfügbar.',
+        playerId,
+        currentMatchday
+      }, 
+      { status: 404 }
     );
     
-    // Transform the match history data
-    const matches = squadAppearances.map((match: any) => ({
-      matchday: match.day,
-      homeTeam: getTeamName(match.t1) || 'Unknown',
-      awayTeam: getTeamName(match.t2) || 'Unknown',
-      homeScore: match.t1g || 0,
-      awayScore: match.t2g || 0,
-      playerMinutes: match.mp ? parseInt(match.mp.replace("'", "")) : 0,
-      playerPoints: match.p || 0,
-      matchDate: match.md || new Date().toISOString(),
-      playerTeam: match.pt === match.t1 ? getTeamName(match.t1) : getTeamName(match.t2)
-    }));
-    
-    // Calculate totals and actual appearances (only games with minutes > 0)
-    const actualAppearances = matches.filter((match: any) => match.playerMinutes > 0);
-    const start11Appearances = matches.filter((match: any) => match.playerMinutes >= 45);
-    const totalPoints = matches.reduce((sum: number, match: any) => sum + match.playerPoints, 0);
-    const totalMinutes = matches.reduce((sum: number, match: any) => sum + match.playerMinutes, 0);
-    const averagePoints = actualAppearances.length > 0 ? totalPoints / actualAppearances.length : 0;
-    
-    // Calculate total matchdays played (unique matchdays from all matches)
-    const totalMatchdays = matches.length > 0 ? Math.max(...matches.map((match: any) => match.matchday)) : 4;
-    
-    // Transform the data to match our expected format
-    const transformedData = {
-      playerId,
-      matches,
-      totalPoints,
-      totalMinutes,
-      averagePoints,
-      actualAppearances: actualAppearances.length,
-      start11Count: start11Appearances.length,
-      totalMatchdays
-    };
-
-    return NextResponse.json(transformedData);
   } catch (error) {
     console.error('Error fetching player performance:', error);
-    console.error('Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : 'No stack trace',
-      playerId,
-      baseUrl: process.env.KICKBASE_BASE,
-      hasApiKey: !!process.env.KICKBASE_KEY
-    });
-    
-    // Return mock data for demonstration
-    const mockData = {
-      playerId: request.nextUrl.searchParams.get('playerId'),
-      matches: [
-        {
-          matchday: 1,
-          homeTeam: 'Bayern München',
-          awayTeam: 'RB Leipzig',
-          homeScore: 6,
-          awayScore: 0,
-          playerMinutes: 91,
-          playerPoints: 427,
-          matchDate: '2025-08-22T18:30:00Z',
-          playerTeam: 'Bayern München'
-        },
-        {
-          matchday: 2,
-          homeTeam: 'Borussia Dortmund',
-          awayTeam: 'Bayern München',
-          homeScore: 2,
-          awayScore: 3,
-          playerMinutes: 107,
-          playerPoints: 273,
-          matchDate: '2025-08-29T15:30:00Z',
-          playerTeam: 'Bayern München'
-        },
-        {
-          matchday: 3,
-          homeTeam: 'Bayern München',
-          awayTeam: 'SC Freiburg',
-          homeScore: 5,
-          awayScore: 0,
-          playerMinutes: 69,
-          playerPoints: 378,
-          matchDate: '2025-09-05T18:30:00Z',
-          playerTeam: 'Bayern München'
-        },
-        {
-          matchday: 4,
-          homeTeam: 'Bayer Leverkusen',
-          awayTeam: 'Bayern München',
-          homeScore: 1,
-          awayScore: 4,
-          playerMinutes: 105,
-          playerPoints: 390,
-          matchDate: '2025-09-12T20:30:00Z',
-          playerTeam: 'Bayern München'
-        }
-      ],
-      totalPoints: 1468,
-      totalMinutes: 372,
-      averagePoints: 367,
-      actualAppearances: 4,
-      start11Count: 4,
-      totalMatchdays: 4
-    };
-
-    return NextResponse.json(mockData);
+    return NextResponse.json(
+      { error: 'Failed to fetch player performance' },
+      { status: 500 }
+    );
   }
 }

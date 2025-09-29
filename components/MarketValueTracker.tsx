@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { optimizedFetch } from '../lib/requestDeduplication';
 
 interface MarketValueData {
   playerId: string;
@@ -27,24 +28,18 @@ export function MarketValueTracker({
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchMarketValues = async () => {
+  const fetchMarketValues = useCallback(async () => {
     setLoading(true);
     setError(null);
     
     try {
-      const response = await fetch('/api/market-values', {
+      const data = await optimizedFetch('/api/market-values', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ playerIds }),
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
       setMarketData(data.marketValues || []);
       setLastUpdate(new Date());
     } catch (err) {
@@ -53,14 +48,14 @@ export function MarketValueTracker({
     } finally {
       setLoading(false);
     }
-  };
+  }, [playerIds]);
 
   useEffect(() => {
     fetchMarketValues();
     
     const interval = setInterval(fetchMarketValues, refreshInterval);
     return () => clearInterval(interval);
-  }, [playerIds, refreshInterval]);
+  }, [fetchMarketValues, refreshInterval]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('de-DE', {
@@ -135,7 +130,7 @@ export function MarketValueTracker({
         <div className="text-center py-8">
           <p className="text-slate-300">Keine Marktwertdaten verfügbar</p>
           <p className="text-sm text-slate-400 mt-2">
-            Klicke auf "Aktualisieren" um Live-Daten zu laden
+            Klicke auf &quot;Aktualisieren&quot; um Live-Daten zu laden
           </p>
         </div>
       ) : (

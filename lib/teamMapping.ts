@@ -147,6 +147,21 @@ export const TEAM_MAPPING: Record<string, TeamInfo> = {
     isActive: true
   },
   
+  // Inaktive Teams (abgestiegen oder nicht mehr in der Bundesliga)
+  '8': {
+    kickbaseId: '8',
+    dflId: 'DFL-CLU-000009',
+    fullName: 'FC Schalke 04',
+    shortName: 'Schalke',
+    isActive: false
+  },
+  '14': {
+    kickbaseId: '14',
+    dflId: 'DFL-CLU-000005',
+    fullName: 'VfL Bochum',
+    shortName: 'Bochum',
+    isActive: false
+  }
 
 } as const;
 

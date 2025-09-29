@@ -25,8 +25,11 @@ export class KickbaseAuthService {
   private token: string | null = null;
   private tokenExpiry: Date | null = null;
   private refreshPromise: Promise<boolean> | null = null;
+  private readonly apiKey: string | null = null;
 
   constructor() {
+    // Initialize with API key from environment
+    this.apiKey = process.env.KICKBASE_KEY || null;
     // Initialize with any existing token from environment or storage
     this.loadStoredToken();
   }
@@ -126,18 +129,21 @@ export class KickbaseAuthService {
   }
 
   /**
-   * Check if the current token is still valid
+   * Check if current token is valid and not expired, or if API key is available
    */
   isTokenValid(): boolean {
+    // If we have an API key from environment, consider it valid
+    if (this.apiKey) {
+      return true;
+    }
+
     if (!this.token || !this.tokenExpiry) {
       return false;
     }
 
-    // Add 5 minute buffer before expiry
-    const bufferTime = 5 * 60 * 1000; // 5 minutes in milliseconds
-    const now = new Date();
-    
-    return now.getTime() < (this.tokenExpiry.getTime() - bufferTime);
+    // Check if token expires within the next 5 minutes
+    const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
+    return this.tokenExpiry > fiveMinutesFromNow;
   }
 
   /**
@@ -220,6 +226,14 @@ export class KickbaseAuthService {
    * Create authenticated headers for API requests
    */
   async getAuthHeaders(): Promise<Record<string, string>> {
+    // Prefer API key from environment if available
+    if (this.apiKey) {
+      return {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json',
+      };
+    }
+
     const token = await this.getValidToken();
     
     if (!token) {
