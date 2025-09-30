@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, TrendingDown, Minus, RefreshCw, AlertCircle, Users, Target, DollarSign } from 'lucide-react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
+import BundesligaLogo from './BundesligaLogo';
 
 // Variants für die Komponente
 const tableRowVariants = cva(
@@ -166,8 +167,6 @@ export default function TeamOverview({ className }: TeamOverviewProps) {
   // Sort teams
   const sortedTeams = tableData?.teams ? [...tableData.teams].sort((a, b) => {
     switch (sortBy) {
-      case 'marketValue':
-        return (b.totalMarketValue || 0) - (a.totalMarketValue || 0);
       case 'points':
         return b.points - a.points;
       default:
@@ -176,237 +175,201 @@ export default function TeamOverview({ className }: TeamOverviewProps) {
   }) : [];
 
   return (
-    <div className={cn("space-y-6", className)}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Trophy className="h-6 w-6 text-primary" />
-          <div>
-            <h2 className="text-2xl font-bold">Team-Übersicht</h2>
-            <p className="text-sm text-muted-foreground">
-              Bundesliga {tableData?.season || '2025/2026'}
-            </p>
+    <section className="space-y-6">
+      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <Trophy className="h-6 w-6 text-primary" />
+            <div>
+              <h2 className="text-xl font-semibold">Bundesliga Tabelle</h2>
+              <p className="text-sm text-slate-400">
+                Saison {tableData?.season || '2025/2026'}
+              </p>
+            </div>
           </div>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowKickbaseData(!showKickbaseData)}
-            className="inline-flex items-center justify-center rounded-md h-9 px-3 bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors text-sm"
-          >
-            <DollarSign className="h-4 w-4 mr-1" />
-            Kickbase
-          </button>
           
-          <button
-            onClick={fetchTableData}
-            disabled={isLoading}
-            className="inline-flex items-center justify-center rounded-md h-10 px-4 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:pointer-events-none transition-colors"
-          >
-            <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
-          </button>
-        </div>
-      </div>
-
-      {/* Sort Controls */}
-      <div className="flex items-center gap-2 bg-card rounded-lg p-4 border">
-        <span className="text-sm font-medium">Sortieren nach:</span>
-        <div className="flex gap-1">
-          {[
-            { key: 'position', label: 'Position', icon: Trophy },
-            { key: 'points', label: 'Punkte', icon: Target },
-            { key: 'marketValue', label: 'Marktwert', icon: DollarSign }
-          ].map(({ key, label, icon: Icon }) => (
+          <div className="flex items-center gap-2">
             <button
-              key={key}
-              onClick={() => setSortBy(key as any)}
+              onClick={() => setShowKickbaseData(!showKickbaseData)}
               className={cn(
-                "inline-flex items-center justify-center rounded-md h-8 px-3 text-xs transition-colors",
-                sortBy === key
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                "inline-flex items-center justify-center rounded-md h-9 px-3 transition-colors text-sm",
+                showKickbaseData 
+                  ? "bg-blue-600 text-white hover:bg-blue-700" 
+                  : "bg-slate-700 text-slate-300 hover:bg-slate-600"
               )}
             >
-              <Icon className="h-3 w-3 mr-1" />
-              {label}
+              <DollarSign className="h-4 w-4 mr-1" />
+              Kickbase
             </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Error State */}
-      {error && (
-        <div className="flex items-center gap-2 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-          <AlertCircle className="h-4 w-4 text-destructive" />
-          <p className="text-sm text-destructive">{error}</p>
-        </div>
-      )}
-
-      {/* Loading State */}
-      {isLoading && (
-        <div className="space-y-2">
-          {[...Array(18)].map((_, i) => (
-            <div key={i} className="animate-pulse">
-              <div className="h-12 bg-muted rounded-lg"></div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Table */}
-      {tableData && !isLoading && (
-        <div className="bg-card rounded-lg border overflow-hidden">
-          {/* Table Header */}
-          <div className="bg-muted/50 border-b border-border">
-            <div className="grid grid-cols-12 gap-2 p-3 text-xs font-medium text-muted-foreground">
-              <div className="col-span-1">#</div>
-              <div className="col-span-3 md:col-span-2">Team</div>
-              <div className="col-span-1 text-center">Sp</div>
-              <div className="col-span-1 text-center">S</div>
-              <div className="col-span-1 text-center">U</div>
-              <div className="col-span-1 text-center">N</div>
-              <div className="col-span-1 text-center">Tore</div>
-              <div className="col-span-1 text-center">Diff</div>
-              <div className="col-span-1 text-center">Pkt</div>
-              {showKickbaseData && (
-                <div className="col-span-1 text-center hidden md:block">MW</div>
-              )}
-            </div>
           </div>
+        </div>
 
-          {/* Table Body */}
-          <div className="divide-y divide-border">
-            {sortedTeams.map((team) => (
-              <div
-                key={team.id}
-                className={cn(tableRowVariants({ position: getPositionCategory(team.position) }))}
-              >
-                <div className="grid grid-cols-12 gap-2 p-3 items-center">
-                  {/* Position */}
-                  <div className="col-span-1">
-                    <span className="text-sm font-medium">{team.position}</span>
-                  </div>
 
-                  {/* Team */}
-                  <div className="col-span-3 md:col-span-2 flex items-center gap-2 min-w-0">
-                    {team.logo && (
-                      <img 
-                        src={team.logo} 
-                        alt={team.name}
-                        className="w-6 h-6 object-contain flex-shrink-0"
-                      />
-                    )}
-                    <div className="min-w-0">
-                      <p className="font-medium truncate text-sm">{team.shortName}</p>
-                      <p className="text-xs text-muted-foreground truncate md:hidden">
-                        {team.name}
-                      </p>
-                    </div>
-                  </div>
 
-                  {/* Games Played */}
-                  <div className="col-span-1 text-center text-sm">{team.played}</div>
+        {/* Error State */}
+        {error && (
+          <div className="flex items-center gap-2 p-4 bg-red-900/20 border border-red-800 rounded-lg mb-4">
+            <AlertCircle className="h-4 w-4 text-red-400" />
+            <p className="text-sm text-red-400">{error}</p>
+          </div>
+        )}
 
-                  {/* Wins */}
-                  <div className="col-span-1 text-center text-sm">{team.won}</div>
-
-                  {/* Draws */}
-                  <div className="col-span-1 text-center text-sm">{team.drawn}</div>
-
-                  {/* Losses */}
-                  <div className="col-span-1 text-center text-sm">{team.lost}</div>
-
-                  {/* Goals */}
-                  <div className="col-span-1 text-center text-sm">
-                    {team.goalsFor}:{team.goalsAgainst}
-                  </div>
-
-                  {/* Goal Difference */}
-                  <div className="col-span-1 text-center text-sm">
-                    <span className={cn(
-                      "font-medium",
-                      team.goalDifference > 0 && "text-green-600",
-                      team.goalDifference < 0 && "text-red-600"
-                    )}>
-                      {team.goalDifference > 0 ? '+' : ''}{team.goalDifference}
-                    </span>
-                  </div>
-
-                  {/* Points */}
-                  <div className="col-span-1 text-center">
-                    <span className="text-sm font-bold">{team.points}</span>
-                  </div>
-
-                  {/* Market Value (Kickbase) */}
-                  {showKickbaseData && (
-                    <div className="col-span-1 text-center hidden md:block">
-                      {team.totalMarketValue ? (
-                        <span className="text-xs font-medium">
-                          {formatCurrency(team.totalMarketValue)}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">-</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {/* Form (Mobile) */}
-                {team.form && team.form.length > 0 && (
-                  <div className="px-3 pb-2 md:hidden">
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs text-muted-foreground mr-2">Form:</span>
-                      {team.form.slice(-5).map((result, index) => (
-                        <div key={index}>
-                          {getFormIndicator(result)}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+        {/* Loading State */}
+        {isLoading && (
+          <div className="space-y-2 mb-4">
+            {[...Array(18)].map((_, i) => (
+              <div key={i} className="animate-pulse">
+                <div className="h-12 bg-slate-700/50 rounded-lg"></div>
               </div>
             ))}
           </div>
+        )}
 
-          {/* Legend */}
-          <div className="bg-muted/30 p-3 border-t border-border">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-100 border border-green-200 rounded"></div>
-                <span>Champions League</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-blue-100 border border-blue-200 rounded"></div>
-                <span>Europa League</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-orange-100 border border-orange-200 rounded"></div>
-                <span>Conference League</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-red-100 border border-red-200 rounded"></div>
-                <span>Abstieg</span>
+        {/* Table */}
+        {tableData && !isLoading && (
+          <div className="bg-slate-800/50 rounded-lg border border-slate-700 overflow-hidden">
+            {/* Table Header */}
+            <div className="bg-slate-700/50 border-b border-slate-600">
+              <div className="grid grid-cols-12 gap-1 p-3 text-xs font-medium text-slate-300">
+                <div className="col-span-1">#</div>
+                <div className="col-span-4 md:col-span-3">Team</div>
+                <div className="col-span-1 text-center">Sp</div>
+                <div className="col-span-1 text-center">S</div>
+                <div className="col-span-1 text-center">U</div>
+                <div className="col-span-1 text-center">N</div>
+                <div className="col-span-1 text-center">Tore</div>
+                <div className="col-span-1 text-center">Diff</div>
+                <div className="col-span-1 text-center">Pkt</div>
               </div>
             </div>
-            {tableData.lastUpdate && (
-              <p className="text-xs text-muted-foreground mt-2">
-                Letzte Aktualisierung: {new Date(tableData.lastUpdate).toLocaleString('de-DE')}
-              </p>
-            )}
-          </div>
-        </div>
-      )}
 
-      {/* Empty State */}
-      {tableData && !tableData.teams?.length && !isLoading && (
-        <div className="text-center py-12">
-          <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-medium mb-2">Keine Tabellendaten gefunden</h3>
-          <p className="text-muted-foreground">
-            Die Bundesliga-Tabelle konnte nicht geladen werden.
-          </p>
-        </div>
-      )}
-    </div>
+            {/* Table Body */}
+            <div className="divide-y divide-slate-700">
+              {sortedTeams.map((team) => (
+                <div
+                  key={team.id}
+                  className={cn(
+                    "border-b border-slate-700 hover:bg-slate-700/30 transition-colors",
+                    getPositionCategory(team.position) === 'champions' && "bg-green-900/20 border-green-800",
+                    getPositionCategory(team.position) === 'europa' && "bg-blue-900/20 border-blue-800",
+                    getPositionCategory(team.position) === 'conference' && "bg-orange-900/20 border-orange-800",
+                    getPositionCategory(team.position) === 'relegation' && "bg-red-900/20 border-red-800"
+                  )}
+                >
+                  <div className="grid grid-cols-12 gap-1 p-3 items-center">
+                    {/* Position */}
+                    <div className="col-span-1">
+                      <span className="text-sm font-medium text-white">{team.position}</span>
+                    </div>
+
+                    {/* Team */}
+                    <div className="col-span-4 md:col-span-3 flex items-center gap-2 min-w-0">
+                      <BundesligaLogo 
+                        teamName={team.name}
+                        size="sm"
+                        className="flex-shrink-0"
+                      />
+                      <div className="min-w-0">
+                        <p className="font-medium truncate text-sm text-white">{team.name}</p>
+                        <p className="text-xs text-slate-400 truncate md:hidden">
+                          {team.shortName}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Games Played */}
+                    <div className="col-span-1 text-center text-sm text-slate-300">{team.played}</div>
+
+                    {/* Wins */}
+                    <div className="col-span-1 text-center text-sm text-slate-300">{team.won}</div>
+
+                    {/* Draws */}
+                    <div className="col-span-1 text-center text-sm text-slate-300">{team.drawn}</div>
+
+                    {/* Losses */}
+                    <div className="col-span-1 text-center text-sm text-slate-300">{team.lost}</div>
+
+                    {/* Goals */}
+                    <div className="col-span-1 text-center text-sm text-slate-300">
+                      {team.goalsFor}:{team.goalsAgainst}
+                    </div>
+
+                    {/* Goal Difference */}
+                    <div className="col-span-1 text-center text-sm">
+                      <span className={cn(
+                        "font-medium",
+                        team.goalDifference > 0 && "text-green-400",
+                        team.goalDifference < 0 && "text-red-400",
+                        team.goalDifference === 0 && "text-slate-300"
+                      )}>
+                        {team.goalDifference > 0 ? '+' : ''}{team.goalDifference}
+                      </span>
+                    </div>
+
+                    {/* Points */}
+                    <div className="col-span-1 text-center">
+                      <span className="text-sm font-bold text-white">{team.points}</span>
+                    </div>
+                  </div>
+
+                  {/* Form (Mobile) */}
+                  {team.form && team.form.length > 0 && (
+                    <div className="px-3 pb-2 md:hidden">
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-slate-400 mr-2">Form:</span>
+                        {team.form.slice(-5).map((result, index) => (
+                          <div key={index}>
+                            {getFormIndicator(result)}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Legend */}
+            <div className="bg-slate-700/30 p-3 border-t border-slate-600">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-green-900/40 border border-green-700 rounded"></div>
+                  <span className="text-slate-300">Champions League</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-blue-900/40 border border-blue-700 rounded"></div>
+                  <span className="text-slate-300">Europa League</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-orange-900/40 border border-orange-700 rounded"></div>
+                  <span className="text-slate-300">Conference League</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-red-900/40 border border-red-700 rounded"></div>
+                  <span className="text-slate-300">Abstieg</span>
+                </div>
+              </div>
+              {tableData.lastUpdate && (
+                <p className="text-xs text-slate-400 mt-2">
+                  Letzte Aktualisierung: {new Date(tableData.lastUpdate).toLocaleString('de-DE')}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {tableData && !tableData.teams?.length && !isLoading && (
+          <div className="text-center py-12">
+            <Trophy className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2 text-white">Keine Tabellendaten gefunden</h3>
+            <p className="text-slate-400">
+              Die Bundesliga-Tabelle konnte nicht geladen werden.
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
