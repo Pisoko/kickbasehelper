@@ -1,8 +1,8 @@
 {
-  "buildNumber": 19,
-  "version": "1.0.19",
-  "timestamp": "2025-09-30T09:55:03.207Z",
-  "commitHash": "d9a6fc30fa4c4396c4e49ad552a803f03f835df1",
-  "commitMessage": "Fix hydration error and implement mobile left-to-right bar filling\n\n- Fix RefreshButton hydration error by implementing client-side localStorage access\n- Add isClient state to prevent server/client rendering mismatch\n- Modify PlayerMatchHistory mobile view for left-to-right bar filling\n- Keep desktop view unchanged with bottom-to-top filling\n- Update CSS masks and positioning for responsive bar behavior",
+  "buildNumber": 23,
+  "version": "1.0.23",
+  "timestamp": "2025-09-30T19:57:22.637Z",
+  "commitHash": "c17b43bdb44726b783894da288696d7c2199a4b4",
+  "commitMessage": "chore: bump version to 0.2.0",
   "branch": "main"
 }

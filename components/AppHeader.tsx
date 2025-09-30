@@ -4,9 +4,9 @@ import React from 'react';
 import ClearCache from './ClearCache';
 import BuildInfo from './BuildInfo';
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
-import { Users, Calendar, Trophy } from 'lucide-react';
+import { Users, Calendar, Trophy, Shield } from 'lucide-react';
 
-type TabType = 'players' | 'matchday' | 'teams';
+type TabType = 'players' | 'matchday' | 'teams' | 'team';
 
 interface TabConfig {
   id: TabType;
@@ -23,6 +23,7 @@ interface AppHeaderProps {
 
 const tabs: TabConfig[] = [
   { id: 'players', label: 'Spieler', icon: Users },
+  { id: 'team', label: 'Team', icon: Shield },
   { id: 'matchday', label: 'Spieltag', icon: Calendar },
   { id: 'teams', label: 'Tabelle', icon: Trophy }
 ];
@@ -49,7 +50,7 @@ export default function AppHeader({
         
         {/* Tab navigation */}
         <Tabs value={activeTab} onValueChange={(value: string) => onTabChange?.(value as TabType)} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
+          <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
             {tabs.map((tab) => {
               const IconComponent = tab.icon;
               return (
