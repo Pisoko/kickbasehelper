@@ -7,6 +7,8 @@ import PlayerStatusTag, { isPlayerFit, getRowTextColor } from '../components/Pla
 import BundesligaLogo from '../components/BundesligaLogo';
 import AppHeader from '../components/AppHeader';
 import MatchdayMonitor from '../components/MatchdayMonitor';
+import MatchdayOverview from '../components/MatchdayOverview';
+import TeamOverview from '../components/TeamOverview';
 import { getFullTeamName } from '../lib/teamMapping';
 import type { Player, Match } from '../lib/types';
 import { 
@@ -26,6 +28,7 @@ import {
 import { optimizedFetch } from '../lib/requestDeduplication';
 import { cachedFetch } from '../lib/apiCache';
 import { SmartPagination } from '../components/ui/smart-pagination';
+import { cn } from '../lib/utils';
 
 
 
@@ -36,7 +39,10 @@ interface CacheInfo {
 
 const formatter = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
+type TabType = 'players' | 'matchday' | 'teams';
+
 export default function PlayerHubPage() {
+  const [activeTab, setActiveTab] = useState<TabType>('players');
   const [spieltag, setSpieltag] = useState(4);
   const [players, setPlayers] = useState<Player[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
@@ -253,34 +259,13 @@ export default function PlayerHubPage() {
     setCurrentPage(1);
   };
 
-  async function handleRefresh() {
-    // First, get the current matchday
-    const currentMatchday = await getCurrentMatchday();
-    
-    // Call the refresh API for the current matchday
-    try {
-      const refreshResponse = await fetch(`/api/refresh?force=true&spieltag=${currentMatchday}`, {
-        method: 'POST'
-      });
-      
-      if (refreshResponse.ok) {
-        const refreshData = await refreshResponse.json();
-        console.log('Refresh API erfolgreich aufgerufen:', refreshData);
-      }
-    } catch (error) {
-      console.error('Fehler beim Aufrufen der Refresh-API:', error);
-    }
-    
-    // Then load the fresh data
-    await loadData(true);
-  }
+
 
   return (
     <>
       <AppHeader 
-        onRefresh={handleRefresh}
-        isLoading={loadingData}
-        showRefreshButton={true}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
       />
       <div className="container mx-auto max-w-7xl space-y-6 py-4 px-4 sm:py-8 sm:px-6">
 
@@ -295,8 +280,9 @@ export default function PlayerHubPage() {
         />
       )}
 
-      {/* Player Hub Content */}
-      <section className="space-y-6">
+      {/* Tab Content */}
+      {activeTab === 'players' && (
+        <section className="space-y-6">
         <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Spieler Übersicht</h2>
@@ -521,7 +507,18 @@ export default function PlayerHubPage() {
             </div>
           )}
         </div>
-      </section>
+        </section>
+      )}
+
+      {/* Matchday Overview Tab */}
+      {activeTab === 'matchday' && (
+        <MatchdayOverview />
+      )}
+
+      {/* Team Overview Tab */}
+      {activeTab === 'teams' && (
+        <TeamOverview />
+      )}
 
       {/* Player Detail Modal */}
       {selectedPlayer && (

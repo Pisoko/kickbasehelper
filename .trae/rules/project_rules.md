@@ -144,6 +144,47 @@ snippets:
     import { Skeleton } from "@/components/ui/skeleton";
     const Chart = dynamic(() => import("@/components/chart"), { ssr: false, loading: () => <Skeleton className="h-48" /> });
 
+build_system:
+  versioning:
+    strategy: "Git-Commit-basiert"
+    format: "1.0.{buildNumber}"
+    increment: "Automatisch pro Commit"
+  
+  build_tracking:
+    service: "lib/services/BuildService.ts"
+    storage: "data/build-info.json + data/changelog.json"
+    api_endpoint: "/api/build-info"
+    
+  changelog:
+    source: "Git-Commit-Messages"
+    limit: "100 Einträge (automatisch begrenzt)"
+    format: "JSON mit buildNumber, commitHash, message, timestamp, author"
+    
+  ui_integration:
+    component: "components/BuildInfo.tsx"
+    location: "AppHeader (neben Titel)"
+    display: "Build #{number} (klickbar für Details)"
+    
+  rules:
+    - "Build-Nummer = Git-Commit-Count (git rev-list --count HEAD)"
+    - "Changelog wird automatisch aus Git-History generiert"
+    - "Build-Info wird bei jedem API-Aufruf aktualisiert (Development)"
+    - "UI zeigt aktuelle Build-Nummer und Changelog-Dialog"
+    - "Alle Build-Daten werden in data/ Verzeichnis gespeichert"
+    
+  api_actions:
+    - "GET /api/build-info?action=info - Aktuelle Build-Info"
+    - "GET /api/build-info?action=changelog&limit=N - Changelog abrufen"
+    - "GET /api/build-info?action=check - Prüfung auf neuen Build"
+    - "POST /api/build-info - Build-Info aktualisieren (nur Development)"
+    
+  development_workflow:
+    - "Build-Nummer erhöht sich automatisch mit jedem Commit"
+    - "Changelog wird aus Git-Commit-Messages generiert"
+    - "UI-Komponente zeigt Build-Status in Echtzeit"
+    - "Entwickler können Build-Info manuell aktualisieren"
+
 notes:
   - "Wenn ui_profile='styled', nutze Mantine/NextUI konsistent, keine Mischformen."
   - "Wenn allow_shadcn=true, shadcn/ui + Radix ok; Performance-Budgets gelten identisch."
+  - "Build-System ist vollständig Git-integriert und erfordert keine manuellen Eingriffe."

@@ -31,3 +31,12 @@ export async function createOddsAdapter(provider: OddsProvider, apiKey?: string)
   }
   return new NoOddsAdapter();
 }
+
+export async function createOddsProvider(): Promise<OddsAdapter> {
+  const provider = (process.env.ODDS_PROVIDER as OddsProvider) || 'none';
+  const apiKey = process.env.ODDS_API_KEY;
+  
+  logger.info({ provider, hasApiKey: !!apiKey }, 'Creating odds provider');
+  
+  return createOddsAdapter(provider, apiKey);
+}
