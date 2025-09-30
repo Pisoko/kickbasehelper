@@ -118,6 +118,18 @@ export async function GET(request: NextRequest) {
       logger.info({ playerId, performanceDataKeys: Object.keys(performanceData || {}) }, 'Retrieved performance data from Kickbase');
     } catch (error) {
       logger.error({ error, playerId }, 'Failed to get performance data from Kickbase');
+      
+      // Get current CV value for mock data as well
+      let currentCV = 0;
+      try {
+        const cvData = await enhancedKickbaseClient.getPlayerCV(playerId);
+        currentCV = cvData.cvValue || cvData.marketValue || 0;
+        logger.info({ playerId, currentCV }, 'Retrieved current CV value for mock data');
+      } catch (cvError) {
+        logger.warn({ cvError, playerId }, 'Failed to get current CV value for mock data, using fallback');
+        currentCV = player.marketValue || 62500000;
+      }
+      
       // Fall back to mock data
       const mockMatchHistory: MatchHistoryData[] = [
         {
@@ -134,7 +146,7 @@ export async function GET(request: NextRequest) {
           assists: 1,
           yellowCards: 0,
           redCards: 0,
-          marketValue: 62500000
+          marketValue: currentCV // Use current CV value instead of hardcoded value
         }
       ];
       
@@ -159,6 +171,17 @@ export async function GET(request: NextRequest) {
           timestamp: new Date().toISOString()
         }
       });
+    }
+
+    // Get current CV value for the player
+    let currentCV = 0;
+    try {
+      const cvData = await enhancedKickbaseClient.getPlayerCV(playerId);
+      currentCV = cvData.cvValue || cvData.marketValue || 0;
+      logger.info({ playerId, currentCV }, 'Retrieved current CV value');
+    } catch (error) {
+      logger.warn({ error, playerId }, 'Failed to get current CV value, using fallback');
+      currentCV = player.marketValue || 0;
     }
 
     // Transform Kickbase performance data to match history format
@@ -188,7 +211,7 @@ export async function GET(request: NextRequest) {
                 assists: match.k ? match.k.filter((k: number) => k === 2 || k === 3).length : 0, // Assists are in k array as 2s or 3s
                 yellowCards: match.k ? match.k.filter((k: number) => k === 4).length : 0, // Yellow cards are in k array as 4s
                 redCards: 0, // Red card data in API is unreliable (shows impossible multiple red cards), setting to 0
-                marketValue: player.marketValue || 0
+                marketValue: currentCV // Use current CV value instead of cached market value
               });
             }
           }

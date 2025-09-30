@@ -116,14 +116,14 @@ export function LiveMatchData({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-slate-900 rounded-lg shadow-md p-6 border border-slate-700">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-gray-900">
+        <h2 className="text-xl font-bold text-slate-100">
           ⚽ Live Spiele
         </h2>
         <div className="flex items-center space-x-4">
           {lastUpdate && (
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-slate-400">
               Letztes Update: {lastUpdate.toLocaleTimeString('de-DE')}
             </span>
           )}
@@ -138,20 +138,20 @@ export function LiveMatchData({
       </div>
 
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-          <p className="text-red-700">❌ {error}</p>
+        <div className="mb-4 p-4 bg-red-900/20 border border-red-700 rounded-md">
+          <p className="text-red-400">❌ {error}</p>
         </div>
       )}
 
       {loading && matches.length === 0 ? (
         <div className="text-center py-8">
           <div className="animate-spin text-2xl mb-2">⚽</div>
-          <p className="text-gray-600">Lade Live-Spiele...</p>
+          <p className="text-slate-300">Lade Live-Spiele...</p>
         </div>
       ) : matches.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-gray-600">Keine Live-Spiele verfügbar</p>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-slate-300">Keine Live-Spiele verfügbar</p>
+          <p className="text-sm text-slate-400 mt-2">
             Aktuell finden keine Spiele statt
           </p>
         </div>
@@ -160,12 +160,12 @@ export function LiveMatchData({
           {matches.slice(0, maxMatches).map((match) => (
             <div
               key={match.id}
-              className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+              className="border border-slate-700 rounded-lg p-4 hover:shadow-md transition-shadow bg-slate-800"
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-2">
                   <span className="text-lg">{getStatusIcon(match.status)}</span>
-                  <span className="text-sm font-medium text-gray-600">
+                  <span className="text-sm font-medium text-slate-300">
                     {getStatusText(match.status)}
                   </span>
                   {match.status === 'live' && (
@@ -174,37 +174,37 @@ export function LiveMatchData({
                     </span>
                   )}
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-slate-400">
                   {match.competition}
                 </div>
               </div>
 
               <div className="flex items-center justify-between mb-3">
                 <div className="flex-1 text-right">
-                  <div className="font-semibold text-gray-900">
+                  <div className="font-semibold text-slate-100">
                     {match.homeTeam}
                   </div>
                 </div>
                 <div className="mx-4 text-center">
-                  <div className="text-2xl font-bold text-gray-900">
+                  <div className="text-2xl font-bold text-slate-100">
                     {match.homeScore} : {match.awayScore}
                   </div>
                   {match.status === 'scheduled' && (
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm text-slate-400">
                       {formatTime(match.kickoff)}
                     </div>
                   )}
                 </div>
                 <div className="flex-1">
-                  <div className="font-semibold text-gray-900">
+                  <div className="font-semibold text-slate-100">
                     {match.awayTeam}
                   </div>
                 </div>
               </div>
 
               {match.events.length > 0 && (
-                <div className="border-t border-gray-100 pt-3">
-                  <h4 className="text-sm font-medium text-gray-700 mb-2">
+                <div className="border-t border-slate-600 pt-3">
+                  <h4 className="text-sm font-medium text-slate-200 mb-2">
                     Ereignisse:
                   </h4>
                   <div className="space-y-1 max-h-32 overflow-y-auto">
@@ -216,14 +216,14 @@ export function LiveMatchData({
                           key={index}
                           className="flex items-center space-x-2 text-sm"
                         >
-                          <span className="w-8 text-center text-gray-500">
+                          <span className="w-8 text-center text-slate-400">
                             {event.minute}&apos;
                           </span>
                           <span>{getEventIcon(event.type)}</span>
-                          <span className="text-gray-700">
+                          <span className="text-slate-200">
                             {event.playerName}
                           </span>
-                          <span className="text-gray-500 text-xs">
+                          <span className="text-slate-400 text-xs">
                             {event.description}
                           </span>
                         </div>
@@ -234,32 +234,32 @@ export function LiveMatchData({
             </div>
           ))}
 
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-semibold text-gray-900 mb-2">📊 Spielübersicht</h3>
+          <div className="mt-6 p-4 bg-slate-800 rounded-lg border border-slate-700">
+            <h3 className="font-semibold text-slate-100 mb-2">📊 Spielübersicht</h3>
             <div className="grid grid-cols-4 gap-4 text-center">
               <div>
-                <div className="text-lg font-bold text-red-600">
+                <div className="text-lg font-bold text-red-400">
                   {matches.filter(m => m.status === 'live').length}
                 </div>
-                <div className="text-sm text-gray-600">Live</div>
+                <div className="text-sm text-slate-300">Live</div>
               </div>
               <div>
-                <div className="text-lg font-bold text-orange-600">
+                <div className="text-lg font-bold text-orange-400">
                   {matches.filter(m => m.status === 'halftime').length}
                 </div>
-                <div className="text-sm text-gray-600">Halbzeit</div>
+                <div className="text-sm text-slate-300">Halbzeit</div>
               </div>
               <div>
-                <div className="text-lg font-bold text-green-600">
+                <div className="text-lg font-bold text-green-400">
                   {matches.filter(m => m.status === 'finished').length}
                 </div>
-                <div className="text-sm text-gray-600">Beendet</div>
+                <div className="text-sm text-slate-300">Beendet</div>
               </div>
               <div>
-                <div className="text-lg font-bold text-blue-600">
+                <div className="text-lg font-bold text-blue-400">
                   {matches.filter(m => m.status === 'scheduled').length}
                 </div>
-                <div className="text-sm text-gray-600">Geplant</div>
+                <div className="text-sm text-slate-300">Geplant</div>
               </div>
             </div>
           </div>

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { enhancedKickbaseClient } from '../../../lib/adapters/EnhancedKickbaseClient';
 import { kickbaseAuth } from '../../../lib/adapters/KickbaseAuthService';
+import pino from 'pino';
+
+const logger = pino({ name: 'MarketValuesAPI' });
 
 interface MarketValueData {
   playerId: string;
@@ -85,11 +88,21 @@ export async function POST(request: NextRequest) {
       
       await Promise.all(batch.map(async (playerId: string) => {
         try {
+          logger.info({ playerId }, `Processing player ${playerId}...`);
           const playerDetails = await enhancedKickbaseClient.getPlayerDetails(playerId);
-          const marketValue = await enhancedKickbaseClient.getPlayerMarketValue(playerId);
+          logger.info({ playerId, success: !!playerDetails }, `Player details for ${playerId}: ${playerDetails ? 'SUCCESS' : 'FAILED'}`);
           
-          if (playerDetails && marketValue) {
-            const currentValue = marketValue.marketValue || playerDetails.marketValue || 0;
+          let marketValue = null;
+          try {
+            marketValue = await enhancedKickbaseClient.getPlayerMarketValue(playerId);
+            logger.info({ playerId, success: !!marketValue }, `Market value for ${playerId}: SUCCESS`);
+          } catch (marketValueError) {
+            logger.warn({ playerId, error: marketValueError }, `Market value API failed for ${playerId}, using player details instead`);
+          }
+          
+          if (playerDetails) {
+            // Use player details market value if market value API fails
+            const currentValue = (marketValue && marketValue.marketValue) || playerDetails.marketValue || playerDetails.mv || 0;
             
             // Update history and get previous value
             updateMarketValueHistory(playerId, currentValue);
@@ -101,7 +114,7 @@ export async function POST(request: NextRequest) {
             
             marketValues.push({
               playerId,
-              playerName: playerDetails.name,
+              playerName: playerDetails.name || playerDetails.n || `Player ${playerId}`,
               currentValue,
               previousValue,
               change,
@@ -109,9 +122,12 @@ export async function POST(request: NextRequest) {
               trend,
               lastUpdated: now,
             });
+            logger.info({ playerId, currentValue }, `Successfully processed player ${playerId} with value ${currentValue}`);
+          } else {
+            logger.error({ playerId }, `No player details found for ${playerId}`);
           }
         } catch (error) {
-          console.error(`Error processing player ${playerId}:`, error);
+          logger.error({ playerId, error }, `Error processing player ${playerId}`);
           // Continue with other players even if one fails
         }
       }));

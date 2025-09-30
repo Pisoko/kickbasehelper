@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import BundesligaLogo from './BundesligaLogo';
+import { calculateFillHeight, getBarColorClasses, getValueColor } from './KickbaseBar';
 
 interface MatchHistoryData {
   matchday: number;
@@ -102,34 +103,20 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
     });
   };
 
-  // Color coding based on performance according to new scale
-  const getPerformanceColor = (points: number): string => {
-    if (points >= 200) return 'from-red-500 via-orange-500 via-yellow-500 via-green-500 via-blue-500 via-indigo-500 to-violet-500'; // Regenbogen-Gradient für außergewöhnliche Leistung
-    if (points >= 150) return 'from-emerald-600 to-emerald-500'; // Dunkelgrün für sehr gute Leistung
-    if (points >= 100) return 'from-green-500 to-green-400'; // Hellgrün für gute Leistung
-    if (points >= 50) return 'from-yellow-500 to-yellow-400'; // Gelb für solide Leistung
-    if (points >= 0) return 'from-red-500 to-red-400'; // Rot für schwache Leistung
-    return 'from-red-900 to-red-800'; // Dunkelrot für negative Punkte
+  // Kickbase-Balkenfüllung mit konkaver Kurve
+  const getKickbaseFillPercentage = (points: number, maxPoints: number = 356): number => {
+    const fillHeight = calculateFillHeight(points, maxPoints);
+    return Math.round(fillHeight * 100);
   };
 
-  const getBarFillPercentage = (points: number) => {
-    // Für negative Punkte: Minimale Höhe von 10% mit rotem Balken
-    if (points < 0) return 10;
-    
-    // Für 0 Punkte: Minimale Höhe von 5%
-    if (points === 0) return 5;
-    
-    // Für niedrige Punktzahlen (1-30): Mindesthöhe von 15% + zusätzliche Höhe basierend auf Punkten
-    if (points > 0 && points <= 30) {
-      return 15 + (points / 30) * 10; // 15% bis 25% für 1-30 Punkte
-    }
-    
-    // Für normale Punktzahlen: Skalierte Höhe
-    const maxPoints = 300;
-    const percentage = (points / maxPoints) * 100;
-    
-    // Cap at 100% for points above 300
-    return Math.min(percentage, 100);
+  // Kickbase-Farblogik
+  const getKickbaseColorClass = (points: number): string => {
+    return getBarColorClasses(points);
+  };
+
+  // Kickbase-Textwertfarbe
+  const getKickbaseValueColor = (points: number): string => {
+    return getValueColor(points);
   };
 
   if (loading) {
@@ -145,9 +132,9 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
 
   if (error && matchHistory.length === 0) {
     return (
-      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Vergangene Spiele 2025/2026</h3>
-        <div className="text-center text-gray-600 dark:text-gray-300 py-8">
+      <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
+          <h3 className="text-lg font-semibold text-slate-100 mb-4">Vergangene Spiele 2025/2026</h3>
+          <div className="text-center text-slate-300 py-8">
           <p>{error}</p>
         </div>
       </div>
@@ -170,12 +157,12 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
   const needsScrolling = sortedMatchHistory.length > 9;
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
+    <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Vergangene Spiele</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-300">2025/2026</p>
+        <h3 className="text-lg font-semibold text-slate-100 mb-2">Vergangene Spiele</h3>
+        <p className="text-sm text-slate-300">2025/2026</p>
         {needsScrolling && (
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-xs text-slate-400 mt-1">
             {sortedMatchHistory.length} Spieltage • Scroll für alle Spiele →
           </p>
         )}
@@ -235,15 +222,56 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
                 </div>
               </div>
               
-              <div className="relative h-10 bg-slate-700/50 rounded overflow-hidden">
-                <div 
-                  className={`absolute bottom-0 left-0 right-0 bg-gradient-to-r ${getPerformanceColor(match.playerPoints)} rounded-b transition-all duration-500 ease-out`}
-                  style={{ height: `${getBarFillPercentage(match.playerPoints)}%` }}
-                ></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-sm font-bold text-white">{match.playerPoints} Pkt</span>
+              {/* Spielminuten oberhalb der Balken */}
+              <div className="text-center mb-1">
+                <div className={`text-xs font-medium ${
+                  match.playerMinutes > 47 
+                    ? 'text-green-400 font-bold' 
+                    : 'text-slate-400'
+                }`}>
+                  {match.playerMinutes}&apos;
                 </div>
               </div>
+              
+              <div className="relative h-10 bg-gray-800 rounded-lg overflow-hidden border border-gray-600">
+                <div 
+                  className={`absolute bottom-0 left-0 right-0 h-full transition-all duration-300 ease-out ${getKickbaseColorClass(match.playerPoints)}`}
+                  style={{
+                    '--fill': `${getKickbaseFillPercentage(match.playerPoints)}%`,
+                    WebkitMask: `linear-gradient(to top, black var(--fill), transparent var(--fill))`,
+                    mask: `linear-gradient(to top, black var(--fill), transparent var(--fill))`,
+                    borderRadius: '0.5rem'
+                  } as React.CSSProperties}
+                />
+              </div>
+              
+              {/* Punktzahlen unterhalb der Balken */}
+              <div className="text-center mt-1">
+                <span 
+                  className="text-sm font-bold"
+                  style={{ color: getKickbaseValueColor(match.playerPoints) }}
+                >
+                  {match.playerPoints}
+                </span>
+              </div>
+              
+              {/* Event-Symbole unterhalb der Punktzahlen */}
+              {(match.goals > 0 || match.assists > 0 || match.yellowCards > 0 || match.redCards > 0) && (
+                <div className="flex justify-center space-x-1 text-xs mt-1">
+                  {match.goals > 0 && (
+                    <span className="text-green-400 font-bold">{match.goals > 1 ? `${match.goals}x` : ''}⚽</span>
+                  )}
+                  {match.assists > 0 && (
+                    <span className="text-blue-400 font-bold">{match.assists > 1 ? `${match.assists}x` : ''}⚡</span>
+                  )}
+                  {match.yellowCards > 0 && (
+                    <span className="text-yellow-400 font-bold">{match.yellowCards > 1 ? `${match.yellowCards}x` : ''}🟨</span>
+                  )}
+                  {match.redCards > 0 && (
+                    <span className="text-red-400 font-bold">{match.redCards > 1 ? `${match.redCards}x` : ''}🟥</span>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}
@@ -276,60 +304,8 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
 
                 {/* Performance Bar - Fixed height container with variable fill */}
                 <div className="flex flex-col items-center">
-                  {/* Fixed height bar container - 50% taller (h-48 instead of h-32), 25% narrower (max-w-9 instead of max-w-12) */}
-                  <div className="relative w-full max-w-9 h-48 bg-slate-700/30 rounded border border-slate-600/50 overflow-hidden mx-auto">
-                    {/* Background grid pattern for better visual reference */}
-                    <div className="absolute inset-0 opacity-20">
-                      <div className="h-full w-full bg-gradient-to-t from-transparent via-slate-500/10 to-transparent"></div>
-                      <div className="absolute top-1/4 left-0 right-0 h-px bg-slate-500/20"></div>
-                      <div className="absolute top-1/2 left-0 right-0 h-px bg-slate-500/30"></div>
-                      <div className="absolute top-3/4 left-0 right-0 h-px bg-slate-500/20"></div>
-                    </div>
-                    
-                    {/* Filled portion - grows from bottom */}
-                    <div 
-                      className={`absolute bottom-0 left-0 right-0 bg-gradient-to-r ${getPerformanceColor(match.playerPoints)} rounded-b transition-all duration-500 ease-out`}
-                      style={{ 
-                        height: `${getBarFillPercentage(match.playerPoints)}%`,
-                        minHeight: match.playerPoints > 0 ? '2px' : '0px'
-                      }}
-                    >
-                      {/* Points label always centered in the bar regardless of fill height */}
-                      {match.playerPoints > 0 && getBarFillPercentage(match.playerPoints) > 15 && (
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                          <span className="text-sm font-bold text-white">
-                            {match.playerPoints}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Zero points indicator - 100% transparent background */}
-                    {match.playerPoints === 0 && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-sm font-bold text-white">0</span>
-                      </div>
-                    )}
-                    
-                    {/* Negative points indicator */}
-                    {match.playerPoints < 0 && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-sm font-bold text-white">{match.playerPoints}</span>
-                      </div>
-                    )}
-                    
-                    {/* For low points, show outside the bar */}
-                    {match.playerPoints > 0 && getBarFillPercentage(match.playerPoints) <= 15 && (
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-center -mb-5">
-                        <span className="text-sm font-bold text-white">
-                          {match.playerPoints}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {/* Minutes and stats below the bar */}
-                  <div className="mt-2 text-center space-y-1">
+                  {/* Spielminuten oberhalb der Balken */}
+                  <div className="mb-2 text-center">
                     <div className={`text-xs font-medium ${
                       match.playerMinutes > 47 
                         ? 'text-green-400 font-bold' 
@@ -337,22 +313,50 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
                     }`}>
                       {match.playerMinutes}&apos;
                     </div>
+                  </div>
+                  
+                  {/* Kickbase-Balken mit konkaver Kurve */}
+                  <div className="relative w-full max-w-9 h-48 bg-gray-800 rounded-lg overflow-hidden border border-gray-600 mx-auto">
+                    {/* Kickbase-Balkenfüllung */}
+                    <div 
+                      className={`absolute bottom-0 left-0 right-0 h-full transition-all duration-300 ease-out ${getKickbaseColorClass(match.playerPoints)}`}
+                      style={{
+                        '--fill': `${getKickbaseFillPercentage(match.playerPoints)}%`,
+                        WebkitMask: `linear-gradient(to top, black var(--fill), transparent var(--fill))`,
+                        mask: `linear-gradient(to top, black var(--fill), transparent var(--fill))`,
+                        borderRadius: '0.5rem'
+                      } as React.CSSProperties}
+                    />
+                  </div>
+                  
+                  {/* Punktzahlen unterhalb der Balken */}
+                  <div className="mt-2 text-center">
+                    <span 
+                      className="text-sm font-bold"
+                      style={{ color: getKickbaseValueColor(match.playerPoints) }}
+                    >
+                      {match.playerPoints}
+                    </span>
+                  </div>
+                  
+                  {/* Event-Symbole unterhalb der Punktzahlen */}
+                  <div className="mt-1 text-center space-y-1">
                     {(match.goals > 0 || match.assists > 0 || match.yellowCards > 0 || match.redCards > 0) && (
-                      <div className="flex justify-center space-x-1 text-xs">
-                        {match.goals > 0 && (
-                          <span className="text-green-400 font-bold">⚽{match.goals > 1 ? match.goals : ''}</span>
-                        )}
-                        {match.assists > 0 && (
-                          <span className="text-blue-400 font-bold">⚡{match.assists > 1 ? match.assists : ''}</span>
-                        )}
-                        {match.yellowCards > 0 && (
-                          <span className="text-yellow-400 font-bold">🟨{match.yellowCards > 1 ? match.yellowCards : ''}</span>
-                        )}
-                        {match.redCards > 0 && (
-                          <span className="text-red-400 font-bold">🟥{match.redCards > 1 ? match.redCards : ''}</span>
-                        )}
-                      </div>
-                    )}
+                        <div className="flex justify-center space-x-1 text-xs">
+                          {match.goals > 0 && (
+                            <span className="text-green-400 font-bold">{match.goals > 1 ? `${match.goals}x` : ''}⚽</span>
+                          )}
+                          {match.assists > 0 && (
+                            <span className="text-blue-400 font-bold">{match.assists > 1 ? `${match.assists}x` : ''}⚡</span>
+                          )}
+                          {match.yellowCards > 0 && (
+                            <span className="text-yellow-400 font-bold">{match.yellowCards > 1 ? `${match.yellowCards}x` : ''}🟨</span>
+                          )}
+                          {match.redCards > 0 && (
+                            <span className="text-red-400 font-bold">{match.redCards > 1 ? `${match.redCards}x` : ''}🟥</span>
+                          )}
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>
@@ -360,6 +364,42 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
           </div>
         </div>
       </div>
+      
+      {/* Kickbase-Balken CSS-Stile */}
+      <style jsx>{`
+        .kickbase-bar-red {
+          background: linear-gradient(to top, #ff4444, #ff6666);
+        }
+        
+        .kickbase-bar-red::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background: repeating-linear-gradient(
+            90deg,
+            #ff4444 0px,
+            #ff4444 4px,
+            transparent 4px,
+            transparent 8px
+          );
+        }
+        
+        .kickbase-bar-orange {
+          background: linear-gradient(to top, #ff8800, #ffaa33);
+        }
+        
+        .kickbase-bar-green {
+          background: linear-gradient(to top, #00ff88, #33ffaa);
+          box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+        }
+        
+        .kickbase-bar-mint {
+          background: #66ffcc;
+        }
+      `}</style>
     </div>
   );
 }

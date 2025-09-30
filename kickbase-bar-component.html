@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kickbase Balkenfüllung</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .demo-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .kickbase-bar {
+            position: relative;
+            width: 44px;
+            height: 120px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #404040;
+        }
+
+        .bar-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            border-radius: 8px;
+            transition: all 0.4s ease-out;
+            
+            /* Bottom-to-Top Maske */
+            -webkit-mask: linear-gradient(to top, black var(--fill, 0%), transparent var(--fill, 0%));
+            mask: linear-gradient(to top, black var(--fill, 0%), transparent var(--fill, 0%));
+        }
+
+        /* Farbvarianten */
+        .bar-fill.red {
+            background: linear-gradient(to top, #ff4444, #ff6666);
+        }
+
+        .bar-fill.red::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: repeating-linear-gradient(
+                90deg,
+                #ff4444 0px,
+                #ff4444 4px,
+                transparent 4px,
+                transparent 8px
+            );
+        }
+
+        .bar-fill.orange {
+            background: linear-gradient(to top, #ff8800, #ffaa33);
+        }
+
+        .bar-fill.green {
+            background: linear-gradient(to top, #00ff88, #33ffaa);
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+        }
+
+        .bar-fill.mint {
+            background: #66ffcc;
+        }
+
+        .bar-value {
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            min-height: 20px;
+        }
+
+        .bar-minutes {
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+        }
+
+        .test-section {
+            margin: 40px 0;
+        }
+
+        .test-section h2 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .explanation {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #00ff88;
+        }
+
+        .explanation h3 {
+            color: #00ff88;
+            margin-top: 0;
+        }
+
+        .formula {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Kickbase Balkenfüllung - Implementierung</h1>
+    
+    <div class="explanation">
+        <h3>Kurvenberechnung</h3>
+        <p>Die Kickbase-Kurve verwendet eine konkave Funktion:</p>
+        <div class="formula">f = a·t^g + b</div>
+        <p>mit:</p>
+        <ul>
+            <li>t = clamp(points / 356, 0, 1)</li>
+            <li>g = 0.71 (konkaver Exponent)</li>
+            <li>a = 1.3142521077</li>
+            <li>b = -0.1179719468</li>
+        </ul>
+        <p>Die konkave Form sorgt dafür, dass niedrige Punktzahlen visuell stärker repräsentiert werden, während hohe Punktzahlen weniger stark ansteigen - typisch für Kickbase's visuelle Darstellung.</p>
+    </div>
+
+    <div class="test-section">
+        <h2>Akzeptanzkriterien - Tests</h2>
+        <div class="demo-container" id="acceptance-tests"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Weitere Beispiele</h2>
+        <div class="demo-container" id="additional-examples"></div>
+    </div>
+
+    <script>
+        /**
+         * Berechnet die Balkenfüllung nach der Kickbase-Kurve
+         * @param {number} points - Punktzahl des Spielers
+         * @param {number} max - Maximale Punktzahl (Standard: 356)
+         * @returns {number} Füllhöhe als Dezimalwert zwischen 0 und 1
+         */
+        function calculateFillHeight(points, max = 356) {
+            // Normalisierung: t = clamp(points / max, 0, 1)
+            const t = Math.max(0, Math.min(1, points / max));
+            
+            // Kurvenparameter
+            const g = 0.71;
+            const a = 1.3142521077;
+            const b = -0.1179719468;
+            
+            // Kurvenberechnung: f = a·t^g + b
+            const f = a * Math.pow(t, g) + b;
+            
+            // Clamping auf [0,1]
+            return Math.max(0, Math.min(1, f));
+        }
+
+        /**
+         * Bestimmt die Farbe basierend auf der Punktzahl
+         * @param {number} points - Punktzahl des Spielers
+         * @returns {string} CSS-Klasse für die Farbe
+         */
+        function getBarColor(points) {
+            if (points <= 0) return 'red';
+            if (points <= 99) return 'orange';
+            if (points <= 199) return 'green';
+            return 'mint';
+        }
+
+        /**
+         * Rendert einen Kickbase-Balken
+         * @param {HTMLElement} container - Container-Element
+         * @param {number} points - Punktzahl des Spielers
+         * @param {number} minutes - Gespielte Minuten (optional)
+         * @param {number} max - Maximale Punktzahl (Standard: 356)
+         */
+        function renderBar(container, points, minutes = null, max = 356) {
+            // Berechnung der Füllhöhe
+            const fillHeight = calculateFillHeight(points, max);
+            const fillPercent = Math.round(fillHeight * 100);
+            
+            // Farbbestimmung
+            const colorClass = getBarColor(points);
+            const valueColor = {
+                'red': '#ff4444',
+                'orange': '#ff8800',
+                'green': '#00ff88',
+                'mint': '#66ffcc'
+            }[colorClass];
+
+            // HTML-Struktur erstellen
+            container.innerHTML = `
+                <div class="kickbase-bar" 
+                     role="progressbar" 
+                     aria-valuenow="${points}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="${max}"
+                     aria-label="Spielerpunkte: ${points} von ${max}">
+                    <div class="bar-fill ${colorClass}" style="--fill: ${fillPercent}%"></div>
+                </div>
+                <div class="bar-value" style="color: ${valueColor}">${points}</div>
+                ${minutes !== null ? `<div class="bar-minutes">${minutes} Min</div>` : ''}
+            `;
+        }
+
+        // Akzeptanzkriterien testen
+        const acceptanceTests = [
+            { points: 73, expected: 31, description: "P=73 → ~31% Höhe, orange" },
+            { points: 117, expected: 48, description: "P=117 → ~48% Höhe, grün" },
+            { points: 185, expected: 71, description: "P=185 → ~71% Höhe, grün" },
+            { points: 213, expected: 80, description: "P=213 → ~80% Höhe, mint" },
+            { points: 231, expected: 85, description: "P=231 → ~85% Höhe, mint" },
+            { points: 286, expected: 100, description: "P=286 → ~100% Höhe, mint" },
+            { points: -8, expected: 0, description: "P=-8 → roter kurzer Balken" }
+        ];
+
+        const acceptanceContainer = document.getElementById('acceptance-tests');
+        acceptanceTests.forEach(test => {
+            const container = document.createElement('div');
+            container.className = 'bar-container';
+            
+            const actual = Math.round(calculateFillHeight(test.points) * 100);
+            const isCorrect = Math.abs(actual - test.expected) <= 2; // 2% Toleranz
+            
+            renderBar(container, test.points, null);
+            
+            // Zusätzliche Info
+            const info = document.createElement('div');
+            info.style.fontSize = '11px';
+            info.style.textAlign = 'center';
+            info.style.marginTop = '5px';
+            info.style.color = isCorrect ? '#00ff88' : '#ff4444';
+            info.textContent = `${actual}% ${isCorrect ? '✓' : '✗'}`;
+            container.appendChild(info);
+            
+            acceptanceContainer.appendChild(container);
+        });
+
+        // Weitere Beispiele
+        const additionalExamples = [
+            { points: 0, minutes: 0 },
+            { points: 25, minutes: 45 },
+            { points: 50, minutes: 90 },
+            { points: 100, minutes: 180 },
+            { points: 150, minutes: 270 },
+            { points: 200, minutes: 360 },
+            { points: 250, minutes: 450 },
+            { points: 300, minutes: 540 },
+            { points: 356, minutes: 630 }
+        ];
+
+        const additionalContainer = document.getElementById('additional-examples');
+        additionalExamples.forEach(example => {
+            const container = document.createElement('div');
+            container.className = 'bar-container';
+            renderBar(container, example.points, example.minutes);
+            additionalContainer.appendChild(container);
+        });
+
+        // Konsolen-Output für Verifikation
+        console.log('Kickbase Balkenfüllung - Akzeptanzkriterien:');
+        acceptanceTests.forEach(test => {
+            const actual = Math.round(calculateFillHeight(test.points) * 100);
+            console.log(`${test.description}: Erwartet ${test.expected}%, Tatsächlich ${actual}%`);
+        });
+    </script>
+</body>
+</html>

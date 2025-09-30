@@ -45,6 +45,7 @@ export default function PlayerHubPage() {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
   const [playerLast3GamesData, setPlayerLast3GamesData] = useState<Map<string, PlayerLast3GamesData>>(new Map());
+  const [isLoadingMatchday, setIsLoadingMatchday] = useState(false);
   
   // Spieler Hub Filter-Zustände
   const [searchTerm, setSearchTerm] = useState('');
@@ -65,6 +66,28 @@ export default function PlayerHubPage() {
     const clubs = [...new Set(players.map(p => p.verein))];
     return clubs.sort();
   }, [players]);
+
+  // Function to get current matchday from API
+  const getCurrentMatchday = useCallback(async () => {
+    setIsLoadingMatchday(true);
+    try {
+      const response = await fetch('/api/matchday/check');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data.currentMatchday) {
+          const currentMatchday = data.data.currentMatchday;
+          console.log(`Aktueller Spieltag erkannt: ${currentMatchday}`);
+          setSpieltag(currentMatchday);
+          return currentMatchday;
+        }
+      }
+    } catch (error) {
+      console.error('Fehler beim Ermitteln des aktuellen Spieltags:', error);
+    } finally {
+      setIsLoadingMatchday(false);
+    }
+    return spieltag; // Fallback to current value
+  }, [spieltag]);
 
   // Function to load player and match data with caching
   const loadData = useCallback(async (forceRefresh = false) => {
@@ -116,6 +139,11 @@ export default function PlayerHubPage() {
       setLoadingData(false);
     }
   }, [spieltag]);
+
+  // Get current matchday on component mount
+  useEffect(() => {
+    getCurrentMatchday();
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -226,6 +254,24 @@ export default function PlayerHubPage() {
   };
 
   async function handleRefresh() {
+    // First, get the current matchday
+    const currentMatchday = await getCurrentMatchday();
+    
+    // Call the refresh API for the current matchday
+    try {
+      const refreshResponse = await fetch(`/api/refresh?force=true&spieltag=${currentMatchday}`, {
+        method: 'POST'
+      });
+      
+      if (refreshResponse.ok) {
+        const refreshData = await refreshResponse.json();
+        console.log('Refresh API erfolgreich aufgerufen:', refreshData);
+      }
+    } catch (error) {
+      console.error('Fehler beim Aufrufen der Refresh-API:', error);
+    }
+    
+    // Then load the fresh data
     await loadData(true);
   }
 
@@ -252,7 +298,16 @@ export default function PlayerHubPage() {
       {/* Player Hub Content */}
       <section className="space-y-6">
         <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
-          <h2 className="text-xl font-semibold mb-4">Spieler Übersicht</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Spieler Übersicht</h2>
+            <div className="text-sm text-slate-400">
+              {isLoadingMatchday ? (
+                <span>Spieltag wird ermittelt...</span>
+              ) : (
+                <span>Spieltag {spieltag}</span>
+              )}
+            </div>
+          </div>
           
           {/* Filters */}
           <div className="grid gap-4 md:grid-cols-4 mb-6">

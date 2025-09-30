@@ -67,7 +67,7 @@ interface StatCardProps {
 const StatCard: React.FC<StatCardProps> = ({ title, value, className }) => (
   <div 
     className={cn(
-      "bg-gray-50 dark:bg-gray-700 p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors text-center",
+      "bg-slate-800 p-3 rounded-lg border border-slate-700 hover:bg-slate-700 transition-colors text-center",
       className
     )}
     role="group"
@@ -76,12 +76,12 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, className }) => (
   >
     <dt 
       id={`stat-${title.replace(/\s+/g, '-').toLowerCase()}`}
-      className="text-sm font-medium text-gray-600 dark:text-gray-300 mb-1"
+      className="text-sm font-medium text-slate-300 mb-1"
     >
       {title}
     </dt>
     <dd 
-      className="text-lg font-semibold text-gray-900 dark:text-gray-100"
+      className="text-lg font-semibold text-slate-100"
       aria-label={`${title}: ${value}`}
     >
       {value}
@@ -100,9 +100,9 @@ interface BadgeProps {
 const Badge: React.FC<BadgeProps> = ({ children, variant = "default", className }) => {
   const baseClasses = "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2";
   const variantClasses = {
-    default: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800",
-    destructive: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-800",
-    secondary: "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
+    default: "bg-blue-900 text-blue-200 hover:bg-blue-800",
+    destructive: "bg-red-900 text-red-200 hover:bg-red-800",
+    secondary: "bg-slate-700 text-slate-200 hover:bg-slate-600"
   };
 
   return (
@@ -304,7 +304,7 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
                   </p>
                 )}
                 {/* Nachname - größer und fett */}
-                <Dialog.Title id="player-detail-title" className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                <Dialog.Title id="player-detail-title" className="text-xl sm:text-2xl font-bold text-slate-100 mb-2">
                   {player.name}
                 </Dialog.Title>
                 {/* Vereinsinformationen */}
@@ -315,7 +315,7 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
                 {/* Kickbase Spieler-ID */}
                 <div className="flex items-center gap-1 mb-2">
                   <span className="text-xs text-muted-foreground">ID:</span>
-                  <span className="text-xs font-mono bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-gray-700 dark:text-gray-300">
+                  <span className="text-xs font-mono bg-slate-800 px-2 py-1 rounded text-slate-300">
                     {player.id}
                   </span>
                 </div>

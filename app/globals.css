@@ -5,3 +5,122 @@
 body {
   @apply bg-slate-950 text-slate-100;
 }
+
+/* Vertikale Progressbar - Holographische Textur für >200 Punkte */
+.holographic-texture {
+  position: relative;
+  overflow: hidden;
+  /* Anti-Aliasing für kleine Höhen */
+  --fill-clamped: max(0.02%, var(--fill, 0%));
+}
+
+/* CSS Mask Support - Moderne Browser */
+@supports (mask: linear-gradient(#000 0 0)) {
+  /* Holographische Textur - fix positioniert, nur Sichtfenster wächst */
+  .holographic-texture::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('/images/holographic-texture.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    /* CSS Mask: Sichtbares Fenster von unten, Höhe = --fill */
+    -webkit-mask: linear-gradient(#000 0 0) bottom/100% var(--fill-clamped) no-repeat;
+            mask: linear-gradient(#000 0 0) bottom/100% var(--fill-clamped) no-repeat;
+    
+    /* Safari-kompatible Transitions */
+    transition: 
+      -webkit-mask-size 0.35s ease-out,
+              mask-size 0.35s ease-out;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Holographischer Farbverlauf-Overlay */
+  .holographic-texture::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, 
+      rgba(255, 0, 255, 0.3) 0%,
+      rgba(0, 255, 255, 0.2) 25%,
+      rgba(255, 255, 0, 0.2) 50%,
+      rgba(0, 255, 128, 0.2) 75%,
+      rgba(255, 0, 255, 0.1) 100%
+    );
+    animation: holographic-shift 4s ease-in-out infinite;
+    
+    /* Gleiche Maske wie die Textur */
+    -webkit-mask: linear-gradient(#000 0 0) bottom/100% var(--fill-clamped) no-repeat;
+            mask: linear-gradient(#000 0 0) bottom/100% var(--fill-clamped) no-repeat;
+    
+    transition: 
+      -webkit-mask-size 0.35s ease-out,
+              mask-size 0.35s ease-out;
+    pointer-events: none;
+    z-index: 3;
+  }
+}
+
+/* Fallback für Browser ohne CSS Mask Support */
+@supports not (mask: linear-gradient(#000 0 0)) {
+  .holographic-texture {
+    overflow: hidden;
+  }
+  
+  /* Fallback: Kind-Div mit overflow:hidden und transform scaleY */
+  .holographic-texture::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('/images/holographic-texture.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transform-origin: bottom;
+    transform: scaleY(calc(var(--fill-clamped) / 100%));
+    transition: transform 0.35s ease-out;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .holographic-texture::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, 
+      rgba(255, 0, 255, 0.3) 0%,
+      rgba(0, 255, 255, 0.2) 25%,
+      rgba(255, 255, 0, 0.2) 50%,
+      rgba(0, 255, 128, 0.2) 75%,
+      rgba(255, 0, 255, 0.1) 100%
+    );
+    animation: holographic-shift 4s ease-in-out infinite;
+    transform-origin: bottom;
+    transform: scaleY(calc(var(--fill-clamped) / 100%));
+    transition: transform 0.35s ease-out;
+    pointer-events: none;
+    z-index: 3;
+  }
+}
+
+@keyframes holographic-shift {
+  0%, 100% { 
+    background-position: 0% 0%;
+    opacity: 0.6;
+  }
+  25% { 
+    background-position: 100% 0%;
+    opacity: 0.8;
+  }
+  50% { 
+    background-position: 100% 100%;
+    opacity: 0.7;
+  }
+  75% { 
+    background-position: 0% 100%;
+    opacity: 0.9;
+  }
+}

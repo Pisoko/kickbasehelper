@@ -159,6 +159,49 @@ export class EnhancedKickbaseClient {
   }
 
   /**
+   * Get player CV (Contract Value) from league endpoint
+   * The CV field represents the contract value of a player, which is different from market value
+   */
+  async getPlayerCV(playerId: string, leagueId: string = '7389547'): Promise<{
+    playerId: string;
+    playerName: string;
+    teamName: string;
+    cvValue: number;
+    marketValue: number;
+  } | null> {
+    try {
+      const data = await this.request<any>(`/v4/leagues/${leagueId}/players/${playerId}`);
+      
+      if (!data) {
+        logger.warn({ playerId, leagueId }, 'No player data received');
+        return null;
+      }
+
+      const cvValue = data.cv;
+      if (cvValue === undefined || cvValue === null) {
+        logger.warn({ playerId, availableFields: Object.keys(data) }, 'CV value not found in player data');
+        return null;
+      }
+
+      const playerName = data.n || `${data.fn || ''} ${data.ln || ''}`.trim();
+      const result = {
+        playerId,
+        playerName,
+        teamName: data.tn || 'Unknown Team',
+        cvValue,
+        marketValue: data.mv || 0
+      };
+
+      logger.info({ playerId, cvValue, marketValue: result.marketValue }, 'Successfully retrieved player CV value');
+      return result;
+
+    } catch (error) {
+      logger.error({ playerId, leagueId, error }, 'Error fetching player CV value');
+      return null;
+    }
+  }
+
+  /**
    * Get live match data
    */
   async getLiveMatches(competitionId: string = '1'): Promise<LiveMatch[]> {
@@ -269,14 +312,15 @@ export class EnhancedKickbaseClient {
   }
 
   /**
-   * Get enhanced player data with performance history
+   * Get enhanced player data with performance history and CV value
    */
-  async getEnhancedPlayerData(playerId: string, competitionId: string = '1'): Promise<Partial<Player>> {
+  async getEnhancedPlayerData(playerId: string, competitionId: string = '1', leagueId: string = '7389547'): Promise<Partial<Player>> {
     try {
-      const [details, performance, marketValue] = await Promise.allSettled([
+      const [details, performance, marketValue, cvData] = await Promise.allSettled([
         this.getPlayerDetails(playerId, competitionId),
         this.getPlayerPerformance(playerId, competitionId),
         this.getPlayerMarketValue(playerId, competitionId),
+        this.getPlayerCV(playerId, leagueId),
       ]);
 
       const enhancedData: Partial<Player> = {};
@@ -299,6 +343,33 @@ export class EnhancedKickbaseClient {
         if (mvData.mv && Array.isArray(mvData.mv)) {
           enhancedData.marketValueHistory = mvData.mv;
         }
+      }
+
+      // Process CV (Contract Value) data
+      logger.info({ 
+        playerId, 
+        cvDataStatus: cvData.status,
+        cvDataValue: cvData.status === 'fulfilled' ? cvData.value : null,
+        cvDataReason: cvData.status === 'rejected' ? cvData.reason : null
+      }, 'CV data processing debug');
+      
+      if (cvData.status === 'fulfilled' && cvData.value) {
+        const cv = cvData.value;
+        enhancedData.cvValue = cv.cvValue;
+        enhancedData.marketValue = cv.cvValue; // Use CV as primary market value
+        enhancedData.kosten = cv.cvValue; // Use CV for Arena Mode costs
+        
+        logger.info({ 
+          playerId, 
+          cvValue: cv.cvValue, 
+          playerName: cv.playerName 
+        }, 'Enhanced player data with CV value');
+      } else {
+        logger.warn({ 
+          playerId,
+          cvDataStatus: cvData.status,
+          cvDataReason: cvData.status === 'rejected' ? cvData.reason : 'No CV data'
+        }, 'Failed to get CV data for player');
       }
 
       return enhancedData;

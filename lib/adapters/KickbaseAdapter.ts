@@ -214,7 +214,7 @@ export class KickbaseAdapter {
       
       const batchPromises = batch.map(async (player) => {
         try {
-          const enhancedData = await enhancedKickbaseClient.getEnhancedPlayerData(player.id);
+          const enhancedData = await enhancedKickbaseClient.getEnhancedPlayerData(player.id, '1', '7389547');
           
           return {
             ...player,
@@ -630,6 +630,15 @@ export class KickbaseAdapter {
     }
 
     console.log(`[OPTIMIZED] Completed: Found ${allPlayers.length} total players`);
+    
+    // Enhance players with live data including CV values
+    if (this.useEnhancedClient && allPlayers.length > 0) {
+      console.log(`[OPTIMIZED] Enhancing ${allPlayers.length} players with live data including CV values...`);
+      const enhancedPlayers = await this.enhancePlayersWithLiveData(allPlayers);
+      console.log(`[OPTIMIZED] Enhanced ${enhancedPlayers.length} players with live data`);
+      return enhancedPlayers;
+    }
+    
     return allPlayers;
   }
 

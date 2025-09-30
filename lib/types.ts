@@ -16,6 +16,7 @@ export interface Player {
   oddsModifier?: number;
   // Enhanced player data from Kickbase API
   marketValue?: number;           // Current market value (from API calls)
+  cvValue?: number;               // Contract Value (cv field from league endpoint)
   totalPoints?: number;           // Total season points
   averagePoints?: number;         // Average points per game
   goals?: number;                 // Goals scored (g field)

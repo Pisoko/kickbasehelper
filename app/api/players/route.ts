@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 
 import { cacheAgeDays, readCache, validatePlayerDataWithTeamCheck } from '../../../lib/data';
+import { enhancedKickbaseClient } from '../../../lib/adapters/EnhancedKickbaseClient';
+import { kickbaseAuth } from '../../../lib/adapters/KickbaseAuthService';
 import type { Player } from '../../../lib/types';
 
 export async function GET(request: Request) {
@@ -35,12 +37,41 @@ export async function GET(request: Request) {
     }
     return player;
   });
+
+  // Enhance players with current CV values for accurate market values
+  let enhancedPlayers = correctedPlayers;
+  try {
+    // Check authentication
+    if (!kickbaseAuth.isTokenValid()) {
+      await kickbaseAuth.refreshToken();
+    }
+
+    // Enhance players with current CV values
+    enhancedPlayers = await Promise.all(correctedPlayers.map(async (player: Player) => {
+      try {
+        const cvData = await enhancedKickbaseClient.getPlayerCV(player.id);
+        if (cvData && cvData.cvValue) {
+          return {
+            ...player,
+            marketValue: cvData.cvValue,
+            kosten: cvData.cvValue
+          };
+        }
+      } catch (error) {
+        console.warn(`Failed to get CV for player ${player.id}:`, error);
+      }
+      return player;
+    }));
+  } catch (error) {
+    console.warn('Failed to enhance players with CV values:', error);
+    // Continue with corrected players if CV enhancement fails
+  }
   
 
     
     const age = cacheAgeDays(spieltag);
     return NextResponse.json({
-      players: correctedPlayers as Player[],
+      players: enhancedPlayers as Player[],
       updatedAt: cache.updatedAt,
       cacheAgeDays: age
     });
