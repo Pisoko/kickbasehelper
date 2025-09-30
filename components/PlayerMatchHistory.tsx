@@ -235,11 +235,11 @@ export default function PlayerMatchHistory({ playerId, playerName, currentTeam }
               
               <div className="relative h-10 bg-gray-800 rounded-lg overflow-hidden border border-gray-600">
                 <div 
-                  className={`absolute bottom-0 left-0 right-0 h-full transition-all duration-300 ease-out ${getKickbaseColorClass(match.playerPoints)}`}
+                  className={`absolute top-0 left-0 bottom-0 w-full transition-all duration-300 ease-out ${getKickbaseColorClass(match.playerPoints)}`}
                   style={{
                     '--fill': `${getKickbaseFillPercentage(match.playerPoints)}%`,
-                    WebkitMask: `linear-gradient(to top, black var(--fill), transparent var(--fill))`,
-                    mask: `linear-gradient(to top, black var(--fill), transparent var(--fill))`,
+                    WebkitMask: `linear-gradient(to right, black var(--fill), transparent var(--fill))`,
+                    mask: `linear-gradient(to right, black var(--fill), transparent var(--fill))`,
                     borderRadius: '0.5rem'
                   } as React.CSSProperties}
                 />

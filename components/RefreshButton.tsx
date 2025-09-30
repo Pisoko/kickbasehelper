@@ -19,9 +19,17 @@ export default function RefreshButton({
 }: RefreshButtonProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // Prüfe beim Laden der Komponente, ob der Button sichtbar sein soll
+    // Setze isClient auf true nach der Hydration
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    // Prüfe nur auf der Client-Seite, ob der Button sichtbar sein soll
+    if (!isClient) return;
+    
     const checkVisibility = () => {
       const lastClickTime = localStorage.getItem(STORAGE_KEY);
       if (lastClickTime) {
@@ -39,7 +47,7 @@ export default function RefreshButton({
     };
 
     checkVisibility();
-  }, []);
+  }, [isClient]);
 
   useEffect(() => {
     // Timer für Countdown und Sichtbarkeit
@@ -49,7 +57,10 @@ export default function RefreshButton({
           const newTime = prev - 1000;
           if (newTime <= 0) {
             setIsVisible(true);
-            localStorage.removeItem(STORAGE_KEY);
+            // Entferne localStorage-Eintrag nur auf der Client-Seite
+            if (isClient) {
+              localStorage.removeItem(STORAGE_KEY);
+            }
             return 0;
           }
           return newTime;
@@ -58,11 +69,13 @@ export default function RefreshButton({
 
       return () => clearInterval(interval);
     }
-  }, [isVisible, timeRemaining]);
+  }, [isVisible, timeRemaining, isClient]);
 
   const handleClick = () => {
-    // Speichere Zeitpunkt des Klicks
-    localStorage.setItem(STORAGE_KEY, Date.now().toString());
+    // Speichere Zeitpunkt des Klicks nur auf der Client-Seite
+    if (isClient) {
+      localStorage.setItem(STORAGE_KEY, Date.now().toString());
+    }
     
     // Verstecke Button für 60 Minuten
     setIsVisible(false);
