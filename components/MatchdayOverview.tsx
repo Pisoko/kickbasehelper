@@ -397,7 +397,7 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
                     <div className="min-w-[80px] text-right">
                       {match.status === 'live' && (
                         <div className="text-sm text-muted-foreground">
-                          90'
+                          90&apos;
                         </div>
                       )}
                     </div>

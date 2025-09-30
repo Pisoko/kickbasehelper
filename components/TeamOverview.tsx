@@ -180,7 +180,9 @@ export default function TeamOverview({ className }: TeamOverviewProps) {
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
+            {/* Hidden: Trophy icon
             <Trophy className="h-6 w-6 text-primary" />
+            */}
             <div>
               <h2 className="text-xl font-semibold">Bundesliga Tabelle</h2>
               <p className="text-sm text-slate-400">
@@ -189,6 +191,7 @@ export default function TeamOverview({ className }: TeamOverviewProps) {
             </div>
           </div>
           
+{/* Hidden: Kickbase button
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowKickbaseData(!showKickbaseData)}
@@ -203,6 +206,7 @@ export default function TeamOverview({ className }: TeamOverviewProps) {
               Kickbase
             </button>
           </div>
+          */}
         </div>
 
 
@@ -350,11 +354,13 @@ export default function TeamOverview({ className }: TeamOverviewProps) {
                   <span className="text-slate-300">Abstieg</span>
                 </div>
               </div>
+{/* Hidden: Last update timestamp
               {tableData.lastUpdate && (
                 <p className="text-xs text-slate-400 mt-2">
                   Letzte Aktualisierung: {new Date(tableData.lastUpdate).toLocaleString('de-DE')}
                 </p>
               )}
+              */}
             </div>
           </div>
         )}

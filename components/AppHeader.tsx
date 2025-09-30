@@ -48,7 +48,7 @@ export default function AppHeader({
         </div>
         
         {/* Tab navigation */}
-        <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
+        <Tabs value={activeTab} onValueChange={(value: string) => onTabChange?.(value as TabType)} className="w-full">
           <TabsList className="grid w-full grid-cols-3 lg:w-[400px]">
             {tabs.map((tab) => {
               const IconComponent = tab.icon;

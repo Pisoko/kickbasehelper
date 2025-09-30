@@ -29,6 +29,16 @@ export async function createOddsAdapter(provider: OddsProvider, apiKey?: string)
     const { ExternalOddsAdapter } = await import('./external/ExternalOddsAdapter');
     return new ExternalOddsAdapter(apiKey);
   }
+  
+  if (provider === 'odds-api') {
+    if (!apiKey) {
+      logger.warn('Odds API Provider ohne API-Key, fallback auf none');
+      return new NoOddsAdapter();
+    }
+    const { OddsApiAdapter } = await import('./OddsApiAdapter');
+    return new OddsApiAdapter(apiKey);
+  }
+  
   return new NoOddsAdapter();
 }
 

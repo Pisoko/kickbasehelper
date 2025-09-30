@@ -50,4 +50,4 @@ export interface Odds {
   format: 'decimal' | 'fractional' | 'american';
 }
 
-export type OddsProvider = 'none' | 'external';
+export type OddsProvider = 'none' | 'external' | 'odds-api';

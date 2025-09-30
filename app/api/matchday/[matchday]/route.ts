@@ -48,10 +48,11 @@ interface MatchdayData {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { matchday: string } }
+  { params }: { params: Promise<{ matchday: string }> }
 ) {
   try {
-    const matchday = parseInt(params.matchday);
+    const resolvedParams = await params;
+    const matchday = parseInt(resolvedParams.matchday);
     
     if (isNaN(matchday) || matchday < 1 || matchday > 34) {
       return NextResponse.json(
@@ -239,7 +240,8 @@ export async function GET(
     return NextResponse.json(matchdayData);
 
   } catch (error) {
-    logger.error({ error, matchday: params.matchday }, 'Failed to fetch matchday data');
+    const resolvedParams = await params;
+    logger.error({ error, matchday: resolvedParams.matchday }, 'Failed to fetch matchday data');
     
     return NextResponse.json(
       { 

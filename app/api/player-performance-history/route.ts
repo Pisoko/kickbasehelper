@@ -123,7 +123,7 @@ export async function GET(request: NextRequest) {
       let currentCV = 0;
       try {
         const cvData = await enhancedKickbaseClient.getPlayerCV(playerId);
-        currentCV = cvData.cvValue || cvData.marketValue || 0;
+        currentCV = cvData?.cvValue || cvData?.marketValue || 0;
         logger.info({ playerId, currentCV }, 'Retrieved current CV value for mock data');
       } catch (cvError) {
         logger.warn({ cvError, playerId }, 'Failed to get current CV value for mock data, using fallback');
@@ -177,7 +177,7 @@ export async function GET(request: NextRequest) {
     let currentCV = 0;
     try {
       const cvData = await enhancedKickbaseClient.getPlayerCV(playerId);
-      currentCV = cvData.cvValue || cvData.marketValue || 0;
+      currentCV = cvData?.cvValue || cvData?.marketValue || 0;
       logger.info({ playerId, currentCV }, 'Retrieved current CV value');
     } catch (error) {
       logger.warn({ error, playerId }, 'Failed to get current CV value, using fallback');
