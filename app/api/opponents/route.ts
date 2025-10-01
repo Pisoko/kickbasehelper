@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { enhancedKickbaseClient } from '../../../lib/adapters/EnhancedKickbaseClient';
 import { getTeamByKickbaseId } from '../../../lib/teamMapping';
-import { createOddsProvider } from '../../../lib/adapters/OddsProvider';
+import { kickbaseDataCache } from '../../../lib/services/KickbaseDataCacheService';
 import pino from 'pino';
 
 const logger = pino({ name: 'OpponentsAPI' });
@@ -93,23 +93,23 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Try to get odds data
+    // Try to get odds data from cache
     try {
-      const oddsAdapter = await createOddsProvider();
-      const matches = targetMatchday.it.map((match: any) => {
-        const homeTeamData = getTeamByKickbaseId(match.t1?.toString());
-        const awayTeamData = getTeamByKickbaseId(match.t2?.toString());
-        
-        return {
-          id: match.mi || `match-${nextMatchday}-${match.t1}-${match.t2}`,
-          spieltag: nextMatchday,
-          heim: homeTeamData?.fullName || `Team ${match.t1}`,
-          auswaerts: awayTeamData?.fullName || `Team ${match.t2}`,
-          kickoff: match.dt || new Date().toISOString()
-        };
-      });
-
-      const oddsData = await oddsAdapter.fetchOdds(matches);
+      // Try to get cached odds for this matchday
+      const cachedOdds = await kickbaseDataCache.getCachedOdds(nextMatchday);
+      let oddsData: any[] = [];
+      
+      if (cachedOdds && cachedOdds.odds.length > 0) {
+        oddsData = cachedOdds.odds;
+        logger.info({ oddsCount: oddsData.length }, 'Using cached odds data for opponents');
+      } else {
+        // Fallback: try to get individual match odds
+        const matchIds = targetMatchday.it.map((match: any) => 
+          match.mi || `match-${nextMatchday}-${match.t1}-${match.t2}`
+        );
+        oddsData = await kickbaseDataCache.getCachedMatchOdds(matchIds);
+        logger.info({ oddsCount: oddsData.length }, 'Using individual cached match odds for opponents');
+      }
       
       // Merge odds data with opponent info
       for (const opponentInfo of opponentInfos) {
@@ -118,13 +118,14 @@ export async function GET(request: NextRequest) {
           const awayTeam = opponentInfo.isHome ? opponentInfo.opponentName : opponentInfo.teamName;
           
           return (odds.heim === homeTeam && odds.auswaerts === awayTeam) ||
-                 (odds.heim.includes(homeTeam.split(' ')[0]) && odds.auswaerts.includes(awayTeam.split(' ')[0]));
+                 (odds.heim && odds.heim.includes(homeTeam.split(' ')[0]) && 
+                  odds.auswaerts && odds.auswaerts.includes(awayTeam.split(' ')[0]));
         });
 
         if (matchOdds) {
-          opponentInfo.homeOdds = matchOdds.heim;
-          opponentInfo.awayOdds = matchOdds.auswaerts;
-          opponentInfo.drawOdds = matchOdds.unentschieden;
+          opponentInfo.homeOdds = Number(matchOdds.heim) || undefined;
+          opponentInfo.awayOdds = Number(matchOdds.auswaerts) || undefined;
+          opponentInfo.drawOdds = Number(matchOdds.unentschieden) || undefined;
         }
       }
     } catch (oddsError) {

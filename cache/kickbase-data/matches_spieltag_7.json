@@ -1,0 +1,281 @@
+{
+  "data": {
+    "matches": [
+      {
+        "id": "8367",
+        "spieltag": 7,
+        "heim": "1. FC Union Berlin",
+        "auswaerts": "Borussia Mönchengladbach",
+        "homeTeam": {
+          "id": "40",
+          "name": "1. FC Union Berlin",
+          "shortName": "Union Berlin"
+        },
+        "awayTeam": {
+          "id": "15",
+          "name": "Borussia Mönchengladbach",
+          "shortName": "M'gladbach"
+        },
+        "kickoff": "2025-10-17T18:30:00Z",
+        "status": "upcoming",
+        "matchStatus": 0,
+        "isLive": false,
+        "homeTeamSymbol": "FCU",
+        "awayTeamSymbol": "BMG",
+        "homeTeamImage": "content/file/8f4c7c08ee9b4dca85c28260fc5917bd.svg",
+        "awayTeamImage": "content/file/7178ef92ad0747a5ad1a05d0783f5088.svg",
+        "odds": {
+          "heim": 1.95,
+          "unentschieden": 3.35,
+          "auswaerts": 2.85,
+          "format": "decimal"
+        }
+      },
+      {
+        "id": "8364",
+        "spieltag": 7,
+        "heim": "1. FC Köln",
+        "auswaerts": "FC Augsburg",
+        "homeTeam": {
+          "id": "28",
+          "name": "1. FC Köln",
+          "shortName": "Köln"
+        },
+        "awayTeam": {
+          "id": "13",
+          "name": "FC Augsburg",
+          "shortName": "Augsburg"
+        },
+        "kickoff": "2025-10-18T13:30:00Z",
+        "status": "upcoming",
+        "matchStatus": 0,
+        "isLive": false,
+        "homeTeamSymbol": "KOE",
+        "awayTeamSymbol": "FCA",
+        "homeTeamImage": "content/file/dca70c4089fd4623932b245c0e81eaba.svg",
+        "awayTeamImage": "content/file/8d68c946b9774505b8292adfa910d0a0.svg",
+        "odds": {
+          "heim": 2.1,
+          "unentschieden": 3.65,
+          "auswaerts": 3.1,
+          "format": "decimal"
+        }
+      },
+      {
+        "id": "8365",
+        "spieltag": 7,
+        "heim": "1. FC Heidenheim",
+        "auswaerts": "Werder Bremen",
+        "homeTeam": {
+          "id": "50",
+          "name": "1. FC Heidenheim",
+          "shortName": "Heidenheim"
+        },
+        "awayTeam": {
+          "id": "10",
+          "name": "Werder Bremen",
+          "shortName": "Bremen"
+        },
+        "kickoff": "2025-10-18T13:30:00Z",
+        "status": "upcoming",
+        "matchStatus": 0,
+        "isLive": false,
+        "homeTeamSymbol": "FCH",
+        "awayTeamSymbol": "SVW",
+        "homeTeamImage": "content/file/f387dd39aafb47d0b4863381fc4a521c.svg",
+        "awayTeamImage": "content/file/a7e609e72fb04c6d8c96e8ed82f0315d.svg",
+        "odds": {
+          "heim": 2.7,
+          "unentschieden": 3.35,
+          "auswaerts": 2.05,
+          "format": "decimal"
+        }
+      },
+      {
+        "id": "8368",
+        "spieltag": 7,
+        "heim": "VfL Wolfsburg",
+        "auswaerts": "VfB Stuttgart",
+        "homeTeam": {
+          "id": "11",
+          "name": "VfL Wolfsburg",
+          "shortName": "Wolfsburg"
+        },
+        "awayTeam": {
+          "id": "9",
+          "name": "VfB Stuttgart",
+          "shortName": "Stuttgart"
+        },
+        "kickoff": "2025-10-18T13:30:00Z",
+        "status": "upcoming",
+        "matchStatus": 0,
+        "isLive": false,
+        "homeTeamSymbol": "WOB",
+        "awayTeamSymbol": "VFB",
+        "homeTeamImage": "content/file/f23d72a0cf2d48a2a29ede777110aece.svg",
+        "awayTeamImage": "content/file/9a1bb78d0ccf45f895797c0c6d8c4d40.svg",
+        "odds": {
+          "heim": 2.25,
+          "unentschieden": 3.3,
+          "auswaerts": 2.45,
+          "format": "decimal"
+        }
+      },
+      {
+        "id": "8369",
+        "spieltag": 7,
+        "heim": "RB Leipzig",
+        "auswaerts": "Hamburger SV",
+        "homeTeam": {
+          "id": "43",
+          "name": "RB Leipzig",
+          "shortName": "Leipzig"
+        },
+        "awayTeam": {
+          "id": "6",
+          "name": "Hamburger SV",
+          "shortName": "Hamburg"
+        },
+        "kickoff": "2025-10-18T13:30:00Z",
+        "status": "upcoming",
+        "matchStatus": 0,
+        "isLive": false,
+        "homeTeamSymbol": "RBL",
+        "awayTeamSymbol": "HSV",
+        "homeTeamImage": "content/file/29ceb88867954b548ca9e27d39d050c2.svg",
+        "awayTeamImage": "content/file/c9b7d8772f324f9badeb285af4c5810a.svg",
+        "odds": {
+          "heim": 1.38,
+          "unentschieden": 4.3,
+          "auswaerts": 4.95,
+          "format": "decimal"
+        }
+      },
+      {
+        "id": "8370",
+        "spieltag": 7,
+        "heim": "FSV Mainz 05",
+        "auswaerts": "Bayer 04 Leverkusen",
+        "homeTeam": {
+          "id": "18",
+          "name": "FSV Mainz 05",
+          "shortName": "Mainz"
+        },
+        "awayTeam": {
+          "id": "7",
+          "name": "Bayer 04 Leverkusen",
+          "shortName": "Leverkusen"
+        },
+        "kickoff": "2025-10-18T13:30:00Z",
+        "status": "upcoming",
+        "matchStatus": 0,
+        "isLive": false,
+        "homeTeamSymbol": "M05",
+        "awayTeamSymbol": "B04",
+        "homeTeamImage": "content/file/d4ac9675b44944039d463837f888cb1c.svg",
+        "awayTeamImage": "content/file/e06a055a6eaf4fd7bebfadb35037f957.svg",
+        "odds": {
+          "heim": 2.8,
+          "unentschieden": 3.25,
+          "auswaerts": 2,
+          "format": "decimal"
+        }
+      },
+      {
+        "id": "8372",
+        "spieltag": 7,
+        "heim": "Bayern München",
+        "auswaerts": "Borussia Dortmund",
+        "homeTeam": {
+          "id": "2",
+          "name": "Bayern München",
+          "shortName": "Bayern"
+        },
+        "awayTeam": {
+          "id": "3",
+          "name": "Borussia Dortmund",
+          "shortName": "Dortmund"
+        },
+        "kickoff": "2025-10-18T16:30:00Z",
+        "status": "upcoming",
+        "matchStatus": 0,
+        "isLive": false,
+        "homeTeamSymbol": "FCB",
+        "awayTeamSymbol": "BVB",
+        "homeTeamImage": "content/file/ff70df040a9f4179a7b45219225a2273.svg",
+        "awayTeamImage": "content/file/dc3d63ae79bf4282a4107bafcd572b99.svg",
+        "odds": {
+          "heim": 1.26,
+          "unentschieden": 5,
+          "auswaerts": 6,
+          "format": "decimal"
+        }
+      },
+      {
+        "id": "8371",
+        "spieltag": 7,
+        "heim": "SC Freiburg",
+        "auswaerts": "Eintracht Frankfurt",
+        "homeTeam": {
+          "id": "5",
+          "name": "SC Freiburg",
+          "shortName": "Freiburg"
+        },
+        "awayTeam": {
+          "id": "4",
+          "name": "Eintracht Frankfurt",
+          "shortName": "Frankfurt"
+        },
+        "kickoff": "2025-10-19T13:30:00Z",
+        "status": "upcoming",
+        "matchStatus": 0,
+        "isLive": false,
+        "homeTeamSymbol": "SCF",
+        "awayTeamSymbol": "SGE",
+        "homeTeamImage": "content/file/6c1a9f14b668493283f966834891aa70.svg",
+        "awayTeamImage": "content/file/422de82bee3b47eb898699d6d27095ba.svg",
+        "odds": {
+          "heim": 2.25,
+          "unentschieden": 3.3,
+          "auswaerts": 2.45,
+          "format": "decimal"
+        }
+      },
+      {
+        "id": "8366",
+        "spieltag": 7,
+        "heim": "FC St. Pauli",
+        "auswaerts": "TSG Hoffenheim",
+        "homeTeam": {
+          "id": "39",
+          "name": "FC St. Pauli",
+          "shortName": "St. Pauli"
+        },
+        "awayTeam": {
+          "id": "14",
+          "name": "TSG Hoffenheim",
+          "shortName": "Hoffenheim"
+        },
+        "kickoff": "2025-10-19T15:30:00Z",
+        "status": "upcoming",
+        "matchStatus": 0,
+        "isLive": false,
+        "homeTeamSymbol": "STP",
+        "awayTeamSymbol": "TSG",
+        "homeTeamImage": "content/file/cae200d5499e43c4a5c382a1fbb25435.svg",
+        "awayTeamImage": "content/file/5212904732a04199aab426e44067347c.svg",
+        "odds": {
+          "heim": 2,
+          "unentschieden": 3.15,
+          "auswaerts": 2.9,
+          "format": "decimal"
+        }
+      }
+    ],
+    "spieltag": 7,
+    "updatedAt": "2025-10-01T18:38:18.372Z"
+  },
+  "timestamp": 1759343898372,
+  "ttl": 1800000,
+  "key": "matches_spieltag_7"
+}

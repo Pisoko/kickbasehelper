@@ -1,0 +1,84 @@
+{
+  "data": {
+    "odds": [
+      {
+        "matchId": "8386",
+        "heim": 2.6,
+        "unentschieden": 3.2,
+        "auswaerts": 2.33,
+        "format": "decimal"
+      },
+      {
+        "matchId": "8383",
+        "heim": 2.59,
+        "unentschieden": 3.2,
+        "auswaerts": 2.35,
+        "format": "decimal"
+      },
+      {
+        "matchId": "8384",
+        "heim": 2.51,
+        "unentschieden": 3.2,
+        "auswaerts": 2.43,
+        "format": "decimal"
+      },
+      {
+        "matchId": "8385",
+        "heim": 2.49,
+        "unentschieden": 3.2,
+        "auswaerts": 2.45,
+        "format": "decimal"
+      },
+      {
+        "matchId": "8388",
+        "heim": 2.41,
+        "unentschieden": 3.2,
+        "auswaerts": 2.53,
+        "format": "decimal"
+      },
+      {
+        "matchId": "8389",
+        "heim": 2.46,
+        "unentschieden": 3.2,
+        "auswaerts": 2.48,
+        "format": "decimal"
+      },
+      {
+        "matchId": "8390",
+        "heim": 2.47,
+        "unentschieden": 3.2,
+        "auswaerts": 2.47,
+        "format": "decimal"
+      },
+      {
+        "matchId": "8382",
+        "heim": 2.48,
+        "unentschieden": 3.2,
+        "auswaerts": 2.46,
+        "format": "decimal"
+      },
+      {
+        "matchId": "8387",
+        "heim": 2.44,
+        "unentschieden": 3.2,
+        "auswaerts": 2.5,
+        "format": "decimal"
+      }
+    ],
+    "matchIds": [
+      "8382",
+      "8383",
+      "8384",
+      "8385",
+      "8386",
+      "8387",
+      "8388",
+      "8389",
+      "8390"
+    ],
+    "updatedAt": "2025-10-01T18:40:25.076Z"
+  },
+  "timestamp": 1759344025077,
+  "ttl": 3600,
+  "key": "batch_odds:8382,8383,8384,8385,8386,8387,8388,8389,8390"
+}

@@ -3,6 +3,8 @@ import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import ServiceWorkerProvider from '../components/ServiceWorkerProvider';
 import BuyMeACoffeeWidget from '../components/BuyMeACoffeeWidget';
+// Initialize cache warmup on server startup
+import '@/lib/startup/cache-warmup';
 
 const inter = Inter({ subsets: ['latin'] });
 

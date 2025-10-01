@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { enhancedKickbaseClient } from '../../../../lib/adapters/EnhancedKickbaseClient';
-import { createOddsProvider } from '../../../../lib/adapters/OddsProvider';
 import { getTeamByKickbaseId } from '../../../../lib/teamMapping';
+import { kickbaseDataCache } from '../../../../lib/services/KickbaseDataCacheService';
 import pino from 'pino';
 
 const logger = pino({ name: 'MatchdayAPI' });
@@ -49,6 +49,22 @@ export async function GET(
     }
 
     logger.info({ matchday }, 'Fetching matchday data');
+
+    // Versuche zuerst Cache zu nutzen
+    let cachedMatches = await kickbaseDataCache.getCachedMatches(matchday);
+    
+    if (cachedMatches) {
+      return NextResponse.json({
+        success: true,
+        data: {
+          matchday,
+          matches: cachedMatches,
+          startDate: getMatchdayStartDate(matchday),
+          endDate: getMatchdayEndDate(matchday),
+          dataSource: 'cache'
+        }
+      });
+    }
 
     let apiError = null;
     
@@ -113,15 +129,26 @@ export async function GET(
             };
           });
 
-          // Fetch odds for upcoming matches
+          // Fetch odds for upcoming matches from cache
           let matchesWithOdds = matches;
           try {
             const upcomingMatches = matches.filter(match => !match.isLive && !match.homeGoals && !match.awayGoals);
             if (upcomingMatches.length > 0) {
-              logger.info({ upcomingMatchesCount: upcomingMatches.length }, 'Fetching odds for upcoming matches');
+              logger.info({ upcomingMatchesCount: upcomingMatches.length }, 'Fetching odds for upcoming matches from cache');
               
-              const oddsProvider = await createOddsProvider();
-              const oddsData = await oddsProvider.fetchOdds(upcomingMatches);
+              // Try to get cached odds for this matchday
+              const cachedOdds = await kickbaseDataCache.getCachedOdds(matchday);
+              let oddsData: any[] = [];
+              
+              if (cachedOdds && cachedOdds.odds.length > 0) {
+                oddsData = cachedOdds.odds;
+                logger.info({ oddsCount: oddsData.length }, 'Using cached odds data');
+              } else {
+                // Fallback: try to get individual match odds
+                const matchIds = upcomingMatches.map(match => match.id);
+                oddsData = await kickbaseDataCache.getCachedMatchOdds(matchIds);
+                logger.info({ oddsCount: oddsData.length }, 'Using individual cached match odds');
+              }
               
               // Merge odds data with matches
               matchesWithOdds = matches.map(match => {
@@ -140,13 +167,16 @@ export async function GET(
                 return match;
               });
               
-              logger.info({ oddsCount: oddsData.length }, 'Successfully fetched odds data');
+              logger.info({ oddsCount: oddsData.length }, 'Successfully merged odds data with matches');
             }
           } catch (oddsError) {
-            logger.warn({ error: oddsError }, 'Failed to fetch odds, continuing without odds data');
+            logger.warn({ error: oddsError }, 'Failed to fetch odds from cache, continuing without odds data');
           }
 
           logger.info({ matchday, matchesCount: matchesWithOdds.length }, 'Successfully fetched live matchday data');
+          
+          // Cache die verarbeiteten Match-Daten
+          await kickbaseDataCache.cacheMatches(matchday, matchesWithOdds);
           
           return NextResponse.json({
             success: true,

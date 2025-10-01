@@ -1,0 +1,12 @@
+{
+  "data": {
+    "matchId": "8388",
+    "heim": 2.41,
+    "unentschieden": 3.2,
+    "auswaerts": 2.53,
+    "format": "decimal"
+  },
+  "timestamp": 1759344025076,
+  "ttl": 3600,
+  "key": "match_odds:8388"
+}

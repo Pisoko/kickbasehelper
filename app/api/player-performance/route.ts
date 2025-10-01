@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { KickbaseAdapter } from '../../../lib/adapters/KickbaseAdapter';
 import { getTeamByKickbaseId } from '../../../lib/teamMapping';
+import { kickbaseDataCache } from '../../../lib/services/KickbaseDataCacheService';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -73,7 +74,14 @@ export async function GET(request: NextRequest) {
     // Aktuellen Spieltag abrufen
     const currentMatchday = await getCurrentMatchday();
     
-    // Versuche, echte Daten von der Kickbase API zu holen
+    // Versuche zuerst verarbeitete Daten aus Cache zu holen
+    let cachedResult = await kickbaseDataCache.getCachedPlayerPerformance(playerId);
+    
+    if (cachedResult) {
+      return NextResponse.json(cachedResult);
+    }
+    
+    // Wenn nicht im Cache, rohe Daten von API holen
     const performanceData = await kickbaseAdapter.getPlayerPerformance(playerId);
     
     // Wenn wir Daten haben, verarbeite sie
@@ -159,6 +167,8 @@ export async function GET(request: NextRequest) {
         
         // Prüfe, ob tatsächlich Spiele gefunden wurden
         if (result.matches.length > 0) {
+          // Cache die verarbeiteten Daten
+          await kickbaseDataCache.cachePlayerPerformance(playerId, result);
           return NextResponse.json(result);
         }
       }

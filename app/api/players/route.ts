@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-
-import { cacheAgeDays, readCache, validatePlayerDataWithTeamCheck } from '../../../lib/data';
-import { enhancedKickbaseClient } from '../../../lib/adapters/EnhancedKickbaseClient';
-import { kickbaseAuth } from '../../../lib/adapters/KickbaseAuthService';
+import { readCache, cacheAgeDays, validatePlayerDataWithTeamCheck } from '../../../lib/data';
+import { kickbaseDataCache } from '../../../lib/services/KickbaseDataCacheService';
 import type { Player } from '../../../lib/types';
 
 export async function GET(request: Request) {
@@ -10,6 +8,20 @@ export async function GET(request: Request) {
   const spieltag = Number(searchParams.get('spieltag') ?? '1');
   
   try {
+    // Versuche zuerst Cache zu nutzen
+    let cachedPlayers = await kickbaseDataCache.getCachedPlayers(spieltag);
+    
+    if (cachedPlayers) {
+      const age = cacheAgeDays(spieltag);
+      return NextResponse.json({
+        players: cachedPlayers,
+        updatedAt: new Date().toISOString(),
+        cacheAgeDays: age,
+        source: 'cache'
+      });
+    }
+    
+    // Fallback auf lokalen Cache
     const cache = readCache(spieltag);
     if (!cache) {
       return NextResponse.json({ error: 'Keine Daten verfügbar' }, { status: 404 });
@@ -42,13 +54,15 @@ export async function GET(request: Request) {
   // CV enhancement is disabled for performance reasons
   const enhancedPlayers = correctedPlayers;
   
-
+  // Cache die verarbeiteten Spielerdaten
+  await kickbaseDataCache.cachePlayers(spieltag, enhancedPlayers as Player[]);
     
     const age = cacheAgeDays(spieltag);
     return NextResponse.json({
       players: enhancedPlayers as Player[],
       updatedAt: cache.updatedAt,
-      cacheAgeDays: age
+      cacheAgeDays: age,
+      source: 'processed'
     });
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
