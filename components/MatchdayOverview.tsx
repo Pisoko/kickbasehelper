@@ -161,9 +161,20 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
       // Handle API response structure: { success: true, data: {...} }
       const data = responseData.success ? responseData.data : responseData;
       
-      // Validate response data
-      if (!data || typeof data.matchday !== 'number' || !Array.isArray(data.matches)) {
-        throw new Error('Ungültige Datenstruktur erhalten. Bitte versuchen Sie es erneut.');
+      // Enhanced validation with better error messages
+      if (!data) {
+        console.error('No data received from API:', responseData);
+        throw new Error('Keine Daten vom Server erhalten. Bitte versuchen Sie es erneut.');
+      }
+      
+      if (typeof data.matchday !== 'number') {
+        console.error('Invalid matchday type:', typeof data.matchday, data.matchday);
+        throw new Error('Ungültige Spieltag-Nummer erhalten. Bitte versuchen Sie es erneut.');
+      }
+      
+      if (!Array.isArray(data.matches)) {
+        console.error('Invalid matches type:', typeof data.matches, data.matches);
+        throw new Error('Ungültige Spiele-Daten erhalten. Bitte versuchen Sie es erneut.');
       }
       
       // Transform API data to component format
