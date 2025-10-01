@@ -38,34 +38,9 @@ export async function GET(request: Request) {
     return player;
   });
 
-  // Enhance players with current CV values for accurate market values
-  let enhancedPlayers = correctedPlayers;
-  try {
-    // Check authentication
-    if (!kickbaseAuth.isTokenValid()) {
-      await kickbaseAuth.refreshToken();
-    }
-
-    // Enhance players with current CV values
-    enhancedPlayers = await Promise.all(correctedPlayers.map(async (player: Player) => {
-      try {
-        const cvData = await enhancedKickbaseClient.getPlayerCV(player.id);
-        if (cvData && cvData.cvValue) {
-          return {
-            ...player,
-            marketValue: cvData.cvValue,
-            kosten: cvData.cvValue
-          };
-        }
-      } catch (error) {
-        console.warn(`Failed to get CV for player ${player.id}:`, error);
-      }
-      return player;
-    }));
-  } catch (error) {
-    console.warn('Failed to enhance players with CV values:', error);
-    // Continue with corrected players if CV enhancement fails
-  }
+  // Use cached market values for better performance
+  // CV enhancement is disabled for performance reasons
+  const enhancedPlayers = correctedPlayers;
   
 
     

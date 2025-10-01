@@ -15,23 +15,26 @@ import {
 interface BundesligaLogoProps {
   teamName?: string;
   kickbaseId?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   className?: string;
 }
 
 const sizeClasses = {
+  xs: 'w-4 h-4',
   sm: 'w-8 h-8',
   md: 'w-12 h-12', 
   lg: 'w-16 h-16'
 };
 
 const textSizeClasses = {
+  xs: 'text-xs',
   sm: 'text-xs',
   md: 'text-sm',
   lg: 'text-xs'
 };
 
 const sizeDimensions = {
+  xs: { width: 16, height: 16 },
   sm: { width: 32, height: 32 },
   md: { width: 48, height: 48 },
   lg: { width: 64, height: 64 }

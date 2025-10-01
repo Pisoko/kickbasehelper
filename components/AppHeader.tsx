@@ -4,9 +4,9 @@ import React from 'react';
 import ClearCache from './ClearCache';
 import BuildInfo from './BuildInfo';
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
-import { Users, Calendar, Trophy, Shield } from 'lucide-react';
+import { Users, Calendar, Trophy, Zap } from 'lucide-react';
 
-type TabType = 'players' | 'matchday' | 'teams' | 'team';
+type TabType = 'players' | 'matchday' | 'teams' | 'arena';
 
 interface TabConfig {
   id: TabType;
@@ -23,7 +23,7 @@ interface AppHeaderProps {
 
 const tabs: TabConfig[] = [
   { id: 'players', label: 'Spieler', icon: Users },
-  { id: 'team', label: 'Team', icon: Shield },
+  { id: 'arena', label: 'Arena', icon: Zap },
   { id: 'matchday', label: 'Spieltag', icon: Calendar },
   { id: 'teams', label: 'Tabelle', icon: Trophy }
 ];

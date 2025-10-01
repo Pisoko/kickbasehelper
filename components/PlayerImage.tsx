@@ -3,6 +3,7 @@
 import { useState, useEffect, memo } from 'react';
 import Image from 'next/image';
 import { getKickbaseImageUrl, generateInitialsUrl, searchTheSportsDBImage, getBundesligaImageUrl, testImageUrl, isKnownPlaceholderImage } from '../lib/imageUtils';
+import { imageCache } from '../lib/imageCache';
 
 interface PlayerImageProps {
   playerImageUrl?: string;
@@ -42,6 +43,14 @@ const PlayerImage = memo(function PlayerImage({
       setIsLoading(true);
       setImageError(false);
 
+      // Check cache first
+      const cachedUrl = imageCache.get(playerName, playerImageUrl);
+      if (cachedUrl && isMounted) {
+        setCurrentImageUrl(cachedUrl);
+        setIsLoading(false);
+        return;
+      }
+
       // Skip known placeholder images from Kickbase
       if (isKnownPlaceholderImage(playerImageUrl)) {
         // Skip Kickbase image and go directly to fallbacks
@@ -52,6 +61,7 @@ const PlayerImage = memo(function PlayerImage({
           const isKickbaseValid = await testImageUrl(kickbaseUrl);
           if (isKickbaseValid) {
             setCurrentImageUrl(kickbaseUrl);
+            imageCache.set(playerName, kickbaseUrl, playerImageUrl);
             return;
           }
         }
@@ -62,6 +72,7 @@ const PlayerImage = memo(function PlayerImage({
         const bundesligaUrl = await getBundesligaImageUrl(playerName);
         if (bundesligaUrl && isMounted) {
           setCurrentImageUrl(bundesligaUrl);
+          imageCache.set(playerName, bundesligaUrl, playerImageUrl);
           return;
         }
       } catch (error) {
@@ -73,6 +84,7 @@ const PlayerImage = memo(function PlayerImage({
         const theSportsDBUrl = await searchTheSportsDBImage(playerName);
         if (theSportsDBUrl && isMounted) {
           setCurrentImageUrl(theSportsDBUrl);
+          imageCache.set(playerName, theSportsDBUrl, playerImageUrl);
           return;
         }
       } catch (error) {
@@ -81,7 +93,9 @@ const PlayerImage = memo(function PlayerImage({
 
       // Fallback to initials
       if (isMounted) {
-        setCurrentImageUrl(generateInitialsUrl(playerName));
+        const initialsUrl = generateInitialsUrl(playerName);
+        setCurrentImageUrl(initialsUrl);
+        imageCache.set(playerName, initialsUrl, playerImageUrl);
       }
     };
 
@@ -107,6 +121,7 @@ const PlayerImage = memo(function PlayerImage({
         const bundesligaUrl = await getBundesligaImageUrl(playerName);
         if (bundesligaUrl) {
           setCurrentImageUrl(bundesligaUrl);
+          imageCache.set(playerName, bundesligaUrl, playerImageUrl);
           setImageError(false);
           return;
         }
@@ -121,6 +136,7 @@ const PlayerImage = memo(function PlayerImage({
         const theSportsDBUrl = await searchTheSportsDBImage(playerName);
         if (theSportsDBUrl) {
           setCurrentImageUrl(theSportsDBUrl);
+          imageCache.set(playerName, theSportsDBUrl, playerImageUrl);
           setImageError(false);
           return;
         }
@@ -130,11 +146,13 @@ const PlayerImage = memo(function PlayerImage({
     }
     
     // Ultimate fallback to initials
-    setCurrentImageUrl(generateInitialsUrl(playerName));
+    const initialsUrl = generateInitialsUrl(playerName);
+    setCurrentImageUrl(initialsUrl);
+    imageCache.set(playerName, initialsUrl, playerImageUrl);
     setImageError(false);
   };
 
-  const baseClasses = `${sizeClasses[size]} rounded-full object-cover border-2 border-slate-600`;
+  const baseClasses = `${sizeClasses[size]} rounded-full object-cover`;
 
   if (isLoading) {
     return (
