@@ -30,29 +30,25 @@ export async function fetchMatchdayData(spieltag: number, options: FetchOptions 
   const apiKey = process.env.KICKBASE_KEY ?? '';
   const oddsProvider = (process.env.ODDS_PROVIDER as OddsProvider) ?? 'none';
   const oddsKey = process.env.ODDS_API_KEY;
-  const useMock = !baseUrl || !apiKey;
+  // No mock data allowed - only live API data
+  if (!baseUrl || !apiKey) {
+    throw new Error('KICKBASE_BASE and KICKBASE_KEY environment variables are required - no mock data allowed');
+  }
 
   let players: Player[] = [];
   let matches: Match[] = [];
   let odds: Odds[] = [];
 
-  if (useMock) {
-    const mock = generateMockData(spieltag);
-    players = mock.players;
-    matches = mock.matches;
-    odds = mock.odds;
-  } else {
-    const adapter = new KickbaseAdapter(baseUrl, apiKey);
-    
-    // Test the new optimized method
-    logger.info('Testing new optimized player fetching method...');
-    players = await adapter.getAllPlayersFromTeamsOptimized();
-    logger.info(`Fetched ${players.length} players using optimized method`);
-    
-    matches = await adapter.getMatches(spieltag);
-    const adapterOdds = await createOddsAdapter(oddsProvider, oddsKey);
-    odds = await adapterOdds.fetchOdds(matches);
-  }
+  const adapter = new KickbaseAdapter(baseUrl, apiKey);
+  
+  // Test the new optimized method
+  logger.info('Testing new optimized player fetching method...');
+  players = await adapter.getAllPlayersFromTeamsOptimized();
+  logger.info(`Fetched ${players.length} players using optimized method`);
+  
+  matches = await adapter.getMatches(spieltag);
+  const adapterOdds = await createOddsAdapter(oddsProvider, oddsKey);
+  odds = await adapterOdds.fetchOdds(matches);
 
   const payload = {
     updatedAt: new Date().toISOString(),
@@ -64,77 +60,7 @@ export async function fetchMatchdayData(spieltag: number, options: FetchOptions 
   return { ...payload, cacheAge: 0, fromCache: false };
 }
 
-function generateMockData(spieltag: number) {
-  const teams = ['Bayern München', 'Borussia Dortmund', 'RB Leipzig', 'Bayer 04 Leverkusen', 'VfB Stuttgart', 'Eintracht Frankfurt'];
-  const positions: { pos: Player['position']; count: number; basePoints: number; baseCost: number }[] = [
-    { pos: 'GK', count: 1, basePoints: 65, baseCost: 5_000_000 },
-    { pos: 'DEF', count: 4, basePoints: 78, baseCost: 7_500_000 },
-    { pos: 'MID', count: 3, basePoints: 95, baseCost: 8_500_000 },
-    { pos: 'FWD', count: 2, basePoints: 110, baseCost: 12_000_000 }
-  ];
-  const players: Player[] = [];
-  let counter = 1;
-  for (const team of teams) {
-    for (const { pos, count, basePoints, baseCost } of positions) {
-      for (let i = 0; i < count; i++) {
-        const variation = (counter % 7) * 3;
-        const hist = Array.from({ length: 5 }, (_, idx) => basePoints + variation - idx * 2 + (idx % 2 === 0 ? 4 : -3));
-        const minutes = Array.from({ length: 5 }, (_, idx) => 70 + ((counter + idx * 3) % 21));
-        const avg = hist.reduce((a, b) => a + b, 0) / hist.length;
-        const sum = hist.reduce((a, b) => a + b, 0);
-        const cost = baseCost + variation * 120_000 + i * 90_000;
-        players.push({
-          id: `mock-${spieltag}-${counter}`,
-          name: `${team} ${pos} ${i + 1}`,
-          position: pos,
-          verein: team,
-          kosten: cost,
-          punkte_hist: hist,
-          punkte_avg: avg,
-          punkte_sum: sum,
-          minutes_hist: minutes,
-          yellowCards: Math.floor(Math.random() * 5), // Random yellow cards (0-4)
-          redCards: Math.random() < 0.1 ? 1 : 0 // 10% chance of red card
-        });
-        counter += 1;
-      }
-    }
-  }
-
-  const matches: Match[] = [
-    {
-      id: `match-${spieltag}-1`,
-      spieltag,
-      heim: teams[0],
-      auswaerts: teams[1],
-      kickoff: new Date(Date.now() + 3600_000).toISOString()
-    },
-    {
-      id: `match-${spieltag}-2`,
-      spieltag,
-      heim: teams[2],
-      auswaerts: teams[3],
-      kickoff: new Date(Date.now() + 7200_000).toISOString()
-    },
-    {
-      id: `match-${spieltag}-3`,
-      spieltag,
-      heim: teams[4],
-      auswaerts: teams[5],
-      kickoff: new Date(Date.now() + 10_800_000).toISOString()
-    }
-  ];
-
-  const odds: Odds[] = matches.map((match, idx) => ({
-    matchId: match.id,
-    heim: 2.1 + idx * 0.1,
-    unentschieden: 3.3 + idx * 0.2,
-    auswaerts: 3.0 + idx * 0.15,
-    format: 'decimal'
-  }));
-
-  return { players, matches, odds };
-}
+// Mock data generation removed - only live API data allowed
 
 async function main() {
   const args = argv.slice(2);

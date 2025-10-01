@@ -40,6 +40,22 @@ export interface Match {
   heim: string;
   auswaerts: string;
   kickoff?: string;
+  // Additional match data from Kickbase API
+  homeGoals?: number;        // t1g - Home team goals
+  awayGoals?: number;        // t2g - Away team goals
+  matchStatus?: number;      // st - Match status (0=not started, 1=live, 2=finished)
+  matchTime?: string;        // mtd - Match time/duration
+  isLive?: boolean;          // il - Is live flag
+  homeTeamSymbol?: string;   // t1sy - Home team symbol/abbreviation
+  awayTeamSymbol?: string;   // t2sy - Away team symbol/abbreviation
+  homeTeamImage?: string;    // t1im - Home team image/logo URL
+  awayTeamImage?: string;    // t2im - Away team image/logo URL
+  odds?: {
+    heim: number;
+    unentschieden: number;
+    auswaerts: number;
+    format: 'decimal' | 'fractional' | 'american';
+  };
 }
 
 export interface Odds {

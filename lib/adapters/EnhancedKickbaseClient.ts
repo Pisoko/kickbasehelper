@@ -1,5 +1,6 @@
 import pino from 'pino';
 import type { Player, Match } from '../types';
+import { kickbaseAuth } from './KickbaseAuthService';
 
 const logger = pino({ name: 'EnhancedKickbaseClient' });
 
@@ -60,25 +61,40 @@ export class EnhancedKickbaseClient {
    */
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     try {
-      const apiKey = process.env.KICKBASE_KEY;
-      if (!apiKey) {
-        throw new Error('KICKBASE_KEY environment variable is not set');
+      const token = await kickbaseAuth.getValidToken();
+      if (!token) {
+        throw new Error('Failed to get valid authentication token');
       }
+      
+      // Debug logging
+      console.log('🔑 Using token (first 20 chars):', token.substring(0, 20) + '...');
+      console.log('🔑 Token length:', token.length);
+      console.log('🌐 Making request to:', `${this.baseUrl}${path}`);
+      
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        ...options.headers,
+      };
+      
+      console.log('📋 Request headers:', JSON.stringify(headers, null, 2));
       
       const response = await fetch(`${this.baseUrl}${path}`, {
         ...options,
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
+        headers,
       });
 
+      console.log('📡 Response status:', response.status, response.statusText);
+
       if (!response.ok) {
+        const errorText = await response.text();
+        console.log('❌ Error response body:', errorText);
+        
         logger.error({ 
           status: response.status, 
           path,
-          statusText: response.statusText 
+          statusText: response.statusText,
+          errorBody: errorText
         }, 'Kickbase API request failed');
         
         throw new Error(`Kickbase API request failed: ${response.status} ${response.statusText}`);
@@ -86,6 +102,7 @@ export class EnhancedKickbaseClient {
 
       return await response.json();
     } catch (error) {
+      console.log('💥 Request error:', error);
       logger.error({ error, path }, 'Error making Kickbase API request');
       throw error;
     }
@@ -220,14 +237,32 @@ export class EnhancedKickbaseClient {
   }
 
   /**
-   * Get competition matches for a specific matchday
+   * Get competition matchdays data
+   */
+  async getCompetitionMatchdays(competitionId: string = '1'): Promise<any> {
+    return this.request(`/v4/competitions/${competitionId}/matchdays`);
+  }
+
+  /**
+   * Get competition matches for a specific matchday (deprecated - use getCompetitionMatchdays)
    */
   async getCompetitionMatches(competitionId: string = '1', matchday?: number): Promise<any> {
-    const path = matchday 
-      ? `/v4/competitions/${competitionId}/matches?matchday=${matchday}`
-      : `/v4/competitions/${competitionId}/matches`;
-      
-    return this.request(path);
+    // Use the matchdays endpoint instead
+    return this.getCompetitionMatchdays(competitionId);
+  }
+
+  /**
+   * Get live event types
+   */
+  async getLiveEventTypes(): Promise<any> {
+    return this.request('/v4/live/eventtypes');
+  }
+
+  /**
+   * Get available leagues for the user
+   */
+  async getLeagueSelection(): Promise<any> {
+    return this.request('/v4/leagues/selection');
   }
 
   /**

@@ -8,9 +8,14 @@ interface AuthToken {
 }
 
 interface TokenClaims {
-  uid: string;
-  kblid: string;
+  'kb.uid': string;
+  'kb.name': string;
+  'kb.r': string;
+  'kb.a': string;
+  'kb.p': string;
+  'kb.cc': string;
   iat: number;
+  nbf: number;
   exp: number;
   iss: string;
   aud: string;
@@ -25,56 +30,97 @@ export class KickbaseAuthService {
   private token: string | null = null;
   private tokenExpiry: Date | null = null;
   private refreshPromise: Promise<boolean> | null = null;
-  private readonly apiKey: string | null = null;
+  private readonly apiKey: string | null;
 
   constructor() {
     // Initialize with API key from environment
     this.apiKey = process.env.KICKBASE_KEY || null;
+    console.log('🔧 KickbaseAuthService initialized with API key:', this.apiKey ? 'YES' : 'NO');
+    if (this.apiKey) {
+      console.log('🔑 API key (first 20 chars):', this.apiKey.substring(0, 20) + '...');
+    }
     // Initialize with any existing token from environment or storage
     this.loadStoredToken();
   }
 
   /**
-   * Authenticate with email and password using Kickbase login endpoint
+   * Authenticate with email and password using Kickbase API login endpoint
    */
   async authenticate(email: string, password: string): Promise<boolean> {
     try {
       console.log('🔐 Attempting authentication with email:', email);
       
-      // Use our own API endpoint that handles the authentication server-side
-      const response = await fetch('/api/auth/kickbase-login', {
+      // Use the correct Kickbase API login endpoint
+      const loginResponse = await fetch('https://api.kickbase.com/v4/user/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'User-Agent': 'KickbaseHelper/1.0'
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+          em: email,
+          pass: password
+        })
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.token) {
-          this.token = data.token;
-          this.tokenExpiry = new Date(data.tokenExpiry);
-          console.log('✅ Authentication successful');
-          return true;
-        }
-      }
+      console.log('Login response status:', loginResponse.status);
 
-      console.log('❌ Authentication failed');
-      return false;
+      if (loginResponse.ok) {
+        const loginData = await loginResponse.json();
+        console.log('✅ API login successful');
+        
+        // Extract token from response
+        const token = loginData.tkn;
+        const tokenExpiry = loginData.tknex;
+        
+        if (token && tokenExpiry) {
+          this.token = token;
+          this.tokenExpiry = new Date(tokenExpiry);
+          
+          // Store token for persistence
+          this.storeToken(loginData);
+          
+          logger.info({ 
+            expiresAt: this.tokenExpiry.toISOString() 
+          }, 'Authentication successful');
+          
+          return true;
+        } else {
+          console.log('❌ No token found in login response');
+          logger.error('No token found in login response');
+        }
+      } else {
+        const errorText = await loginResponse.text();
+        console.log('❌ API login failed:', errorText);
+        logger.error({ status: loginResponse.status, error: errorText }, 'API login failed');
+      }
     } catch (error) {
-      console.error('❌ Authentication error:', error);
-      return false;
+      console.log('❌ Authentication request failed:', error);
+      logger.error({ error }, 'Authentication failed');
     }
+    
+    return false;
   }
 
   /**
    * Get a valid authentication token, refreshing if necessary
    */
   async getValidToken(): Promise<string | null> {
+    // If we have an API key from environment, use it directly
+    if (this.apiKey) {
+      console.log('🔑 Using API key from environment (first 20 chars):', this.apiKey.substring(0, 20) + '...');
+      return this.apiKey;
+    }
+
+    console.log('⚠️ No API key found in environment, checking stored token...');
+
     if (this.isTokenValid()) {
+      console.log('✅ Stored token is valid');
       return this.token;
     }
+
+    console.log('❌ No valid token available, attempting refresh...');
 
     // If a refresh is already in progress, wait for it
     if (this.refreshPromise) {
@@ -105,8 +151,19 @@ export class KickbaseAuthService {
       });
 
       if (!response.ok) {
-        logger.error({ status: response.status }, 'Token refresh failed');
-        return false;
+        logger.warn({ status: response.status }, 'Token refresh failed, attempting new authentication');
+        
+        // If refresh fails, try to authenticate with stored credentials
+        const email = process.env.KICKBASE_EMAIL;
+        const password = process.env.KICKBASE_PASSWORD;
+        
+        if (email && password) {
+          logger.info('Attempting automatic re-authentication with stored credentials');
+          return await this.authenticate(email, password);
+        } else {
+          logger.error('No stored credentials available for automatic re-authentication');
+          return false;
+        }
       }
 
       const authData: AuthToken = await response.json();
@@ -123,7 +180,17 @@ export class KickbaseAuthService {
       
       return true;
     } catch (error) {
-      logger.error({ error }, 'Error refreshing token');
+      logger.error({ error }, 'Error refreshing token, attempting fallback authentication');
+      
+      // Fallback: Try to authenticate with stored credentials
+      const email = process.env.KICKBASE_EMAIL;
+      const password = process.env.KICKBASE_PASSWORD;
+      
+      if (email && password) {
+        logger.info('Attempting fallback authentication with stored credentials');
+        return await this.authenticate(email, password);
+      }
+      
       return false;
     }
   }
@@ -151,15 +218,29 @@ export class KickbaseAuthService {
    */
   private decodeToken(token: string): TokenClaims | null {
     try {
+      console.log('🔍 Decoding token, length:', token?.length);
       const parts = token.split('.');
+      console.log('🔍 Token parts:', parts.length);
+      
       if (parts.length !== 3) {
+        console.log('❌ Invalid JWT format, parts:', parts.length);
         return null;
       }
 
       const payload = parts[1];
-      const decoded = JSON.parse(atob(payload));
+      console.log('🔍 Payload part length:', payload.length);
+      
+      // Convert base64url to base64
+      const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+      // Add padding if needed
+      const padded = base64 + '='.repeat((4 - base64.length % 4) % 4);
+      console.log('🔍 Base64 conversion done, padded length:', padded.length);
+      
+      const decoded = JSON.parse(Buffer.from(padded, 'base64').toString());
+      console.log('✅ Token decoded successfully, keys:', Object.keys(decoded));
       return decoded as TokenClaims;
     } catch (error) {
+      console.error('❌ Error decoding token:', error);
       logger.error({ error }, 'Error decoding token');
       return null;
     }
@@ -168,40 +249,38 @@ export class KickbaseAuthService {
   /**
    * Get the user ID from the current token
    */
-  getUserId(): string | null {
-    if (!this.token) {
-      return null;
-    }
-
-    const claims = this.decodeToken(this.token);
-    return claims?.uid || null;
+  async getUserId(): Promise<string | null> {
+    const claims = await this.getTokenClaims();
+    return claims?.['kb.uid'] || null;
   }
 
   /**
    * Get token claims for the current token
    */
-  getTokenClaims(): TokenClaims | null {
-    if (!this.token) {
+  async getTokenClaims(): Promise<TokenClaims | null> {
+    console.log('🔍 getTokenClaims called');
+    const token = await this.getValidToken();
+    
+    if (!token) {
+      console.log('❌ No token available from getValidToken');
       return null;
     }
 
-    return this.decodeToken(this.token);
+    console.log('✅ Got token from getValidToken, length:', token.length);
+    return this.decodeToken(token);
   }
 
   /**
    * Get league IDs from the current token
    */
-  getLeagueIds(): string[] {
-    if (!this.token) {
+  async getLeagueIds(): Promise<string[]> {
+    const claims = await this.getTokenClaims();
+    if (!claims?.['kb.p']) {
       return [];
     }
 
-    const claims = this.decodeToken(this.token);
-    if (!claims?.kblid) {
-      return [];
-    }
-
-    return claims.kblid.split(',').filter(id => id.trim().length > 0);
+    // kb.p contains comma-separated project/league IDs
+    return claims['kb.p'].split(',').filter(id => id.trim().length > 0);
   }
 
   /**

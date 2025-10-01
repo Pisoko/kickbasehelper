@@ -9,7 +9,7 @@ export async function GET() {
 
     if (isTokenValid) {
         try {
-          const tokenClaims = kickbaseAuth.getTokenClaims();
+          const tokenClaims = await kickbaseAuth.getTokenClaims();
           userInfo = {
             leagues: kickbaseAuth.getLeagueIds()
           };

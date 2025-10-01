@@ -1,8 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    typedRoutes: true
-  },
+  typedRoutes: true,
+  outputFileTracingRoot: '/root/kickbasehelper',
   webpack: (config, { isServer }) => {
     // Handle WASM files
     config.experiments = {

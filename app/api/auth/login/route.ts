@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
       if (isTokenValid) {
         try {
-          const tokenClaims = kickbaseAuth.getTokenClaims();
+          const tokenClaims = await kickbaseAuth.getTokenClaims();
           userInfo = {
             email: email,
             leagues: kickbaseAuth.getLeagueIds()

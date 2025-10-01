@@ -57,6 +57,12 @@ interface MatchdayData {
   matches: Match[];
   startDate: string;
   endDate: string;
+  meta?: {
+    dataSource: 'live' | 'mock';
+    apiError: string | null;
+    timestamp: string;
+    season: string;
+  };
 }
 
 interface MatchdayOverviewProps extends VariantProps<typeof matchRowVariants> {
@@ -64,7 +70,7 @@ interface MatchdayOverviewProps extends VariantProps<typeof matchRowVariants> {
 }
 
 export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
-  const [currentMatchday, setCurrentMatchday] = useState(6); // Standard: aktueller Spieltag + 1
+  const [currentMatchday, setCurrentMatchday] = useState<number | null>(null); // Wird dynamisch geladen
   const [actualCurrentMatchday, setActualCurrentMatchday] = useState<number | null>(null); // Der tatsächlich aktuelle Spieltag
   const [matchdayData, setMatchdayData] = useState<MatchdayData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -77,11 +83,18 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
       if (response.ok) {
         const data = await response.json();
         setActualCurrentMatchday(data.currentMatchday);
+        // Setze den angezeigten Spieltag auf den nächsten Spieltag (aktueller + 1)
+        if (currentMatchday === null) {
+          setCurrentMatchday(data.currentMatchday + 1);
+        }
       }
     } catch (err) {
       console.error('Error fetching current matchday:', err);
       // Fallback: Nehme an, dass Spieltag 5 der aktuelle ist
       setActualCurrentMatchday(5);
+      if (currentMatchday === null) {
+        setCurrentMatchday(6); // Nächster Spieltag als Fallback
+      }
     }
   };
 
@@ -143,14 +156,57 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
         }
       }
       
-      const data = await response.json();
+      const responseData = await response.json();
+      
+      // Handle API response structure: { success: true, data: {...} }
+      const data = responseData.success ? responseData.data : responseData;
       
       // Validate response data
       if (!data || typeof data.matchday !== 'number' || !Array.isArray(data.matches)) {
         throw new Error('Ungültige Datenstruktur erhalten. Bitte versuchen Sie es erneut.');
       }
       
-      setMatchdayData(data);
+      // Transform API data to component format
+      const transformedData: MatchdayData = {
+        matchday: data.matchday,
+        matches: data.matches.map((match: any) => ({
+          id: match.id,
+          homeTeam: {
+            id: match.homeTeamSymbol || 'unknown',
+            name: match.heim,
+            shortName: match.homeTeamSymbol || match.heim.substring(0, 3).toUpperCase(),
+            logo: match.homeTeamImage
+          },
+          awayTeam: {
+            id: match.awayTeamSymbol || 'unknown',
+            name: match.auswaerts,
+            shortName: match.awayTeamSymbol || match.auswaerts.substring(0, 3).toUpperCase(),
+            logo: match.awayTeamImage
+          },
+          kickoff: match.kickoff,
+          status: match.isLive ? 'live' : (match.matchStatus === 2 ? 'finished' : 'upcoming'),
+          result: (match.homeGoals !== undefined && match.awayGoals !== undefined) ? {
+            homeGoals: match.homeGoals,
+            awayGoals: match.awayGoals
+          } : undefined,
+          odds: match.odds ? {
+            heim: match.odds.heim,
+            unentschieden: match.odds.unentschieden,
+            auswaerts: match.odds.auswaerts,
+            format: match.odds.format || 'decimal'
+          } : undefined
+        })),
+        startDate: data.startDate,
+        endDate: data.endDate,
+        meta: {
+          dataSource: data.dataSource || 'unknown',
+          apiError: data.apiError || null,
+          timestamp: new Date().toISOString(),
+          season: '2025/2026'
+        }
+      };
+      
+      setMatchdayData(transformedData);
     } catch (err) {
       console.error('Error fetching matchday data:', err);
       
@@ -167,23 +223,30 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
 
   useEffect(() => {
     fetchCurrentMatchday();
-    fetchMatchdayData(currentMatchday);
+  }, []);
+
+  useEffect(() => {
+    if (currentMatchday !== null) {
+      fetchMatchdayData(currentMatchday);
+    }
   }, [currentMatchday]);
 
   const handlePreviousMatchday = () => {
-    if (currentMatchday > 1) {
+    if (currentMatchday !== null && currentMatchday > 1) {
       setCurrentMatchday(currentMatchday - 1);
     }
   };
 
   const handleNextMatchday = () => {
-    if (currentMatchday < 34) {
+    if (currentMatchday !== null && currentMatchday < 34) {
       setCurrentMatchday(currentMatchday + 1);
     }
   };
 
   const handleRefresh = () => {
-    fetchMatchdayData(currentMatchday);
+    if (currentMatchday !== null) {
+      fetchMatchdayData(currentMatchday);
+    }
   };
 
   if (loading) {
@@ -224,7 +287,7 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
           <div className="flex gap-2">
             <button
               onClick={handlePreviousMatchday}
-              disabled={currentMatchday <= 1}
+              disabled={!currentMatchday || currentMatchday <= 1}
               className="p-2 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-slate-800/60 text-slate-300 hover:text-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -237,7 +300,7 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
             </button>
             <button
               onClick={handleNextMatchday}
-              disabled={currentMatchday >= 34}
+              disabled={currentMatchday === null || currentMatchday >= 34}
               className="p-2 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-slate-800/60 text-slate-300 hover:text-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronRight className="h-4 w-4" />
@@ -266,14 +329,19 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
     <div className={cn("space-y-6", className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold flex items-center gap-2">
-          <Calendar className="h-6 w-6" />
-          Spieltag {currentMatchday}
-        </h2>
+        <div className="flex items-center gap-4">
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <Calendar className="h-6 w-6" />
+            Spieltag {currentMatchday ?? '...'}
+          </h2>
+          
+
+        </div>
+        
         <div className="flex gap-2">
           <button
             onClick={handlePreviousMatchday}
-            disabled={currentMatchday <= 1}
+            disabled={currentMatchday === null || currentMatchday <= 1}
             className="p-2 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-slate-800/60 text-slate-300 hover:text-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -286,7 +354,7 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
           </button>
           <button
             onClick={handleNextMatchday}
-            disabled={currentMatchday >= 34}
+            disabled={currentMatchday === null || currentMatchday >= 34}
             className="p-2 rounded-lg border border-slate-800 bg-slate-900/60 hover:bg-slate-800/60 text-slate-300 hover:text-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronRight className="h-4 w-4" />
@@ -352,13 +420,15 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
                         {/* Home Team Odds - only for upcoming matches and only for next matchday */}
                         {match.status === 'upcoming' && match.odds && shouldShowOdds() && (
                           <div className="mt-2 text-center">
-                            <div className="text-sm font-medium text-slate-300">{match.odds.heim.toFixed(2)}</div>
+                            <div className="text-sm font-medium text-green-400 bg-green-900/30 px-2 py-1 rounded">
+                              {match.odds.heim.toFixed(2)}
+                            </div>
                           </div>
                         )}
                       </div>
 
                       {/* Score or VS */}
-                      <div className="flex items-center justify-center min-w-[60px] md:min-w-[80px]">
+                      <div className="flex flex-col items-center justify-center min-w-[60px] md:min-w-[80px]">
                         {match.status === 'finished' || match.status === 'live' ? (
                           <div className="text-xl md:text-2xl font-bold text-center">
                             {match.result?.homeGoals || 0} : {match.result?.awayGoals || 0}
@@ -387,7 +457,9 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
                         {/* Away Team Odds - only for upcoming matches and only for next matchday */}
                         {match.status === 'upcoming' && match.odds && shouldShowOdds() && (
                           <div className="mt-2 text-center">
-                            <div className="text-sm font-medium text-slate-300">{match.odds.auswaerts.toFixed(2)}</div>
+                            <div className="text-sm font-medium text-blue-400 bg-blue-900/30 px-2 py-1 rounded">
+                              {match.odds.auswaerts.toFixed(2)}
+                            </div>
                           </div>
                         )}
                       </div>

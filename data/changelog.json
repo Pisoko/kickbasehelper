@@ -1,5 +1,19 @@
 [
   {
+    "buildNumber": 27,
+    "commitHash": "49a2fb9c85bdb8c64a1bf4fb97147a4c73b3de69",
+    "commitMessage": "Implement Dark Mode Only: Enforce consistent dark theme across all environments\n\n- Add 'dark' class to HTML element in layout.tsx for Tailwind dark mode\n- Simplify CSS variables in globals.css to use only dark mode values\n- Remove redundant body styles that caused conflicts between light/dark modes\n- Remove darkMode config from tailwind.config.ts (no longer needed)\n- Fixes white background issue on different VMs/browsers\n- Ensures robust dark-only display regardless of system preferences",
+    "timestamp": "2025-10-01T11:17:28.280Z",
+    "author": "root"
+  },
+  {
+    "buildNumber": 26,
+    "commitHash": "77d92f555e2742795a1cb7e931dad193b29ac1b4",
+    "commitMessage": "Fix PlayerDetailModal accessibility: Add proper Dialog.Title and Dialog.Description\n\n- Move Dialog.Title to be direct child of Dialog.Content for Radix UI compliance\n- Add Dialog.Description for better accessibility\n- Use sr-only class to hide accessibility elements visually\n- Convert nested Dialog.Title to regular h2 element\n- Fixes console warning about missing DialogTitle",
+    "timestamp": "2025-10-01T07:03:46.787Z",
+    "author": "root"
+  },
+  {
     "buildNumber": 23,
     "commitHash": "c17b43bdb44726b783894da288696d7c2199a4b4",
     "commitMessage": "chore: bump version to 0.2.0",

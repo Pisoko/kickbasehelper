@@ -116,21 +116,52 @@ export class KickbaseAdapter {
 
   private async request<T>(path: string): Promise<T> {
     const url = `${this.baseUrl}${path}`;
+    
+    // Use KickbaseAuthService for automatic token management
+    const authHeaders = await kickbaseAuth.getAuthHeaders();
+    
     const res = await fetch(url, {
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`
+        'User-Agent': 'curl/7.68.0',
+        'Accept': '*/*',
+        ...authHeaders
       }
     });
+    
+    // If we get 401/403, try to refresh token and retry once
+    if ((res.status === 401 || res.status === 403) && this.apiKey) {
+      logger.warn({ status: res.status, url }, 'Auth failed, attempting token refresh');
+      
+      // Try to authenticate with stored credentials
+      const email = process.env.KICKBASE_EMAIL;
+      const password = process.env.KICKBASE_PASSWORD;
+      
+      if (email && password) {
+        const authSuccess = await kickbaseAuth.authenticate(email, password);
+        if (authSuccess) {
+          // Retry the request with new token
+          const newAuthHeaders = await kickbaseAuth.getAuthHeaders();
+          const retryRes = await fetch(url, {
+            headers: {
+              'User-Agent': 'curl/7.68.0',
+              'Accept': '*/*',
+              ...newAuthHeaders
+            }
+          });
+          
+          if (retryRes.ok) {
+            return await retryRes.json();
+          }
+        }
+      }
+    }
+    
     if (!res.ok) {
       logger.error({ status: res.status, url }, 'Kickbase Request fehlgeschlagen');
       throw new Error(`Kickbase Request fehlgeschlagen (${res.status})`);
     }
-    const json = (await res.json()) as KickbaseResponse<T> | T;
-    if ('data' in (json as KickbaseResponse<T>)) {
-      return (json as KickbaseResponse<T>).data;
-    }
-    return json as T;
+    // Kickbase API returns data directly, not wrapped in a data property
+    return (await res.json()) as T;
   }
 
   async getPlayers(spieltag: number): Promise<Player[]> {
@@ -703,7 +734,7 @@ export class KickbaseAdapter {
     // Extract real performance history from 'ph' field
     const pointsHistory = detailedPlayer.ph && Array.isArray(detailedPlayer.ph) 
       ? detailedPlayer.ph.map((ph: any) => ph.p || 0)
-      : this.generateMockHistory(detailedPlayer.tp || 0);
+      : []; // No mock data - empty array if no real data available
 
     // Calculate minutes played (convert seconds to minutes)
     const totalMinutesPlayed = detailedPlayer.sec ? Math.round(detailedPlayer.sec / 60) : 0;
@@ -722,9 +753,9 @@ export class KickbaseAdapter {
       punkte_hist: pointsHistory,
       punkte_avg: detailedPlayer.ap || 0,
       punkte_sum: detailedPlayer.tp || 0,
-      minutes_hist: this.generateMockMinutes(),
-      goals_hist: this.generateMockGoals(detailedPlayer.g || 0),
-      assists_hist: this.generateMockAssists(detailedPlayer.a || 0),
+      minutes_hist: [], // No mock data - empty array if no real data available
+      goals_hist: [], // No mock data - empty array if no real data available
+      assists_hist: [], // No mock data - empty array if no real data available
       // Enhanced fields
       marketValue: detailedPlayer.cv || detailedPlayer.mv || 1000000,
       totalPoints: detailedPlayer.tp || 0,
@@ -761,12 +792,12 @@ export class KickbaseAdapter {
       position: 'MID', // Position not available in team center API, will be updated by detailed call
       verein: this.getTeamName(teamId),
       kosten: 1000000, // Market value not available in team center API
-      punkte_hist: this.generateMockHistory(points),
+      punkte_hist: [], // No mock data - empty array if no real data available
       punkte_avg: points,
       punkte_sum: points,
-      minutes_hist: this.generateMockMinutes(),
-      goals_hist: this.generateMockGoals(0),
-      assists_hist: this.generateMockAssists(0),
+      minutes_hist: [], // No mock data - empty array if no real data available
+      goals_hist: [], // No mock data - empty array if no real data available
+      assists_hist: [], // No mock data - empty array if no real data available
       // Enhanced fields
       marketValue: 1000000,
       totalPoints: points,
@@ -950,9 +981,9 @@ export class KickbaseAdapter {
       4: 'FWD'   // Forward
     };
 
-    // Generate mock historical data since Kickbase API doesn't provide this directly
+    // No mock data - use empty array if no real historical data available
     const currentPoints = kickbasePlayer.p || 0;
-    const mockHistory = this.generateMockHistory(currentPoints);
+    const pointsHistory: number[] = []; // No mock data allowed
 
     return {
       id: kickbasePlayer.pi || `unknown-${Date.now()}`,
@@ -961,12 +992,12 @@ export class KickbaseAdapter {
       position: positionMap[kickbasePlayer.pos] || 'MID',
       verein: this.getTeamName(kickbasePlayer.tid),
       kosten: this.calculateMarketValue(kickbasePlayer), // Market value calculation
-      punkte_hist: mockHistory,
-      punkte_avg: mockHistory.reduce((a, b) => a + b, 0) / mockHistory.length,
-      punkte_sum: mockHistory.reduce((a, b) => a + b, 0),
-      minutes_hist: this.generateMockMinutes(),
-      goals_hist: this.generateMockGoals(kickbasePlayer.g || 0),
-      assists_hist: this.generateMockAssists(kickbasePlayer.a || 0),
+      punkte_hist: pointsHistory,
+      punkte_avg: 0, // No mock data - calculate from real data when available
+      punkte_sum: currentPoints,
+      minutes_hist: [], // No mock data - empty array if no real data available
+      goals_hist: [], // No mock data - empty array if no real data available
+      assists_hist: [], // No mock data - empty array if no real data available
       // Enhanced fields from Kickbase API
       minutesPlayed: kickbasePlayer.mt || 0,           // Minutes played in last game (mt field)
       goals: kickbasePlayer.g || 0,                    // Goals scored (last game)
@@ -975,7 +1006,7 @@ export class KickbaseAdapter {
       status: kickbasePlayer.st?.toString(),           // Player status
       playerImageUrl: kickbasePlayer.pim,              // Player image URL
       totalPoints: currentPoints,                      // Current season points
-      averagePoints: currentPoints > 0 ? currentPoints / Math.max(1, mockHistory.length) : 0,
+      averagePoints: 0, // No mock data - calculate from real data when available
       // Market value will be populated by enhanced API calls in getPlayers method
       marketValue: undefined,
       yellowCards: kickbasePlayer.y || 0,             // Yellow cards
@@ -983,53 +1014,9 @@ export class KickbaseAdapter {
     };
   }
 
-  private generateMockHistory(currentPoints: number): number[] {
-    // Generate 5 historical points based on current points with some variation
-    const basePoints = Math.max(currentPoints * 0.8, 50); // Ensure minimum base points
-    return Array.from({ length: 5 }, (_, i) => {
-      const variation = (Math.random() - 0.5) * 20; // ±10 points variation
-      return Math.round(basePoints + variation + (i % 2 === 0 ? 5 : -5));
-    });
-  }
+  // Mock data generation removed - only live API data allowed
 
-  private generateMockMinutes(): number[] {
-    // Generate mock minutes played (typically 60-90 minutes)
-    return Array.from({ length: 5 }, () => Math.round(60 + Math.random() * 30));
-  }
-
-  private generateMockGoals(currentSeasonGoals: number): number[] {
-    // Generate historical goals based on current season total
-    // Distribute goals across 4 matchdays (as user mentioned 4 matchdays played)
-    const goals = [0, 0, 0, 0]; // 4 matchdays
-    let remaining = currentSeasonGoals;
-    
-    // Randomly distribute goals across matchdays
-    for (let i = 0; i < 4 && remaining > 0; i++) {
-      const maxGoals = Math.min(remaining, 3); // Max 3 goals per game
-      const goalsThisGame = Math.floor(Math.random() * (maxGoals + 1));
-      goals[i] = goalsThisGame;
-      remaining -= goalsThisGame;
-    }
-    
-    return goals;
-  }
-
-  private generateMockAssists(currentSeasonAssists: number): number[] {
-    // Generate historical assists based on current season total
-    // Distribute assists across 4 matchdays
-    const assists = [0, 0, 0, 0]; // 4 matchdays
-    let remaining = currentSeasonAssists;
-    
-    // Randomly distribute assists across matchdays
-    for (let i = 0; i < 4 && remaining > 0; i++) {
-      const maxAssists = Math.min(remaining, 3); // Max 3 assists per game
-      const assistsThisGame = Math.floor(Math.random() * (maxAssists + 1));
-      assists[i] = assistsThisGame;
-      remaining -= assistsThisGame;
-    }
-    
-    return assists;
-  }
+  // Mock data generation methods removed - only live API data allowed
 
   private calculateMarketValue(kickbasePlayer: any): number {
     // If API provides current value (Arena Mode), use it (convert from thousands to full amount)
@@ -1221,27 +1208,38 @@ export class KickbaseAdapter {
       const data = await this.request<any>(`/v4/competitions/1/matchdays`);
       
       // Find matches for the specific spieltag
-      if (data && data.matchdays) {
-        const matchday = data.matchdays.find((md: any) => md.matchday === spieltag);
-        if (matchday && matchday.matches) {
-          return matchday.matches.map((match: any) => this.transformMatch(match, spieltag));
+      // API structure: { it: [{ day: number, it: [match objects] }] }
+      if (data && data.it) {
+        const matchday = data.it.find((md: any) => md.day === spieltag);
+        if (matchday && matchday.it) {
+          return matchday.it.map((match: any) => this.transformMatch(match, spieltag));
         }
       }
     } catch (error) {
-      logger.warn({ spieltag, error }, 'Failed to fetch matches from API, generating mock data');
+      logger.error({ spieltag, error }, 'Failed to fetch matches from API - no mock data allowed');
     }
     
-    // Fallback to mock matches if API fails or no data
-    return this.generateMockMatches(spieltag);
+    // No mock data allowed - return empty array if no live data available
+    return [];
   }
 
   private transformMatch(kickbaseMatch: any, spieltag: number): Match {
     return {
-      id: kickbaseMatch.id || `match-${spieltag}-${Date.now()}`,
+      id: kickbaseMatch.mi || `match-${spieltag}-${Date.now()}`,
       spieltag,
-      heim: this.getTeamName(kickbaseMatch.homeTeamId || kickbaseMatch.heim),
-      auswaerts: this.getTeamName(kickbaseMatch.awayTeamId || kickbaseMatch.auswaerts),
-      kickoff: kickbaseMatch.kickoff || kickbaseMatch.date || new Date().toISOString()
+      heim: this.getTeamName(kickbaseMatch.t1),
+      auswaerts: this.getTeamName(kickbaseMatch.t2),
+      kickoff: kickbaseMatch.dt || new Date().toISOString(),
+      // Additional match data from API
+      homeGoals: kickbaseMatch.t1g,
+      awayGoals: kickbaseMatch.t2g,
+      matchStatus: kickbaseMatch.st,
+      matchTime: kickbaseMatch.mtd,
+      isLive: kickbaseMatch.il || false,
+      homeTeamSymbol: kickbaseMatch.t1sy,
+      awayTeamSymbol: kickbaseMatch.t2sy,
+      homeTeamImage: kickbaseMatch.t1im,
+      awayTeamImage: kickbaseMatch.t2im
     };
   }
 
@@ -1626,31 +1624,7 @@ export class KickbaseAdapter {
     return realPlayers;
   }
 
-  private generateMockMatches(spieltag: number): Match[] {
-    const teams = ['Bayern München', 'Borussia Dortmund', 'RB Leipzig', 'SC Freiburg', 'Bayer Leverkusen', 'Eintracht Frankfurt'];
-    
-    return [
-      {
-        id: `match-${spieltag}-1`,
-        spieltag,
-        heim: teams[0],
-        auswaerts: teams[1],
-        kickoff: new Date(Date.now() + 3600_000).toISOString()
-      },
-      {
-        id: `match-${spieltag}-2`,
-        spieltag,
-        heim: teams[2],
-        auswaerts: teams[3],
-        kickoff: new Date(Date.now() + 7200_000).toISOString()
-      },
-      {
-        id: `match-${spieltag}-3`,
-        spieltag,
-        heim: teams[4],
-        auswaerts: teams[5],
-        kickoff: new Date(Date.now() + 10_800_000).toISOString()
-      }
-    ];
-  }
+  // Mock data generation methods removed - only live API data allowed
+
+
 }

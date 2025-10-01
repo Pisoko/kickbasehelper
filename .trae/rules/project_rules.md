@@ -5,6 +5,19 @@ meta:
   owner: "Frontend"
   intent: "Erzwinge moderne, performante, mobile-first UI mit konsistentem Tooling."
 
+season_config:
+  current_season: "2025/2026"
+  season_start: "2025-08-01"
+  season_end: "2026-05-31"
+  total_matchdays: 34
+  matches_per_matchday: 9
+  current_matchday: 5
+  completed_matchdays: 5
+  display_rules:
+    - "MatchdayOverview zeigt immer den kommenden Spieltag (aktueller + 1)"
+    - "Alle 9 Spiele eines Spieltags müssen angezeigt werden"
+    - "API-Endpoints unterstützen vollständige Spieltag-Daten"
+
 toggles:
   allow_shadcn: false            # true = shadcn/ui erlaubt; false = nur Headless
   ui_profile: "headless"         # "headless" | "styled"
@@ -81,6 +94,23 @@ next_react_guidelines:
   - "Daten-Fetching: Cache & revalidate nutzen; Overfetching vermeiden."
   - "State so lokal wie möglich; globale Stores nur wenn nötig."
 
+data_policy:
+  no_mock_data:
+    - "STRIKT VERBOTEN: Keine Mock-Daten, Fake-Daten oder Test-Daten in der Produktion"
+    - "Alle Daten MÜSSEN von der Live Kickbase API kommen"
+    - "MockDataGenerator.ts und ähnliche Klassen sind NUR für Tests erlaubt"
+    - "API-Endpoints dürfen NIEMALS auf Mock-Daten zurückgreifen"
+    - "Fallback-Verhalten: Fehler anzeigen statt Mock-Daten verwenden"
+  live_api_only:
+    - "Ausschließlich Kickbase API als Datenquelle"
+    - "Alle Spieler-, Match- und Team-Daten von Live-API"
+    - "Cache nur für Performance, nie als Mock-Ersatz"
+    - "Bei API-Fehlern: Nutzer informieren, keine falschen Daten zeigen"
+  enforcement:
+    - "Code-Reviews müssen Mock-Daten Verwendung ablehnen"
+    - "CI/CD Pipeline soll Mock-Daten Imports in Production-Code blockieren"
+    - "Entwickler müssen Live-API Integration vor Feature-Completion sicherstellen"
+
 security:
   - "Keine Secrets im Client; nur NEXT_PUBLIC_* im Browser."
   - "Alle API-Antworten validieren (zod) bevor rendern."
@@ -130,6 +160,7 @@ pr_checklist:
   - "[ ] Tests vorhanden (RTL/Vitest, kritischer Flow in Playwright)."
   - "[ ] Web Vitals/Budgets eingehalten (CI grün)."
   - "[ ] A11y geprüft (Labels, Focus, Keyboard)."
+  - "[ ] KEINE Mock-Daten in Production-Code (nur Live Kickbase API)."
 
 snippets:
   next_config: |

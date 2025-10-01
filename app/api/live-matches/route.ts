@@ -44,74 +44,7 @@ function transformMatchData(apiMatch: any): LiveMatch {
   };
 }
 
-// Mock data for demonstration when API is not available
-function generateMockMatches(): LiveMatch[] {
-  const teams = [
-    'Bayern München', 'Borussia Dortmund', 'RB Leipzig', 'Bayer Leverkusen',
-    'Eintracht Frankfurt', 'VfL Wolfsburg', 'SC Freiburg', 'Union Berlin',
-    'Borussia Mönchengladbach', 'VfB Stuttgart', 'TSG Hoffenheim', 'FC Augsburg'
-  ];
-
-  const mockMatches: LiveMatch[] = [];
-  const now = new Date();
-
-  // Generate 3-5 mock matches
-  for (let i = 0; i < Math.floor(Math.random() * 3) + 3; i++) {
-    const homeTeam = teams[Math.floor(Math.random() * teams.length)];
-    let awayTeam = teams[Math.floor(Math.random() * teams.length)];
-    while (awayTeam === homeTeam) {
-      awayTeam = teams[Math.floor(Math.random() * teams.length)];
-    }
-
-    const statuses: Array<'live' | 'finished' | 'scheduled' | 'halftime'> = 
-      ['live', 'finished', 'scheduled', 'halftime'];
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
-    
-    const homeScore = status === 'scheduled' ? 0 : Math.floor(Math.random() * 4);
-    const awayScore = status === 'scheduled' ? 0 : Math.floor(Math.random() * 4);
-    const minute = status === 'live' ? Math.floor(Math.random() * 90) + 1 : 
-                   status === 'halftime' ? 45 : 
-                   status === 'finished' ? 90 : 0;
-
-    const events: MatchEvent[] = [];
-    if (status !== 'scheduled') {
-      // Generate some random events
-      const eventCount = Math.floor(Math.random() * 5);
-      for (let j = 0; j < eventCount; j++) {
-        const eventTypes: Array<'goal' | 'yellow_card' | 'red_card' | 'substitution'> = 
-          ['goal', 'yellow_card', 'red_card', 'substitution'];
-        const eventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
-        
-        events.push({
-          type: eventType,
-          minute: Math.floor(Math.random() * minute) + 1,
-          playerId: `player_${j}`,
-          playerName: `Spieler ${j + 1}`,
-          description: eventType === 'goal' ? 'Tor' : 
-                      eventType === 'yellow_card' ? 'Gelbe Karte' :
-                      eventType === 'red_card' ? 'Rote Karte' : 'Auswechslung'
-        });
-      }
-    }
-
-    const kickoffTime = new Date(now.getTime() + (i - 2) * 2 * 60 * 60 * 1000); // Spread matches over time
-
-    mockMatches.push({
-      id: `match_${i}`,
-      homeTeam,
-      awayTeam,
-      homeScore,
-      awayScore,
-      minute,
-      status,
-      events: events.sort((a, b) => a.minute - b.minute),
-      kickoff: kickoffTime.toISOString(),
-      competition: 'Bundesliga 2025/26'
-    });
-  }
-
-  return mockMatches;
-}
+// No mock data generation - only live API data allowed
 
 export async function GET() {
   try {
@@ -138,14 +71,20 @@ export async function GET() {
         matches = competitionMatches.slice(0, 10).map(transformMatchData);
       }
     } catch (apiError) {
-      console.warn('API error, using mock data:', apiError);
-      // Fall back to mock data
-      matches = generateMockMatches();
+      console.warn('API error:', apiError);
+      // No mock data fallback - only live API data allowed
+      matches = [];
     }
 
-    // If still no matches, use mock data
+    // No fallback to mock data - show error if no live data available
     if (matches.length === 0) {
-      matches = generateMockMatches();
+      console.log('No live matches available from API');
+      return NextResponse.json({
+        error: 'Keine Live-Spiele verfügbar',
+        message: 'Die Kickbase API liefert derzeit keine Live-Spiele. Bitte versuchen Sie es später erneut.',
+        dataSource: 'error',
+        updatedAt: new Date().toISOString()
+      }, { status: 503 });
     }
 
     return NextResponse.json({
@@ -159,16 +98,12 @@ export async function GET() {
   } catch (error) {
     console.error('Live matches API error:', error);
     
-    // Return mock data as fallback
-    const mockMatches = generateMockMatches();
-    
+    // No mock data fallback - only live API data allowed
     return NextResponse.json({
-      success: true,
-      matches: mockMatches,
-      timestamp: new Date().toISOString(),
-      totalMatches: mockMatches.length,
-      source: 'mock',
-      error: 'API unavailable, showing mock data'
-    });
+      error: 'Live-Spiele nicht verfügbar',
+      message: 'Die Kickbase API ist derzeit nicht erreichbar. Bitte versuchen Sie es später erneut.',
+      dataSource: 'error',
+      updatedAt: new Date().toISOString()
+    }, { status: 503 });
   }
 }

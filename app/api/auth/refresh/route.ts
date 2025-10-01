@@ -12,7 +12,7 @@ export async function POST() {
 
       if (isTokenValid) {
         try {
-          const tokenClaims = kickbaseAuth.getTokenClaims();
+          const tokenClaims = await kickbaseAuth.getTokenClaims();
           userInfo = {
             leagues: kickbaseAuth.getLeagueIds()
           };

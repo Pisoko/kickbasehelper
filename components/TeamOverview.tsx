@@ -14,7 +14,8 @@ const tableRowVariants = cva(
       position: {
         champions: "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800",
         europa: "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800",
-        conference: "bg-orange-50 dark:bg-orange-950/20 border-orange-200 dark:border-orange-800",
+        conference: "bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800",
+        relegation_playoff: "bg-white dark:bg-white/10 border-gray-300 dark:border-gray-600",
         relegation: "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800",
         default: ""
       }
@@ -128,11 +129,12 @@ export default function TeamOverview({ className }: TeamOverviewProps) {
   }, []);
 
   // Get position category for styling
-  const getPositionCategory = (position: number): 'champions' | 'europa' | 'conference' | 'relegation' | 'default' => {
+  const getPositionCategory = (position: number): 'champions' | 'europa' | 'conference' | 'relegation_playoff' | 'relegation' | 'default' => {
     if (position <= 4) return 'champions';
     if (position <= 6) return 'europa';
     if (position === 7) return 'conference';
-    if (position >= 16) return 'relegation';
+    if (position === 16) return 'relegation_playoff';
+    if (position >= 17) return 'relegation';
     return 'default';
   };
 
@@ -257,7 +259,8 @@ export default function TeamOverview({ className }: TeamOverviewProps) {
                     "border-b border-slate-700 hover:bg-slate-700/30 transition-colors",
                     getPositionCategory(team.position) === 'champions' && "bg-green-900/20 border-green-800",
                     getPositionCategory(team.position) === 'europa' && "bg-blue-900/20 border-blue-800",
-                    getPositionCategory(team.position) === 'conference' && "bg-orange-900/20 border-orange-800",
+                    getPositionCategory(team.position) === 'conference' && "bg-yellow-900/20 border-yellow-800",
+                    getPositionCategory(team.position) === 'relegation_playoff' && "bg-white/10 border-gray-600",
                     getPositionCategory(team.position) === 'relegation' && "bg-red-900/20 border-red-800"
                   )}
                 >
@@ -336,7 +339,7 @@ export default function TeamOverview({ className }: TeamOverviewProps) {
 
             {/* Legend */}
             <div className="bg-slate-700/30 p-3 border-t border-slate-600">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-green-900/40 border border-green-700 rounded"></div>
                   <span className="text-slate-300">Champions League</span>
@@ -346,8 +349,12 @@ export default function TeamOverview({ className }: TeamOverviewProps) {
                   <span className="text-slate-300">Europa League</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-orange-900/40 border border-orange-700 rounded"></div>
+                  <div className="w-3 h-3 bg-yellow-900/40 border border-yellow-700 rounded"></div>
                   <span className="text-slate-300">Conference League</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-white/20 border border-gray-600 rounded"></div>
+                  <span className="text-slate-300">Relegation</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-red-900/40 border border-red-700 rounded"></div>

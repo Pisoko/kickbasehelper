@@ -154,39 +154,79 @@ export class MatchdayService {
   }
 
   /**
-   * Detect current matchday based on API data
+   * Detect current matchday based on completed matches
+   * Current matchday = highest matchday where ALL matches are finished
    */
   private async detectCurrentMatchday(): Promise<number> {
     try {
-      // Get live matches to determine current matchday
-      const liveMatches = await enhancedKickbaseClient.getLiveMatches('1');
-      
-      // Try to get matchday from competition matches
+      // Get competition matches to analyze matchday completion status
       const competitionMatches = await enhancedKickbaseClient.getCompetitionMatches('1');
       
-      let currentMatchday = 1;
+      let currentMatchday = 0; // Start with 0, will be incremented for each completed matchday
       
       if (competitionMatches && competitionMatches.ms) {
-        // Find the highest matchday that has started or completed matches
+        // Group matches by matchday
+        const matchdayGroups: { [key: number]: any[] } = {};
+        
         for (const match of competitionMatches.ms) {
-          if (match.md && match.st > 0) { // md = matchday, st = status (>0 means started/finished)
-            currentMatchday = Math.max(currentMatchday, match.md);
+          if (match.md) {
+            if (!matchdayGroups[match.md]) {
+              matchdayGroups[match.md] = [];
+            }
+            matchdayGroups[match.md].push(match);
+          }
+        }
+        
+        // Check each matchday in order to find the highest completed one
+        const sortedMatchdays = Object.keys(matchdayGroups).map(Number).sort((a, b) => a - b);
+        
+        for (const matchday of sortedMatchdays) {
+          const matches = matchdayGroups[matchday];
+          
+          // Check if ALL matches in this matchday are finished (st = 2 means finished)
+          const allMatchesFinished = matches.every(match => match.st === 2);
+          
+          if (allMatchesFinished) {
+            currentMatchday = matchday;
+            logger.info({ matchday, totalMatches: matches.length }, 'Matchday completed');
+          } else {
+            // If this matchday is not completed, stop checking higher matchdays
+            const finishedMatches = matches.filter(match => match.st === 2).length;
+            const liveMatches = matches.filter(match => match.st === 1).length;
+            const upcomingMatches = matches.filter(match => match.st === 0).length;
+            
+            logger.info({ 
+              matchday, 
+              finishedMatches, 
+              liveMatches, 
+              upcomingMatches, 
+              totalMatches: matches.length 
+            }, 'Matchday in progress or upcoming');
+            break;
           }
         }
       }
       
-      // Fallback: estimate based on current date and season start
-      if (currentMatchday === 1) {
+      // If no completed matchdays found, use fallback logic
+      if (currentMatchday === 0) {
         const now = new Date();
         const seasonStart = new Date('2025-08-22'); // Bundesliga 2025/26 season start
         const weeksSinceStart = Math.floor((now.getTime() - seasonStart.getTime()) / (7 * 24 * 60 * 60 * 1000));
-        currentMatchday = Math.min(Math.max(1, weeksSinceStart + 1), 34);
+        currentMatchday = Math.min(Math.max(0, weeksSinceStart), 34);
+        
+        logger.info({ 
+          weeksSinceStart, 
+          estimatedMatchday: currentMatchday 
+        }, 'Using date-based fallback for current matchday');
       }
       
+      logger.info({ detectedCurrentMatchday: currentMatchday }, 'Current matchday detection completed');
       return currentMatchday;
+      
     } catch (error) {
       logger.error({ error }, 'Failed to detect current matchday');
       // Fallback to matchday 5 as mentioned by user
+      logger.info('Using fallback: currentMatchday = 5');
       return 5;
     }
   }

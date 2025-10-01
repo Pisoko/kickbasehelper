@@ -1,45 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getTeamByKickbaseId } from '../../../../lib/teamMapping';
-import { readCache } from '../../../../lib/data';
+import { enhancedKickbaseClient } from '../../../../lib/adapters/EnhancedKickbaseClient';
 import { createOddsProvider } from '../../../../lib/adapters/OddsProvider';
-import type { Match as OddsMatch } from '../../../../lib/types';
+import { getTeamByKickbaseId } from '../../../../lib/teamMapping';
 import pino from 'pino';
 
 const logger = pino({ name: 'MatchdayAPI' });
 
 interface Match {
   id: string;
-  homeTeam: {
-    id: string;
-    name: string;
-    shortName: string;
-    logo?: string;
-  };
-  awayTeam: {
-    id: string;
-    name: string;
-    shortName: string;
-    logo?: string;
-  };
+  spieltag: number;
+  heim: string;
+  auswaerts: string;
   kickoff: string;
-  status: 'upcoming' | 'live' | 'finished';
-  result?: {
-    homeGoals: number;
-    awayGoals: number;
-  };
+  homeGoals?: number;
+  awayGoals?: number;
+  matchStatus?: number;
+  matchTime?: string;
+  isLive?: boolean;
+  homeTeamSymbol?: string;
+  awayTeamSymbol?: string;
+  homeTeamImage?: string;
+  awayTeamImage?: string;
   odds?: {
     heim: number;
     unentschieden: number;
     auswaerts: number;
     format: 'decimal' | 'fractional' | 'american';
   };
-}
-
-interface MatchdayData {
-  matchday: number;
-  matches: Match[];
-  startDate: string;
-  endDate: string;
 }
 
 /**
@@ -63,192 +50,199 @@ export async function GET(
 
     logger.info({ matchday }, 'Fetching matchday data');
 
-    const apiKey = process.env.KICKBASE_KEY;
+    let apiError = null;
     
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: 'Kickbase API Key nicht konfiguriert' },
-        { status: 500 }
-      );
-    }
-
-    // Get matchday data from Kickbase API
-    const response = await fetch(
-      `https://api.kickbase.com/v4/competitions/1/matchdays`,
-      {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Kickbase API Error: ${response.status}`);
-    }
-
-    const matchdaysData = await response.json();
-    
-    if (!matchdaysData.it || !Array.isArray(matchdaysData.it)) {
-      return NextResponse.json(
-        { error: 'No match data available' },
-        { status: 404 }
-      );
-    }
-
-    // Find the specific matchday
-    const specificMatchday = matchdaysData.it.find((md: any) => md.day === matchday);
-    
-    if (!specificMatchday || !specificMatchday.it || specificMatchday.it.length === 0) {
-      return NextResponse.json(
-        { error: `No matches found for matchday ${matchday}` },
-        { status: 404 }
-      );
-    }
-
-    const matchdayMatches = specificMatchday.it;
-
-    // Try to load odds data from cache
-    let oddsData: any[] = [];
+    // Try to fetch live data from Kickbase API
     try {
-      const cachedData = readCache(matchday);
-      if (cachedData && cachedData.odds) {
-        oddsData = cachedData.odds;
-        logger.info({ matchday, oddsCount: oddsData.length }, 'Loaded odds data from cache');
-      }
-  
-    } catch (error) {
-      logger.warn({ matchday, error }, 'Failed to load odds data from cache');
-    }
-
-    // Transform matches to our format
-    const matches: Match[] = matchdayMatches.map((match: any) => {
-      const homeTeam = getTeamByKickbaseId(match.t1);
-      const awayTeam = getTeamByKickbaseId(match.t2);
+      logger.info('Attempting to fetch live data from Kickbase API using EnhancedKickbaseClient');
       
-      // Determine match status
-      let status: 'upcoming' | 'live' | 'finished' = 'upcoming';
-      if (match.st === 2) {
-        status = 'finished';
-      } else if (match.st === 1) {
-        status = 'live';
-      }
-
-      const matchId = match.mi || `match_${match.t1}_${match.t2}`;
+      const matchdaysData = await enhancedKickbaseClient.getCompetitionMatchdays('1');
       
-      // Find odds for this match
-      let matchOdds = oddsData.find((odds: any) => 
-        odds.matchId === matchId || 
-        odds.matchId === `match-${matchday}-${matchdayMatches.indexOf(match) + 1}`
-      );
-      
-      // Generate mock odds if no real odds are available OR if all odds are 0
-      const hasValidOdds = matchOdds && (matchOdds.heim > 0 || matchOdds.unentschieden > 0 || matchOdds.auswaerts > 0);
-      
-      if (!hasValidOdds && status === 'upcoming') {
-        // Use placeholder odds - will be replaced by OddsProvider below
-        matchOdds = {
-          heim: 0,
-          unentschieden: 0,
-          auswaerts: 0,
-          format: 'decimal'
-        };
-      }
-
-      return {
-        id: matchId,
-        homeTeam: {
-          id: match.t1,
-          name: homeTeam?.fullName || `Team ${match.t1}`,
-          shortName: homeTeam?.shortName || match.t1sy || `T${match.t1}`,
-          logo: match.t1im || undefined
-        },
-        awayTeam: {
-          id: match.t2,
-          name: awayTeam?.fullName || `Team ${match.t2}`,
-          shortName: awayTeam?.shortName || match.t2sy || `T${match.t2}`,
-          logo: match.t2im || undefined
-        },
-        kickoff: match.dt || new Date().toISOString(),
-        status,
-        result: status === 'finished' || status === 'live' ? {
-          homeGoals: match.t1g || 0,
-          awayGoals: match.t2g || 0
-        } : undefined,
-        odds: matchOdds ? {
-          heim: matchOdds.heim,
-          unentschieden: matchOdds.unentschieden,
-          auswaerts: matchOdds.auswaerts,
-          format: matchOdds.format || 'decimal'
-        } : undefined
-      };
-    });
-
-    // Sort matches by kickoff time
-    matches.sort((a, b) => new Date(a.kickoff).getTime() - new Date(b.kickoff).getTime());
-
-    // Fetch odds for upcoming matches using OddsProvider
-    const upcomingMatches = matches.filter(match => match.status === 'upcoming');
-    if (upcomingMatches.length > 0) {
-      try {
-        const oddsProvider = await createOddsProvider();
+      if (matchdaysData && matchdaysData.it) {
+        // Find the specific matchday in the response
+        const targetMatchday = matchdaysData.it.find((md: any) => md.day === matchday);
         
-        // Convert to OddsMatch format
-        const oddsMatches: OddsMatch[] = upcomingMatches.map(match => ({
-          id: match.id,
-          spieltag: matchday,
-          heim: match.homeTeam.name,
-          auswaerts: match.awayTeam.name,
-          kickoff: match.kickoff
-        }));
-
-        const fetchedOdds = await oddsProvider.fetchOdds(oddsMatches);
-        
-        // Update matches with fetched odds
-        fetchedOdds.forEach(odds => {
-          const matchIndex = matches.findIndex(m => m.id === odds.matchId);
-          if (matchIndex !== -1 && matches[matchIndex].status === 'upcoming') {
-            matches[matchIndex].odds = {
-              heim: odds.heim,
-              unentschieden: odds.unentschieden,
-              auswaerts: odds.auswaerts,
-              format: odds.format
+        if (targetMatchday && targetMatchday.it) {
+          // Transform matches for this matchday
+          const matches = targetMatchday.it.map((match: any) => {
+            const homeTeamName = getTeamName(match.t1);
+            const awayTeamName = getTeamName(match.t2);
+            const homeTeamData = getTeamByKickbaseId(match.t1.toString());
+            const awayTeamData = getTeamByKickbaseId(match.t2.toString());
+            
+            // Determine match status
+            let status: 'upcoming' | 'live' | 'finished' = 'upcoming';
+            if (match.st === 2) {
+              status = 'finished';
+            } else if (match.il || match.st === 1) {
+              status = 'live';
+            }
+            
+            return {
+              id: match.mi || `match-${matchday}-${Date.now()}`,
+              spieltag: matchday,
+              heim: homeTeamName,
+              auswaerts: awayTeamName,
+              homeTeam: {
+                id: match.t1.toString(),
+                name: homeTeamName,
+                shortName: homeTeamData?.shortName || homeTeamName,
+                logo: homeTeamData?.logo
+              },
+              awayTeam: {
+                id: match.t2.toString(),
+                name: awayTeamName,
+                shortName: awayTeamData?.shortName || awayTeamName,
+                logo: awayTeamData?.logo
+              },
+              kickoff: match.dt || new Date().toISOString(),
+              status,
+              result: (match.t1g !== undefined && match.t2g !== undefined) ? {
+                homeGoals: match.t1g,
+                awayGoals: match.t2g
+              } : undefined,
+              homeGoals: match.t1g,
+              awayGoals: match.t2g,
+              matchStatus: match.st,
+              matchTime: match.mtd,
+              isLive: match.il || false,
+              homeTeamSymbol: match.t1sy,
+              awayTeamSymbol: match.t2sy,
+              homeTeamImage: match.t1im,
+              awayTeamImage: match.t2im
             };
-          }
-        });
+          });
 
-        logger.info({ matchday, oddsCount: fetchedOdds.length }, 'Successfully fetched odds from provider');
-      } catch (error) {
-        logger.warn({ matchday, error }, 'Failed to fetch odds from provider, using cached/mock odds');
+          // Fetch odds for upcoming matches
+          let matchesWithOdds = matches;
+          try {
+            const upcomingMatches = matches.filter(match => !match.isLive && !match.homeGoals && !match.awayGoals);
+            if (upcomingMatches.length > 0) {
+              logger.info({ upcomingMatchesCount: upcomingMatches.length }, 'Fetching odds for upcoming matches');
+              
+              const oddsProvider = await createOddsProvider();
+              const oddsData = await oddsProvider.fetchOdds(upcomingMatches);
+              
+              // Merge odds data with matches
+              matchesWithOdds = matches.map(match => {
+                const matchOdds = oddsData.find(odds => odds.matchId === match.id);
+                if (matchOdds) {
+                  return {
+                    ...match,
+                    odds: {
+                      heim: matchOdds.heim,
+                      unentschieden: matchOdds.unentschieden,
+                      auswaerts: matchOdds.auswaerts,
+                      format: matchOdds.format
+                    }
+                  };
+                }
+                return match;
+              });
+              
+              logger.info({ oddsCount: oddsData.length }, 'Successfully fetched odds data');
+            }
+          } catch (oddsError) {
+            logger.warn({ error: oddsError }, 'Failed to fetch odds, continuing without odds data');
+          }
+
+          logger.info({ matchday, matchesCount: matchesWithOdds.length }, 'Successfully fetched live matchday data');
+          
+          return NextResponse.json({
+            success: true,
+            data: {
+              matchday,
+              matches: matchesWithOdds,
+              startDate: getMatchdayStartDate(matchday),
+              endDate: getMatchdayEndDate(matchday),
+              dataSource: 'live'
+            }
+          });
+        } else {
+          logger.warn({ matchday }, 'Matchday not found in API response');
+        }
+      } else {
+        logger.warn('Invalid matchdays data structure from API');
       }
+    } catch (error) {
+      logger.error({ error, matchday }, 'Failed to fetch live matchday data');
+      apiError = `Kickbase API request failed: ${error instanceof Error ? error.message : 'Unknown error'}`;
     }
 
-    // Calculate start and end dates for the matchday
-    const kickoffTimes = matches.map(m => new Date(m.kickoff));
-    const startDate = new Date(Math.min(...kickoffTimes.map(d => d.getTime()))).toISOString();
-    const endDate = new Date(Math.max(...kickoffTimes.map(d => d.getTime()))).toISOString();
-
-    const matchdayData: MatchdayData = {
-      matchday,
-      matches,
-      startDate,
-      endDate
-    };
-
-    logger.info({ matchday, matchCount: matches.length }, 'Successfully fetched matchday data');
-
-    return NextResponse.json(matchdayData);
-
+    // No fallback to mock data - show error if no live data available
+    logger.info({ matchday }, 'No live data available, returning error response');
+    
+    return NextResponse.json({
+      error: `Keine Spiele für Spieltag ${matchday} verfügbar`,
+      message: 'Die Kickbase API liefert derzeit keine Spiele für diesen Spieltag. Bitte versuchen Sie es später erneut.',
+      spieltag: matchday,
+      dataSource: 'error',
+      updatedAt: new Date().toISOString(),
+      apiError
+    }, { status: 503 });
   } catch (error) {
-    const resolvedParams = await params;
-    logger.error({ error, matchday: resolvedParams.matchday }, 'Failed to fetch matchday data');
+    logger.error({ error }, 'Unexpected error in matchday API');
     
     return NextResponse.json(
       { 
         error: 'Internal server error',
-        message: 'Failed to fetch matchday data'
+        message: 'An unexpected error occurred while fetching matchday data'
       },
       { status: 500 }
     );
   }
 }
+
+// Helper function to get team name from team ID - Using consistent mapping from teamMapping.ts
+function getTeamName(teamId: string): string {
+  // Korrekte Team-Zuordnung basierend auf echten Kickbase API Daten für Saison 2025/26
+  const teamMapping: { [key: string]: string } = {
+    '2': 'Bayern München',        // FCB
+    '3': 'Borussia Dortmund',     // BVB
+    '4': 'Eintracht Frankfurt',   // SGE
+    '5': 'SC Freiburg',           // SCF
+    '6': 'Hamburger SV',          // HSV
+    '7': 'Bayer 04 Leverkusen',   // B04
+    '9': 'VfB Stuttgart',         // VFB
+    '10': 'Werder Bremen',        // SVW
+    '11': 'VfL Wolfsburg',        // WOB
+    '13': 'FC Augsburg',          // FCA
+    '14': 'TSG Hoffenheim',       // TSG - KORRIGIERT!
+    '15': 'Borussia Mönchengladbach', // BMG
+    '18': 'FSV Mainz 05',         // M05
+    '28': '1. FC Köln',           // KOE
+    '39': 'FC St. Pauli',         // STP
+    '40': '1. FC Union Berlin',   // FCU
+    '43': 'RB Leipzig',           // RBL
+    '50': '1. FC Heidenheim'      // FCH
+  };
+  
+  return teamMapping[teamId] || `Team ${teamId}`;
+}
+
+// Helper function to get matchday start date
+function getMatchdayStartDate(matchday: number): string {
+  const seasonStart = new Date('2025-08-16');
+  const matchdayDate = new Date(seasonStart);
+  matchdayDate.setDate(seasonStart.getDate() + (matchday - 1) * 7);
+  
+  // Adjust to Friday of that week (matches typically start Friday)
+  const dayOfWeek = matchdayDate.getDay();
+  const daysToFriday = (5 - dayOfWeek + 7) % 7;
+  matchdayDate.setDate(matchdayDate.getDate() + daysToFriday);
+  matchdayDate.setHours(20, 30, 0, 0); // 20:30 typical kickoff
+  
+  return matchdayDate.toISOString();
+}
+
+// Helper function to get matchday end date
+function getMatchdayEndDate(matchday: number): string {
+  const startDate = new Date(getMatchdayStartDate(matchday));
+  const endDate = new Date(startDate);
+  endDate.setDate(startDate.getDate() + 2); // Sunday
+  endDate.setHours(17, 30, 0, 0); // 17:30 typical Sunday kickoff
+  
+  return endDate.toISOString();
+}
+
+// No mock data generation - only live API data allowed

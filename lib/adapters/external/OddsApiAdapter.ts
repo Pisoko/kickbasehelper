@@ -78,9 +78,9 @@ export class OddsApiAdapter implements OddsAdapter {
     for (const match of matches) {
       // Finde entsprechendes Spiel in der API-Antwort
       const apiMatch = apiData.find(apiGame => 
-        this.teamNamesMatch(match.homeTeam.name, apiGame.home_team) &&
-        this.teamNamesMatch(match.awayTeam.name, apiGame.away_team)
-      );
+          this.teamNamesMatch(match.heim, apiGame.home_team) &&
+          this.teamNamesMatch(match.auswaerts, apiGame.away_team)
+        );
 
       if (apiMatch && apiMatch.bookmakers.length > 0) {
         // Verwende den ersten verfügbaren Buchmacher mit h2h-Markt
@@ -94,10 +94,10 @@ export class OddsApiAdapter implements OddsAdapter {
           if (h2hMarket && h2hMarket.outcomes.length >= 3) {
             // Finde die Quoten für Heim, Unentschieden, Auswärts
             const homeOdds = h2hMarket.outcomes.find(outcome => 
-              this.teamNamesMatch(match.homeTeam.name, outcome.name)
+              this.teamNamesMatch(match.heim, outcome.name)
             );
             const awayOdds = h2hMarket.outcomes.find(outcome => 
-              this.teamNamesMatch(match.awayTeam.name, outcome.name)
+                this.teamNamesMatch(match.auswaerts, outcome.name)
             );
             const drawOdds = h2hMarket.outcomes.find(outcome => 
               outcome.name.toLowerCase() === 'draw'
@@ -112,10 +112,10 @@ export class OddsApiAdapter implements OddsAdapter {
                 format: 'decimal'
               });
 
-              logger.debug({ 
-                matchId: match.id, 
-                homeTeam: match.homeTeam.name,
-                awayTeam: match.awayTeam.name,
+              logger.debug({
+                matchId: match.id,
+                homeTeam: match.heim,
+                awayTeam: match.auswaerts,
                 bookmaker: bookmaker.title,
                 odds: { home: homeOdds.price, draw: drawOdds.price, away: awayOdds.price }
               }, 'Mapped odds for match');
@@ -192,7 +192,7 @@ export class OddsApiAdapter implements OddsAdapter {
 
   private generateMockOddsForMatch(match: Match): Odds {
     // Einfache Mock-Odds basierend auf Teamstärke
-    const { home, draw, away } = this.getTeamStrength(match.homeTeam.name, match.awayTeam.name);
+    const { home, draw, away } = this.getTeamStrength(match.heim, match.auswaerts);
     
     return {
       matchId: match.id,
