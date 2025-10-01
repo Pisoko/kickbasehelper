@@ -31,7 +31,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de">
+    <html lang="de" className="dark">
       <body className={`${inter.className} min-h-screen bg-slate-950 text-slate-100`}>
         <ServiceWorkerProvider>
           <div className="mx-auto flex min-h-screen w-full max-w-screen-2xl flex-col px-4 py-6 sm:px-6 lg:px-8">
