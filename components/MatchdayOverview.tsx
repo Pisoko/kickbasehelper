@@ -157,58 +157,91 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
       }
       
       const responseData = await response.json();
+      console.log('Raw API Response:', responseData);
       
       // Handle API response structure: { success: true, data: {...} }
       const data = responseData.success ? responseData.data : responseData;
+      console.log('Extracted data:', data);
       
-      // Enhanced validation with better error messages
+      // Enhanced validation with better error messages and environment-specific handling
       if (!data) {
         console.error('No data received from API:', responseData);
         throw new Error('Keine Daten vom Server erhalten. Bitte versuchen Sie es erneut.');
       }
       
-      if (typeof data.matchday !== 'number') {
-        console.error('Invalid matchday type:', typeof data.matchday, data.matchday);
+      // More robust type checking for different environments
+      const matchdayValue = data.matchday;
+      if (matchdayValue === null || matchdayValue === undefined || (typeof matchdayValue !== 'number' && !Number.isInteger(Number(matchdayValue)))) {
+        console.error('Invalid matchday value:', {
+          value: matchdayValue,
+          type: typeof matchdayValue,
+          isNumber: typeof matchdayValue === 'number',
+          canConvert: Number.isInteger(Number(matchdayValue)),
+          environment: process.env.NODE_ENV
+        });
         throw new Error('Ungültige Spieltag-Nummer erhalten. Bitte versuchen Sie es erneut.');
       }
       
-      if (!Array.isArray(data.matches)) {
-        console.error('Invalid matches type:', typeof data.matches, data.matches);
+      const matchesValue = data.matches;
+      if (!Array.isArray(matchesValue)) {
+        console.error('Invalid matches value:', {
+          value: matchesValue,
+          type: typeof matchesValue,
+          isArray: Array.isArray(matchesValue),
+          keys: matchesValue ? Object.keys(matchesValue) : 'null/undefined',
+          environment: process.env.NODE_ENV
+        });
         throw new Error('Ungültige Spiele-Daten erhalten. Bitte versuchen Sie es erneut.');
       }
       
-      // Transform API data to component format
+      // Safe data transformation with fallbacks for missing properties
       const transformedData: MatchdayData = {
-        matchday: data.matchday,
-        matches: data.matches.map((match: any) => ({
-          id: match.id,
-          homeTeam: {
-            id: match.homeTeamSymbol || 'unknown',
-            name: match.heim,
-            shortName: match.homeTeamSymbol || match.heim.substring(0, 3).toUpperCase(),
-            logo: match.homeTeamImage
-          },
-          awayTeam: {
-            id: match.awayTeamSymbol || 'unknown',
-            name: match.auswaerts,
-            shortName: match.awayTeamSymbol || match.auswaerts.substring(0, 3).toUpperCase(),
-            logo: match.awayTeamImage
-          },
-          kickoff: match.kickoff,
-          status: match.isLive ? 'live' : (match.matchStatus === 2 ? 'finished' : 'upcoming'),
-          result: (match.homeGoals !== undefined && match.awayGoals !== undefined) ? {
-            homeGoals: match.homeGoals,
-            awayGoals: match.awayGoals
-          } : undefined,
-          odds: match.odds ? {
-            heim: match.odds.heim,
-            unentschieden: match.odds.unentschieden,
-            auswaerts: match.odds.auswaerts,
-            format: match.odds.format || 'decimal'
-          } : undefined
-        })),
-        startDate: data.startDate,
-        endDate: data.endDate,
+        matchday: typeof matchdayValue === 'number' ? matchdayValue : Number(matchdayValue),
+        matches: matchesValue.map((match: any, index: number) => {
+          try {
+            // Validate essential match properties
+            if (!match) {
+              console.warn(`Match at index ${index} is null/undefined`);
+              return null;
+            }
+            
+            const homeTeamName = match.heim || match.homeTeam?.name || `Team ${index + 1}A`;
+            const awayTeamName = match.auswaerts || match.awayTeam?.name || `Team ${index + 1}B`;
+            
+            return {
+              id: match.id || `match-${index}`,
+              homeTeam: {
+                id: match.homeTeamSymbol || match.homeTeam?.id || 'unknown',
+                name: homeTeamName,
+                shortName: match.homeTeamSymbol || homeTeamName.substring(0, 3).toUpperCase(),
+                logo: match.homeTeamImage || match.homeTeam?.logo
+              },
+              awayTeam: {
+                id: match.awayTeamSymbol || match.awayTeam?.id || 'unknown',
+                name: awayTeamName,
+                shortName: match.awayTeamSymbol || awayTeamName.substring(0, 3).toUpperCase(),
+                logo: match.awayTeamImage || match.awayTeam?.logo
+              },
+              kickoff: match.kickoff || match.startTime || new Date().toISOString(),
+              status: match.isLive ? 'live' : (match.matchStatus === 2 ? 'finished' : 'upcoming'),
+              result: (match.homeGoals !== undefined && match.awayGoals !== undefined) ? {
+                homeGoals: Number(match.homeGoals) || 0,
+                awayGoals: Number(match.awayGoals) || 0
+              } : undefined,
+              odds: match.odds ? {
+                heim: Number(match.odds.heim) || 1.0,
+                unentschieden: Number(match.odds.unentschieden) || 1.0,
+                auswaerts: Number(match.odds.auswaerts) || 1.0,
+                format: match.odds.format || 'decimal'
+              } : undefined
+            };
+          } catch (matchError) {
+            console.error(`Error processing match at index ${index}:`, matchError, match);
+            return null;
+          }
+        }).filter(Boolean), // Remove null entries
+        startDate: data.startDate || new Date().toISOString(),
+        endDate: data.endDate || new Date().toISOString(),
         meta: {
           dataSource: data.dataSource || 'unknown',
           apiError: data.apiError || null,
@@ -217,15 +250,25 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
         }
       };
       
+      console.log('Transformed data:', transformedData);
       setMatchdayData(transformedData);
     } catch (err) {
-      console.error('Error fetching matchday data:', err);
+      console.error('Error fetching matchday data:', {
+        error: err,
+        message: err instanceof Error ? err.message : 'Unknown error',
+        stack: err instanceof Error ? err.stack : undefined,
+        environment: process.env.NODE_ENV,
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Server'
+      });
       
-      // Provide user-friendly error messages
+      // Provide user-friendly error messages with environment context
       if (err instanceof TypeError && err.message.includes('fetch')) {
         setError('Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.');
+      } else if (err instanceof Error && err.message.includes('Ungültige')) {
+        // This is our custom validation error
+        setError(`${err.message} (Umgebung: ${process.env.NODE_ENV || 'unknown'})`);
       } else {
-        setError(err instanceof Error ? err.message : 'Ein unbekannter Fehler ist aufgetreten');
+        setError(err instanceof Error ? err.message : 'Ungültige Datenstruktur erhalten. Bitte versuchen Sie es erneut.');
       }
     } finally {
       setLoading(false);
