@@ -271,9 +271,14 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
         <Dialog.Content 
           className={cn(dialogVariants({ size: "xl" }))}
-          aria-labelledby="player-detail-title"
-          aria-describedby="player-detail-description"
         >
+          <Dialog.Title id="player-detail-title" className="sr-only">
+            Spielerdetails für {player.name}
+          </Dialog.Title>
+          <Dialog.Description id="player-detail-description" className="sr-only">
+            Detaillierte Statistiken und Informationen für {player.name}
+          </Dialog.Description>
+          
           {/* Header - Mobile optimized - Reduced horizontal spacing */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-2 sm:gap-3">
@@ -304,9 +309,9 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
                   </p>
                 )}
                 {/* Nachname - größer und fett */}
-                <Dialog.Title id="player-detail-title" className="text-xl sm:text-2xl font-bold text-slate-100 mb-2">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-100 mb-2">
                   {player.name}
-                </Dialog.Title>
+                </h2>
                 {/* Vereinsinformationen */}
                 <div className="flex items-center gap-1 mb-2">
                   {player.verein && <BundesligaLogo teamName={player.verein} size="sm" />}
