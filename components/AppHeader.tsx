@@ -4,7 +4,8 @@ import React from 'react';
 import ClearCache from './ClearCache';
 import BuildInfo from './BuildInfo';
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
-import { Users, Calendar, Trophy, Zap } from 'lucide-react';
+import { Button } from './ui/button';
+import { Users, Calendar, Trophy, Zap, RefreshCw } from 'lucide-react';
 
 type TabType = 'players' | 'matchday' | 'teams' | 'arena';
 
@@ -19,6 +20,7 @@ interface AppHeaderProps {
   showBuildInfo?: boolean;
   activeTab?: TabType;
   onTabChange?: (tab: TabType) => void;
+  onRefresh?: () => void;
 }
 
 const tabs: TabConfig[] = [
@@ -32,7 +34,8 @@ export default function AppHeader({
   showClearCache = true,
   showBuildInfo = true,
   activeTab = 'players',
-  onTabChange
+  onTabChange,
+  onRefresh
 }: AppHeaderProps) {
   return (
     <header className="mb-6 pb-4">
@@ -44,6 +47,17 @@ export default function AppHeader({
             {showBuildInfo && <BuildInfo variant="ghost" size="sm" />}
           </div>
           <div className="flex items-center gap-2">
+            {onRefresh && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={onRefresh}
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Aktualisieren
+              </Button>
+            )}
             {showClearCache && <ClearCache />}
           </div>
         </div>

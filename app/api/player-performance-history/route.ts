@@ -4,6 +4,7 @@ import { enhancedKickbaseClient } from '../../../lib/adapters/EnhancedKickbaseCl
 import { kickbaseAuth } from '../../../lib/adapters/KickbaseAuthService';
 import { getTeamByKickbaseId } from '../../../lib/teamMapping';
 import { readCache, validatePlayerDataWithTeamCheck } from '../../../lib/data';
+import { kickbaseDataCacheService } from '../../../lib/services/KickbaseDataCacheService';
 import type { Player } from '../../../lib/types';
 import pino from 'pino';
 
@@ -99,6 +100,32 @@ export async function GET(request: NextRequest) {
         }
       }
     }
+
+    // If still not found, try the current players API data (for newer players)
+    if (!player) {
+      logger.info({ playerId }, 'Player not found in cached data, checking current players API');
+      
+      try {
+        // Make internal API call to get current players data
+        const playersResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/players`);
+        if (playersResponse.ok) {
+          const playersData = await playersResponse.json();
+          const currentPlayer = playersData.players?.find((p: any) => p.id === playerId);
+          
+          if (currentPlayer) {
+            player = {
+              id: currentPlayer.id,
+              name: currentPlayer.name,
+              verein: currentPlayer.verein,
+              marketValue: currentPlayer.marketValue || currentPlayer.kosten || 0
+            };
+            logger.info({ playerId, playerName: player.name }, 'Found player in current players API data');
+          }
+        }
+      } catch (apiError) {
+        logger.warn({ apiError, playerId }, 'Failed to fetch from current players API');
+      }
+    }
     
     if (!player) {
       logger.warn({ playerId }, 'Player not found in live or cached data');
@@ -109,6 +136,25 @@ export async function GET(request: NextRequest) {
         },
         { status: 404 }
       );
+    }
+
+    // First check if we have cached performance history data
+    let cachedPerformanceHistory;
+    try {
+      cachedPerformanceHistory = await kickbaseDataCacheService.getCachedPlayerPerformanceHistory(playerId);
+      if (cachedPerformanceHistory) {
+        logger.info({ playerId }, 'Found cached performance history data');
+        return NextResponse.json({
+          playerId,
+          playerName: player.name,
+          playerTeam: player.verein,
+          matchHistory: cachedPerformanceHistory,
+          fromCache: true,
+          source: 'comprehensive_cache'
+        });
+      }
+    } catch (cacheError) {
+      logger.warn({ cacheError, playerId }, 'Failed to retrieve cached performance history');
     }
 
     // Get real performance data from Kickbase API

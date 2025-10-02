@@ -10,6 +10,7 @@ import { BudgetTracker } from './BudgetTracker';
 import { ArenaHeader } from './ArenaHeader';
 import { TeamStatsCard } from './TeamStatsCard';
 import { FormationChangeConfirmDialog } from './FormationChangeConfirmDialog';
+import { Start11GeneratorButton } from './Start11GeneratorButton';
 
 interface ArenaProps {
   initialPlayers?: Player[];
@@ -67,6 +68,12 @@ export function Arena({ initialPlayers = [] }: ArenaProps) {
   const handleFormationCancel = () => {
     setShowFormationConfirm(false);
     setPendingFormation(null);
+  };
+
+  // Handle team update from Start11 generator
+  const handleTeamUpdate = (newTeam: ArenaTeam) => {
+    setArenaTeam(newTeam);
+    setError(null);
   };
 
   // Handle player selection
@@ -162,6 +169,13 @@ export function Arena({ initialPlayers = [] }: ArenaProps) {
             currentFormation={arenaTeam.formation}
             onFormationChange={handleFormationChange}
           />
+          
+          <div className="bg-card rounded-lg border p-4">
+              <Start11GeneratorButton
+                currentTeam={arenaTeam}
+                onTeamUpdate={handleTeamUpdate}
+              />
+            </div>
         </div>
       </div>
 

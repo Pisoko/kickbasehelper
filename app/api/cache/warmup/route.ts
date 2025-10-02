@@ -34,18 +34,25 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json().catch(() => ({}));
-    
-    const config = {
-      includeAllPlayers: body.includeAllPlayers ?? true,
-      includePlayerDetails: body.includePlayerDetails ?? true,
-      includeTeamLogos: body.includeTeamLogos ?? true,
-      currentSpieltag: body.currentSpieltag
-    };
+    const body = await request.json();
+    const { 
+      includeAllPlayers = false, 
+      includePlayerDetails = false, 
+      includeTeamLogos = false,
+      includeComprehensivePlayerData = false,
+      currentSpieltag
+    } = body;
 
-    logger.warn('Starting cache warmup with config:', config);
-    
-    const result = await startupCacheService.startWarmup(config);
+    // Use currentSpieltag from request or default to current matchday from workspace rules
+    const spieltag = currentSpieltag || 5; // Current matchday from workspace rules
+
+    const result = await startupCacheService.startWarmup({
+      includeAllPlayers,
+      includePlayerDetails,
+      includeTeamLogos,
+      includeComprehensivePlayerData,
+      currentSpieltag: spieltag
+    });
     
     logger.warn('Cache warmup completed:', {
       success: result.success,

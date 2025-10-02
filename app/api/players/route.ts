@@ -1,24 +1,87 @@
 import { NextResponse } from 'next/server';
 import { readCache, cacheAgeDays, validatePlayerDataWithTeamCheck } from '../../../lib/data';
 import { kickbaseDataCache } from '../../../lib/services/KickbaseDataCacheService';
+import { correctPlayersPositions } from '../../../lib/positionCorrections';
 import type { Player } from '../../../lib/types';
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const spieltag = Number(searchParams.get('spieltag') ?? '1');
-  
   try {
-    // Versuche zuerst Cache zu nutzen
-    let cachedPlayers = await kickbaseDataCache.getCachedPlayers(spieltag);
+    const { searchParams } = new URL(request.url);
+    const spieltag = parseInt(searchParams.get('spieltag') || '0');
+    const refresh = searchParams.get('refresh') === 'true';
     
-    if (cachedPlayers) {
-      const age = cacheAgeDays(spieltag);
-      return NextResponse.json({
-        players: cachedPlayers,
-        updatedAt: new Date().toISOString(),
-        cacheAgeDays: age,
-        source: 'cache'
-      });
+    console.log(`[Players API] Fetching players for Spieltag ${spieltag}, refresh: ${refresh}`);
+    
+    // If refresh is requested, skip cache and force reload
+    if (!refresh) {
+      // First try to get cached data from cache warmup (all players)
+      const allPlayersData = await kickbaseDataCache.getCachedAllPlayers('bundesliga');
+      if (allPlayersData && allPlayersData.players && allPlayersData.players.length > 0) {
+        console.log(`[Players API] Returning cache warmup data (${allPlayersData.players.length} players)`);
+        // Apply position corrections to cached data
+        const correctedPlayers = correctPlayersPositions(allPlayersData.players);
+        return NextResponse.json({
+          players: correctedPlayers,
+          spieltag,
+          updatedAt: allPlayersData.lastUpdated,
+          cacheAgeDays: 0,
+          fromCache: true,
+          source: 'cache_warmup'
+        });
+      }
+    }
+    
+    // Fallback: Try to get cached data for specific spieltag (only if not refreshing)
+    if (!refresh) {
+      const cachedData = await kickbaseDataCache.getCachedPlayers(spieltag);
+      if (cachedData) {
+        console.log(`[Players API] Returning cached data for Spieltag ${spieltag} (${cachedData.players.length} players)`);
+        // Apply position corrections to cached data
+        const correctedPlayers = correctPlayersPositions(cachedData.players);
+        return NextResponse.json({
+          ...cachedData,
+          players: correctedPlayers,
+          fromCache: true,
+          cacheAge: cachedData.cacheAgeDays,
+          source: 'spieltag_cache'
+        });
+      }
+    }
+    
+    // If refresh is requested, trigger cache warmup to reload data
+    if (refresh) {
+      console.log(`[Players API] Refresh requested, triggering cache warmup for Spieltag ${spieltag}`);
+      try {
+        // Import the startup cache service
+        const { startupCacheService } = await import('../../../lib/services/StartupCacheService');
+        
+        // Trigger cache warmup
+        await startupCacheService.startWarmup({
+          includeAllPlayers: true,
+          includePlayerDetails: false,
+          includeTeamLogos: false,
+          includeComprehensivePlayerData: false,
+          currentSpieltag: spieltag
+        });
+        
+        // After warmup, try to get the fresh data
+        const freshData = await kickbaseDataCache.getCachedAllPlayers('bundesliga');
+        if (freshData && freshData.players && freshData.players.length > 0) {
+          console.log(`[Players API] Returning fresh data after warmup (${freshData.players.length} players)`);
+          const correctedPlayers = correctPlayersPositions(freshData.players);
+          return NextResponse.json({
+            players: correctedPlayers,
+            spieltag,
+            updatedAt: freshData.lastUpdated,
+            cacheAgeDays: 0,
+            fromCache: false,
+            source: 'fresh_warmup'
+          });
+        }
+      } catch (error) {
+        console.error(`[Players API] Cache warmup failed:`, error);
+        // Continue to fallback logic
+      }
     }
     
     // Fallback auf lokalen Cache
@@ -54,12 +117,15 @@ export async function GET(request: Request) {
   // CV enhancement is disabled for performance reasons
   const enhancedPlayers = correctedPlayers;
   
+  // Apply position corrections to processed players
+  const finalPlayers = correctPlayersPositions(enhancedPlayers as Player[]);
+  
   // Cache die verarbeiteten Spielerdaten
-  await kickbaseDataCache.cachePlayers(spieltag, enhancedPlayers as Player[]);
+  await kickbaseDataCache.cachePlayers(spieltag, finalPlayers);
     
     const age = cacheAgeDays(spieltag);
     return NextResponse.json({
-      players: enhancedPlayers as Player[],
+      players: finalPlayers,
       updatedAt: cache.updatedAt,
       cacheAgeDays: age,
       source: 'processed'

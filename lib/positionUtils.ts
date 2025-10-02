@@ -82,3 +82,84 @@ export function calculatePointsPerMillion(totalPoints: number, marketValue: numb
   if (marketValue === 0) return 0;
   return totalPoints / (marketValue / 1000000);
 }
+
+/**
+ * Team odds mapping for X-Factor calculation
+ */
+export const teamOddsMapping: Record<string, number> = {
+  'Hoffenheim': 3.5,
+  'TSG Hoffenheim': 3.5,
+  'TSG 1899 Hoffenheim': 3.5,
+  'Köln': 1.95,
+  '1. FC Köln': 1.95,
+  'FC Köln': 1.95,
+  'Bremen': 2.9,
+  'Werder Bremen': 2.9,
+  'SV Werder Bremen': 2.9,
+  'St. Pauli': 2.3,
+  'FC St. Pauli': 2.3,
+  'Leverkusen': 5,
+  'Bayer Leverkusen': 5,
+  'Bayer 04 Leverkusen': 5,
+  'Union Berlin': 1.63,
+  '1. FC Union Berlin': 1.63,
+  'FC Union Berlin': 1.63,
+  'FC Augsburg': 2.5,
+  'Augsburg': 2.5,
+  'Wolfsburg': 2.65,
+  'VfL Wolfsburg': 2.65,
+  'Dortmund': 4.1,
+  'Borussia Dortmund': 4.1,
+  'BVB': 4.1,
+  'Leipzig': 1.71,
+  'RB Leipzig': 1.71,
+  'Frankfurt': 1.46,
+  'Eintracht Frankfurt': 1.46,
+  'Bayern': 5.75,
+  'FC Bayern München': 5.75,
+  'Bayern München': 5.75,
+  'Hamburg': 2.4,
+  'Hamburger SV': 2.4,
+  'HSV': 2.4,
+  'Mainz': 2.7,
+  'FSV Mainz 05': 2.7,
+  'Mainz 05': 2.7,
+  'Gladbach': 2.8,
+  'Borussia Mönchengladbach': 2.8,
+  'Mönchengladbach': 2.8,
+  'Freiburg': 2.4,
+  'SC Freiburg': 2.4
+};
+
+/**
+ * Get team odds for X-Factor calculation
+ */
+export function getTeamOdds(teamName: string): number {
+  // Try exact match first
+  if (teamOddsMapping[teamName]) {
+    return teamOddsMapping[teamName];
+  }
+  
+  // Try partial match for common variations
+  const normalizedTeamName = teamName.toLowerCase();
+  for (const [key, value] of Object.entries(teamOddsMapping)) {
+    if (key.toLowerCase().includes(normalizedTeamName) || normalizedTeamName.includes(key.toLowerCase())) {
+      return value;
+    }
+  }
+  
+  // Default fallback
+  console.warn(`No odds found for team: ${teamName}`);
+  return 1.0;
+}
+
+/**
+ * Calculate X-Factor: (Points per Minute) * (Points per Million €) * Team Odds
+ */
+export function calculateXFactor(totalPoints: number, totalMinutes: number, marketValue: number, teamName: string): number {
+  const pointsPerMinute = calculatePointsPerMinute(totalPoints, totalMinutes);
+  const pointsPerMillion = calculatePointsPerMillion(totalPoints, marketValue);
+  const teamOdds = getTeamOdds(teamName);
+  
+  return pointsPerMinute * pointsPerMillion * teamOdds;
+}

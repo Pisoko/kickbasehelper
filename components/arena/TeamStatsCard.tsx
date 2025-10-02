@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Player } from '@/lib/types';
-import { calculatePointsPerMinute } from '@/lib/positionUtils';
+import { calculatePointsPerMinute, calculateXFactor } from '@/lib/positionUtils';
 
 interface TeamStatsCardProps {
   selectedPlayers: { [positionId: string]: Player };
@@ -25,6 +25,17 @@ export function TeamStatsCard({ selectedPlayers }: TeamStatsCardProps) {
     return sum + (player.punkte_avg || 0);
   }, 0);
 
+  // Calculate total X-Factor
+  const totalXFactor = players.reduce((sum, player) => {
+    const xFactor = calculateXFactor(
+      player.punkte_sum || 0,
+      player.totalMinutesPlayed || 0,
+      player.marketValue || player.kosten || 0,
+      player.verein || ''
+    );
+    return sum + xFactor;
+  }, 0);
+
   const playerCount = players.length;
 
   return (
@@ -45,6 +56,11 @@ export function TeamStatsCard({ selectedPlayers }: TeamStatsCardProps) {
         <div className="flex justify-between items-center">
           <span className="text-sm text-muted-foreground">Summe Ø-Punkte:</span>
           <span className="font-medium">{totalAveragePoints.toFixed(1)}</span>
+        </div>
+        
+        <div className="flex justify-between items-center">
+          <span className="text-sm text-muted-foreground">X-Werte (gesamt):</span>
+          <span className="font-medium">{totalXFactor.toFixed(1)}</span>
         </div>
 
         {playerCount > 0 && (

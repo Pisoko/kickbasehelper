@@ -32,6 +32,7 @@ export interface Player {
   redCards?: number;             // Red cards (r field)
   recentPerformance?: number[];  // Points from last 3-5 games
   marketValueHistory?: number[]; // Historical market values
+  xFactor?: number;              // Calculated X-Factor for optimization
 }
 
 export interface Match {

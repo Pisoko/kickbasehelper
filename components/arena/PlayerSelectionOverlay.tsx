@@ -5,7 +5,8 @@ import { Player } from '@/lib/types';
 import { X, Search, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PlayerImage from '@/components/PlayerImage';
-import { getGermanPosition, getPositionColorClasses, calculatePointsPerMinute, calculatePointsPerMillion, getEnglishPosition } from '@/lib/positionUtils';
+import { getGermanPosition, getPositionColorClasses, calculatePointsPerMinute, calculatePointsPerMillion, getEnglishPosition, calculateXFactor } from '@/lib/positionUtils';
+import { correctPlayersPositions } from '@/lib/positionCorrections';
 import { getFullTeamName, getBundesligaLogoUrlByDflId } from '@/lib/teamMapping';
 import PlayerStatusTag, { isPlayerFit, getRowTextColor, getStatusInfo } from '@/components/PlayerStatusTag';
 import { optimizedFetch } from '@/lib/requestDeduplication';
@@ -14,7 +15,7 @@ import BundesligaLogo from '@/components/BundesligaLogo';
 // Interface für die Spieldaten der letzten 3 Spiele
 interface PlayerLast3GamesData {
   playerId: string;
-  last3Games: boolean[]; // true = Start-11, false = keine Start-11
+  last3Games: (boolean | null)[]; // true = Start-11, false = keine Start-11, null = keine Daten
   totalGames: number;
 }
 
@@ -100,7 +101,8 @@ async function getPlayerLast3GamesData(playerId: string): Promise<PlayerLast3Gam
       return result;
     }
   } catch (error) {
-    console.error(`Fehler beim Abrufen der Spieldaten für Spieler ${playerId}:`, error);
+    // Silently handle 404 errors and other API errors
+    console.warn(`Could not load performance data for player ${playerId}:`, error instanceof Error ? error.message : 'Unknown error');
   }
   
   // Fallback, wenn keine Daten abgerufen werden konnten
@@ -121,12 +123,39 @@ async function getPlayerLast3GamesData(playerId: string): Promise<PlayerLast3Gam
  * @returns JSX-Element mit den farbigen Blöcken
  */
 function getLast3GamesBlocks(data: PlayerLast3GamesData): JSX.Element {
+  // Handle empty or missing data
+  if (!data || !data.last3Games || data.last3Games.length === 0) {
+    return (
+      <div className="flex space-x-1 justify-center">
+        <div className="w-4 h-4 rounded bg-gray-500" title="Keine Daten verfügbar" />
+        <div className="w-4 h-4 rounded bg-gray-500" title="Keine Daten verfügbar" />
+        <div className="w-4 h-4 rounded bg-gray-500" title="Keine Daten verfügbar" />
+      </div>
+    );
+  }
+
+  // Ensure we always show 3 blocks, padding with gray if necessary
+  const games = [...data.last3Games];
+  while (games.length < 3) {
+    games.unshift(null); // null represents no data
+  }
+  
   return (
     <div className="flex space-x-1 justify-center">
-      {data.last3Games.map((isStart11, index) => {
+      {games.slice(-3).map((isStart11, index) => {
         const gameNumber = 3 - index; // 3. letztes, 2. letztes, letztes Spiel
         const gameLabel = gameNumber === 3 ? "Drittletztes Spiel" : 
                          gameNumber === 2 ? "Vorletztes Spiel" : "Letztes Spiel";
+        
+        if (isStart11 === null) {
+          return (
+            <div
+              key={index}
+              className="w-4 h-4 rounded bg-gray-500"
+              title={`${gameLabel}: Keine Daten`}
+            />
+          );
+        }
         
         return (
           <div
@@ -163,9 +192,10 @@ export function PlayerSelectionOverlay({
   
   // Filter states
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'marketValue' | 'punkte_sum' | 'punkte_avg' | 'name' | 'verein' | 'pointsPerMinute' | 'pointsPerMillion'>('pointsPerMillion');
+  const [sortBy, setSortBy] = useState<'marketValue' | 'punkte_sum' | 'punkte_avg' | 'name' | 'verein' | 'pointsPerMinute' | 'pointsPerMillion' | 'xFactor'>('xFactor');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [showAffordableOnly, setShowAffordableOnly] = useState(false);
+  const [showStart11Only, setShowStart11Only] = useState(false);
   
   // Start11 data state
   const [playerLast3GamesData, setPlayerLast3GamesData] = useState<Map<string, PlayerLast3GamesData>>(new Map());
@@ -192,20 +222,15 @@ export function PlayerSelectionOverlay({
           throw new Error('Invalid data format: expected array of players');
         }
         
-        // Filter by position (hard filter) - handle both German and English position formats
-         const germanPosition = getGermanPosition(position);
-         const positionPlayers = playersArray.filter((player: Player) => {
-           // Check if player position matches either English or German format
-           const playerPos = player.position as string;
-           return playerPos === position || 
-                  playerPos === germanPosition ||
-                  getEnglishPosition(playerPos as any) === position;
+        // Apply position corrections for misclassified players
+        const correctedPlayers = correctPlayersPositions(playersArray);
+        
+        // Filter by position (hard filter) - players already have English position format
+         const positionPlayers = correctedPlayers.filter((player: Player) => {
+           return player.position === position;
          });
         
-        console.log(`Filtering for position: ${position} (German: ${germanPosition})`);
-        console.log(`Total players from API: ${playersArray.length}`);
-        console.log(`Filtered players for position: ${positionPlayers.length}`);
-        console.log('Sample player positions:', playersArray.slice(0, 5).map(p => ({ name: p.name, position: p.position })));
+        // Position filtering completed successfully
         
         setPlayers(positionPlayers);
         setOpponentData(opponentDataMap);
@@ -259,7 +284,21 @@ export function PlayerSelectionOverlay({
       // Already selected filter - exclude already selected players
       const notAlreadySelected = !selectedPlayerIds.includes(player.id);
       
-      return searchMatch && affordableMatch && notAlreadySelected;
+      // Start 11 filter - only show players who were in Start 11 in their last game
+      let start11Match = true;
+      if (showStart11Only) {
+        const playerData = playerLast3GamesData.get(player.id);
+        if (playerData && playerData.last3Games.length > 0) {
+          // Check if player was in Start 11 in their last game (last element of array)
+          const lastGameStart11 = playerData.last3Games[playerData.last3Games.length - 1];
+          start11Match = lastGameStart11 === true;
+        } else {
+          // If no data available, exclude from Start 11 filter
+          start11Match = false;
+        }
+      }
+      
+      return searchMatch && affordableMatch && notAlreadySelected && start11Match;
     });
 
     // Sort players
@@ -284,6 +323,10 @@ export function PlayerSelectionOverlay({
           comparison = calculatePointsPerMillion(a.punkte_sum || 0, a.marketValue || a.kosten || 0) - 
                       calculatePointsPerMillion(b.punkte_sum || 0, b.marketValue || b.kosten || 0);
           break;
+        case 'xFactor':
+          comparison = calculateXFactor(a.punkte_sum || 0, a.totalMinutesPlayed || 0, a.marketValue || a.kosten || 0, a.verein || '') - 
+                      calculateXFactor(b.punkte_sum || 0, b.totalMinutesPlayed || 0, b.marketValue || b.kosten || 0, b.verein || '');
+          break;
         case 'name':
           comparison = a.name.localeCompare(b.name);
           break;
@@ -296,7 +339,7 @@ export function PlayerSelectionOverlay({
     });
 
     return filtered;
-  }, [players, searchTerm, showAffordableOnly, sortBy, sortOrder, remainingBudget, selectedPlayers]);
+  }, [players, searchTerm, showAffordableOnly, showStart11Only, sortBy, sortOrder, remainingBudget, selectedPlayers, playerLast3GamesData]);
 
   const getPositionLabel = (pos: string) => {
     switch (pos) {
@@ -373,6 +416,7 @@ export function PlayerSelectionOverlay({
                 onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
                 className="bg-slate-800 border border-slate-600 rounded px-3 py-1 text-sm text-white"
               >
+                <option value="xFactor">X-Faktor</option>
                 <option value="marketValue">Marktwert</option>
                 <option value="punkte_sum">Gesamtpunkte</option>
                 <option value="punkte_avg">Ø Punkte</option>
@@ -398,11 +442,21 @@ export function PlayerSelectionOverlay({
               />
               Nur erschwingliche Spieler
             </label>
+
+            <label className="flex items-center gap-2 text-sm text-slate-300">
+              <input
+                type="checkbox"
+                checked={showStart11Only}
+                onChange={(e) => setShowStart11Only(e.target.checked)}
+                className="rounded"
+              />
+              Letztes Spiel Start 11
+            </label>
           </div>
         </div>
 
         {/* Player List - Table View Only */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden min-h-0">
           {loading && (
             <div className="flex items-center justify-center h-64">
               <div className="text-slate-400">Lade Spieler...</div>
@@ -416,9 +470,9 @@ export function PlayerSelectionOverlay({
           )}
 
           {!loading && !error && (
-            <div className="overflow-auto h-full">
+            <div className="overflow-auto h-full max-h-[60vh]">
               <table className="w-full">
-                <thead className="bg-slate-800 sticky top-0">
+                <thead className="bg-slate-800 sticky top-0 z-10">
                   <tr>
                     <th className="text-left py-3 px-4 text-sm font-medium text-slate-300">
                       <button
@@ -434,7 +488,7 @@ export function PlayerSelectionOverlay({
                     <th className="text-center py-3 px-2 text-sm font-medium text-slate-300">
                       <button
                         onClick={() => handleSort('verein')}
-                        className="flex items-center gap-1 hover:text-white"
+                        className="flex items-center justify-center gap-1 hover:text-white"
                       >
                         Verein
                         {sortBy === 'verein' && (
@@ -448,7 +502,7 @@ export function PlayerSelectionOverlay({
                     <th className="text-center py-3 px-2 text-sm font-medium text-slate-300">
                       <button
                         onClick={() => handleSort('marketValue')}
-                        className="flex items-center gap-1 hover:text-white"
+                        className="flex items-center justify-center gap-1 hover:text-white"
                       >
                         Marktwert
                         {sortBy === 'marketValue' && (
@@ -459,7 +513,7 @@ export function PlayerSelectionOverlay({
                     <th className="text-center py-3 px-2 text-sm font-medium text-slate-300">
                       <button
                         onClick={() => handleSort('punkte_sum')}
-                        className="flex items-center gap-1 hover:text-white"
+                        className="flex items-center justify-center gap-1 hover:text-white"
                       >
                         Punkte
                         {sortBy === 'punkte_sum' && (
@@ -470,7 +524,7 @@ export function PlayerSelectionOverlay({
                     <th className="text-center py-3 px-2 text-sm font-medium text-slate-300">
                       <button
                         onClick={() => handleSort('punkte_avg')}
-                        className="flex items-center gap-1 hover:text-white"
+                        className="flex items-center justify-center gap-1 hover:text-white"
                       >
                         ⌀ Punkte
                         {sortBy === 'punkte_avg' && (
@@ -481,7 +535,7 @@ export function PlayerSelectionOverlay({
                     <th className="text-center py-3 px-2 text-sm font-medium text-slate-300">
                       <button
                         onClick={() => handleSort('pointsPerMinute')}
-                        className="flex items-center gap-1 hover:text-white"
+                        className="flex items-center justify-center gap-1 hover:text-white"
                       >
                         Pkt/Min
                         {sortBy === 'pointsPerMinute' && (
@@ -492,10 +546,21 @@ export function PlayerSelectionOverlay({
                     <th className="text-center py-3 px-2 text-sm font-medium text-slate-300">
                       <button
                         onClick={() => handleSort('pointsPerMillion')}
-                        className="flex items-center gap-1 hover:text-white"
+                        className="flex items-center justify-center gap-1 hover:text-white"
                       >
                         Pkt/Mio
                         {sortBy === 'pointsPerMillion' && (
+                          <span className="text-xs">{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                        )}
+                      </button>
+                    </th>
+                    <th className="text-center py-3 px-2 text-sm font-medium text-slate-300">
+                      <button
+                        onClick={() => handleSort('xFactor')}
+                        className="flex items-center justify-center gap-1 hover:text-white"
+                      >
+                        X
+                        {sortBy === 'xFactor' && (
                           <span className="text-xs">{sortOrder === 'asc' ? '↑' : '↓'}</span>
                         )}
                       </button>
@@ -546,7 +611,9 @@ export function PlayerSelectionOverlay({
                         </td>
                         <td className="text-center py-3 px-2">
                           {(() => {
-                            const opponent = opponentData.get(player.verein);
+                            // Map short team name to full team name for opponent lookup
+                            const fullTeamName = getFullTeamName(player.verein);
+                            const opponent = opponentData.get(fullTeamName);
                             if (!opponent) {
                               return <span className="text-slate-500 text-xs">-</span>;
                             }
@@ -556,18 +623,18 @@ export function PlayerSelectionOverlay({
                             return (
                               <div className="flex flex-col items-center gap-1">
                                 <div className="flex items-center gap-1">
-                                  {opponent.opponentLogo && (
-                                    <img 
-                                      src={getBundesligaLogoUrlByDflId(opponent.opponentLogo)} 
-                                      alt={opponent.opponentName}
-                                      className="w-4 h-4"
-                                    />
-                                  )}
                                   <span className={`text-xs px-1 py-0.5 rounded ${
                                     opponent.isHome ? 'bg-green-900/30 text-green-400' : 'bg-blue-900/30 text-blue-400'
                                   }`}>
                                     {opponent.isHome ? 'H' : 'A'}
                                   </span>
+                                  {opponent.opponentLogo && (
+                                    <img 
+                                      src={getBundesligaLogoUrlByDflId(opponent.opponentLogo)} 
+                                      alt={opponent.opponentName}
+                                      className="w-8 h-8 opacity-45"
+                                    />
+                                  )}
                                 </div>
                                 {playerTeamOdds && (
                                   <span className="text-xs text-slate-400">
@@ -594,6 +661,9 @@ export function PlayerSelectionOverlay({
                         </td>
                         <td className="text-center py-3 px-2 text-sm">
                           {calculatePointsPerMillion(player.punkte_sum || 0, player.marketValue || player.kosten || 0).toFixed(1)}
+                        </td>
+                        <td className="text-center py-3 px-2 text-sm font-medium text-yellow-400">
+                          {calculateXFactor(player.punkte_sum || 0, player.totalMinutesPlayed || 0, player.marketValue || player.kosten || 0, player.verein || '').toFixed(2)}
                         </td>
                         <td className="py-3 px-2 text-center font-medium">
                           {playerLast3GamesData.has(player.id) ? (

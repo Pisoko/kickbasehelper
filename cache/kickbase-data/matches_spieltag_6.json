@@ -23,13 +23,7 @@
         "homeTeamSymbol": "TSG",
         "awayTeamSymbol": "KOE",
         "homeTeamImage": "content/file/5212904732a04199aab426e44067347c.svg",
-        "awayTeamImage": "content/file/dca70c4089fd4623932b245c0e81eaba.svg",
-        "odds": {
-          "heim": 1.9,
-          "unentschieden": 3.9,
-          "auswaerts": 3.7,
-          "format": "decimal"
-        }
+        "awayTeamImage": "content/file/dca70c4089fd4623932b245c0e81eaba.svg"
       },
       {
         "id": "8357",
@@ -53,13 +47,7 @@
         "homeTeamSymbol": "FCA",
         "awayTeamSymbol": "WOB",
         "homeTeamImage": "content/file/8d68c946b9774505b8292adfa910d0a0.svg",
-        "awayTeamImage": "content/file/f23d72a0cf2d48a2a29ede777110aece.svg",
-        "odds": {
-          "heim": 2.75,
-          "unentschieden": 3.5,
-          "auswaerts": 2.45,
-          "format": "decimal"
-        }
+        "awayTeamImage": "content/file/f23d72a0cf2d48a2a29ede777110aece.svg"
       },
       {
         "id": "8360",
@@ -83,13 +71,7 @@
         "homeTeamSymbol": "SVW",
         "awayTeamSymbol": "STP",
         "homeTeamImage": "content/file/a7e609e72fb04c6d8c96e8ed82f0315d.svg",
-        "awayTeamImage": "content/file/cae200d5499e43c4a5c382a1fbb25435.svg",
-        "odds": {
-          "heim": 2.25,
-          "unentschieden": 3.6,
-          "auswaerts": 3,
-          "format": "decimal"
-        }
+        "awayTeamImage": "content/file/cae200d5499e43c4a5c382a1fbb25435.svg"
       },
       {
         "id": "8361",
@@ -113,13 +95,7 @@
         "homeTeamSymbol": "BVB",
         "awayTeamSymbol": "RBL",
         "homeTeamImage": "content/file/dc3d63ae79bf4282a4107bafcd572b99.svg",
-        "awayTeamImage": "content/file/29ceb88867954b548ca9e27d39d050c2.svg",
-        "odds": {
-          "heim": 1.67,
-          "unentschieden": 4.5,
-          "auswaerts": 4.4,
-          "format": "decimal"
-        }
+        "awayTeamImage": "content/file/29ceb88867954b548ca9e27d39d050c2.svg"
       },
       {
         "id": "8363",
@@ -143,13 +119,7 @@
         "homeTeamSymbol": "B04",
         "awayTeamSymbol": "FCU",
         "homeTeamImage": "content/file/e06a055a6eaf4fd7bebfadb35037f957.svg",
-        "awayTeamImage": "content/file/8f4c7c08ee9b4dca85c28260fc5917bd.svg",
-        "odds": {
-          "heim": 1.67,
-          "unentschieden": 4.1,
-          "auswaerts": 4.8,
-          "format": "decimal"
-        }
+        "awayTeamImage": "content/file/8f4c7c08ee9b4dca85c28260fc5917bd.svg"
       },
       {
         "id": "8362",
@@ -173,13 +143,7 @@
         "homeTeamSymbol": "SGE",
         "awayTeamSymbol": "FCB",
         "homeTeamImage": "content/file/422de82bee3b47eb898699d6d27095ba.svg",
-        "awayTeamImage": "content/file/ff70df040a9f4179a7b45219225a2273.svg",
-        "odds": {
-          "heim": 6.5,
-          "unentschieden": 5.5,
-          "auswaerts": 1.4,
-          "format": "decimal"
-        }
+        "awayTeamImage": "content/file/ff70df040a9f4179a7b45219225a2273.svg"
       },
       {
         "id": "8359",
@@ -203,13 +167,7 @@
         "homeTeamSymbol": "VFB",
         "awayTeamSymbol": "FCH",
         "homeTeamImage": "content/file/9a1bb78d0ccf45f895797c0c6d8c4d40.svg",
-        "awayTeamImage": "content/file/f387dd39aafb47d0b4863381fc4a521c.svg",
-        "odds": {
-          "heim": 1.42,
-          "unentschieden": 5.2,
-          "auswaerts": 6.5,
-          "format": "decimal"
-        }
+        "awayTeamImage": "content/file/f387dd39aafb47d0b4863381fc4a521c.svg"
       },
       {
         "id": "8355",
@@ -233,13 +191,7 @@
         "homeTeamSymbol": "HSV",
         "awayTeamSymbol": "M05",
         "homeTeamImage": "content/file/c9b7d8772f324f9badeb285af4c5810a.svg",
-        "awayTeamImage": "content/file/d4ac9675b44944039d463837f888cb1c.svg",
-        "odds": {
-          "heim": 2.75,
-          "unentschieden": 3.6,
-          "auswaerts": 2.4,
-          "format": "decimal"
-        }
+        "awayTeamImage": "content/file/d4ac9675b44944039d463837f888cb1c.svg"
       },
       {
         "id": "8358",
@@ -263,19 +215,13 @@
         "homeTeamSymbol": "BMG",
         "awayTeamSymbol": "SCF",
         "homeTeamImage": "content/file/7178ef92ad0747a5ad1a05d0783f5088.svg",
-        "awayTeamImage": "content/file/6c1a9f14b668493283f966834891aa70.svg",
-        "odds": {
-          "heim": 2.35,
-          "unentschieden": 3.6,
-          "auswaerts": 2.85,
-          "format": "decimal"
-        }
+        "awayTeamImage": "content/file/6c1a9f14b668493283f966834891aa70.svg"
       }
     ],
     "spieltag": 6,
-    "updatedAt": "2025-10-01T18:34:27.806Z"
+    "updatedAt": "2025-10-02T12:15:07.197Z"
   },
-  "timestamp": 1759343667806,
+  "timestamp": 1759407307197,
   "ttl": 1800000,
   "key": "matches_spieltag_6"
 }

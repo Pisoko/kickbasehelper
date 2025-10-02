@@ -159,39 +159,95 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
       const responseData = await response.json();
       console.log('Raw API Response:', responseData);
       
+      // Check if the API returned an error response
+      if (responseData.error) {
+        console.error('API returned error response:', responseData);
+        throw new Error(responseData.message || responseData.error || 'API Error');
+      }
+      
       // Handle API response structure: { success: true, data: {...} }
       const data = responseData.success ? responseData.data : responseData;
       console.log('Extracted data:', data);
       
       // Enhanced validation with better error messages and environment-specific handling
       if (!data) {
-        console.error('No data received from API:', responseData);
+        console.error('No data received from API:', {
+          responseData,
+          hasSuccess: 'success' in responseData,
+          successValue: responseData.success,
+          hasData: 'data' in responseData
+        });
         throw new Error('Keine Daten vom Server erhalten. Bitte versuchen Sie es erneut.');
       }
       
+      // Check if this is an error response that wasn't caught above
+      if (data.error || data.dataSource === 'error') {
+        console.error('Data contains error information:', data);
+        throw new Error(data.message || data.error || 'Fehler beim Laden der Spieltag-Daten');
+      }
+      
+      // Additional check for empty or malformed data
+      if (typeof data !== 'object' || data === null) {
+        console.error('Data is not a valid object:', {
+          data,
+          type: typeof data,
+          isNull: data === null,
+          responseData
+        });
+        throw new Error('Ungültige Datenstruktur vom Server erhalten.');
+      }
+      
       // More robust type checking for different environments
-      const matchdayValue = data.matchday;
+      // The API can return matchday in different places: data.matchday, data.spieltag, or data.matches.spieltag
+      let matchdayValue = data.matchday || data.spieltag;
+      if (!matchdayValue && data.matches && typeof data.matches === 'object' && 'spieltag' in data.matches) {
+        matchdayValue = data.matches.spieltag;
+      }
+      
       if (matchdayValue === null || matchdayValue === undefined || (typeof matchdayValue !== 'number' && !Number.isInteger(Number(matchdayValue)))) {
         console.error('Invalid matchday value:', {
           value: matchdayValue,
           type: typeof matchdayValue,
           isNumber: typeof matchdayValue === 'number',
           canConvert: Number.isInteger(Number(matchdayValue)),
-          environment: process.env.NODE_ENV
+          environment: process.env.NODE_ENV,
+          availableKeys: Object.keys(data),
+          dataMatchday: data.matchday,
+          dataSpielTag: data.spieltag,
+          nestedSpielTag: data.matches && typeof data.matches === 'object' ? data.matches.spieltag : 'not available',
+          fullData: data
         });
         throw new Error('Ungültige Spieltag-Nummer erhalten. Bitte versuchen Sie es erneut.');
       }
       
-      const matchesValue = data.matches;
+      // Handle nested matches structure: data.matches.matches or data.matches
+      let matchesValue = data.matches;
+      if (matchesValue && typeof matchesValue === 'object' && 'matches' in matchesValue) {
+        // Nested structure: data.matches.matches
+        matchesValue = matchesValue.matches;
+      }
+      
       if (!Array.isArray(matchesValue)) {
         console.error('Invalid matches value:', {
           value: matchesValue,
           type: typeof matchesValue,
           isArray: Array.isArray(matchesValue),
-          keys: matchesValue ? Object.keys(matchesValue) : 'null/undefined',
-          environment: process.env.NODE_ENV
+          isNull: matchesValue === null,
+          isUndefined: matchesValue === undefined,
+          keys: matchesValue && typeof matchesValue === 'object' ? Object.keys(matchesValue) : 'not an object',
+          environment: process.env.NODE_ENV,
+          dataKeys: Object.keys(data),
+          originalMatches: data.matches,
+          originalMatchesType: typeof data.matches,
+          fullData: data
         });
         throw new Error('Ungültige Spiele-Daten erhalten. Bitte versuchen Sie es erneut.');
+      }
+      
+      // Check if matches array is empty
+      if (matchesValue.length === 0) {
+        console.warn('Matches array is empty for matchday:', matchdayValue);
+        // Don't throw an error for empty matches, just log a warning
       }
       
       // Safe data transformation with fallbacks for missing properties

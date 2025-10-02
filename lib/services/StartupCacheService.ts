@@ -56,6 +56,7 @@ export class StartupCacheService {
     includeAllPlayers?: boolean;
     includePlayerDetails?: boolean;
     includeTeamLogos?: boolean;
+    includeComprehensivePlayerData?: boolean;
     currentSpieltag?: number;
   } = {}): Promise<{
     success: boolean;
@@ -65,6 +66,7 @@ export class StartupCacheService {
       playerDetails: number;
       teamLogos: number;
       matches: number;
+      comprehensivePlayerData?: number;
     };
     errors: string[];
   }> {
@@ -78,7 +80,8 @@ export class StartupCacheService {
       allPlayers: 0,
       playerDetails: 0,
       teamLogos: 0,
-      matches: 0
+      matches: 0,
+      comprehensivePlayerData: 0
     };
 
     // Calculate total tasks
@@ -87,6 +90,7 @@ export class StartupCacheService {
     if (config.includeTeamLogos !== false) totalTasks += 18; // 18 Bundesliga teams
     if (config.currentSpieltag) totalTasks += 1;
     if (config.includePlayerDetails) totalTasks += 50; // Top 50 players
+    if (config.includeComprehensivePlayerData) totalTasks += 469; // All 469 players
 
     this.warmupProgress = {
       total: totalTasks,
@@ -114,6 +118,11 @@ export class StartupCacheService {
       // 4. Warm up popular player details
       if (config.includePlayerDetails) {
         await this.warmupPlayerDetails(results);
+      }
+
+      // 5. Warm up comprehensive player data
+      if (config.includeComprehensivePlayerData) {
+        await this.warmupComprehensivePlayerData(results);
       }
 
       logger.info('Cache warmup completed successfully', { 
@@ -161,8 +170,8 @@ export class StartupCacheService {
         return;
       }
 
-      // Fetch all players from API (using getPlayers method)
-      const players = await this.kickbaseAdapter.getPlayers(1); // Get players for current spieltag
+      // Fetch all players from API (using getAllPlayersFromTeamsOptimized method to get all 469 players)
+      const players = await this.kickbaseAdapter.getAllPlayersFromTeamsOptimized(); // Get ALL players from ALL teams using optimized method
       
       const allPlayersData = {
         players,
@@ -282,6 +291,127 @@ export class StartupCacheService {
       }
     } catch (error) {
       const errorMsg = `Failed to warm up player details: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      this.warmupProgress.errors.push(errorMsg);
+      logger.warn(errorMsg);
+    }
+  }
+
+  /**
+   * Warm up comprehensive player data for all 469 players
+   * This includes player details, performance data, and performance history
+   */
+  private async warmupComprehensivePlayerData(results: any): Promise<void> {
+    this.warmupProgress.currentTask = 'Loading comprehensive player data for all 469 players...';
+    
+    try {
+      // First, get all players to get their IDs
+      const allPlayersData = await kickbaseDataCache.getCachedAllPlayers('bundesliga');
+      let allPlayers: any[] = [];
+      
+      if (allPlayersData && allPlayersData.players) {
+        allPlayers = allPlayersData.players;
+      } else {
+        // If not cached, fetch ALL players from ALL teams (not just current matchday)
+        allPlayers = await this.kickbaseAdapter.getAllPlayersFromTeamsOptimized();
+        // Cache the all players data
+        await kickbaseDataCache.cacheAllPlayers('bundesliga', {
+          players: allPlayers,
+          lastUpdated: new Date().toISOString(),
+          competitionId: 'bundesliga'
+        });
+      }
+
+      logger.info(`Starting comprehensive caching for ${allPlayers.length} players`);
+
+      // Process players in batches to avoid overwhelming the API
+      const batchSize = 10;
+      const batches = [];
+      for (let i = 0; i < allPlayers.length; i += batchSize) {
+        batches.push(allPlayers.slice(i, i + batchSize));
+      }
+
+      for (const batch of batches) {
+        await Promise.all(batch.map(async (player: any) => {
+          const playerId = player.id?.toString();
+          if (!playerId) {
+            this.warmupProgress.completed++;
+            return;
+          }
+
+          try {
+            // Update progress message
+            this.warmupProgress.currentTask = `Caching player ${player.firstName} ${player.lastName} (${playerId})...`;
+
+            // 1. Cache player details if not already cached
+            const cachedDetails = await kickbaseDataCache.getCachedPlayerDetails(playerId);
+            if (!cachedDetails) {
+              try {
+                const playerDetails = await this.kickbaseAdapter.getPlayerDetails(playerId);
+                if (playerDetails) {
+                  await kickbaseDataCache.cachePlayerDetails(playerId, playerDetails);
+                }
+              } catch (detailsError) {
+                logger.debug(`Could not fetch details for player ${playerId}: ${detailsError instanceof Error ? detailsError.message : 'Unknown error'}`);
+              }
+            }
+
+            // 2. Cache player performance data if not already cached
+            const cachedPerformance = await kickbaseDataCache.getCachedPlayerPerformance(playerId);
+            if (!cachedPerformance) {
+              try {
+                const performanceData = await this.kickbaseAdapter.getPlayerPerformance(playerId);
+                if (performanceData) {
+                  // Transform the data to match our interface
+                  const transformedData = {
+                    playerId,
+                    matches: performanceData.it || [],
+                    totalPoints: performanceData.totalPoints || 0,
+                    totalMinutes: performanceData.totalMinutes || 0,
+                    averagePoints: performanceData.averagePoints || 0,
+                    actualAppearances: performanceData.actualAppearances || 0,
+                    start11Count: performanceData.start11Count || 0,
+                    currentMatchday: 5
+                  };
+                  await kickbaseDataCache.cachePlayerPerformance(playerId, transformedData);
+                }
+              } catch (performanceError) {
+                logger.debug(`Could not fetch performance for player ${playerId}: ${performanceError instanceof Error ? performanceError.message : 'Unknown error'}`);
+              }
+            }
+
+            // 3. Cache player performance history if not already cached
+            const cachedHistory = await kickbaseDataCache.getCachedPlayerPerformanceHistory(playerId);
+            if (!cachedHistory) {
+              try {
+                // Use the same performance data for history (they're similar)
+                const historyData = await this.kickbaseAdapter.getPlayerPerformance(playerId);
+                if (historyData) {
+                  await kickbaseDataCache.cachePlayerPerformanceHistory(playerId, historyData);
+                }
+              } catch (historyError) {
+                logger.debug(`Could not fetch history for player ${playerId}: ${historyError instanceof Error ? historyError.message : 'Unknown error'}`);
+              }
+            }
+
+            results.comprehensivePlayerData++;
+            
+          } catch (error) {
+            const errorMsg = `Failed to cache comprehensive data for player ${playerId}: ${error instanceof Error ? error.message : 'Unknown error'}`;
+            this.warmupProgress.errors.push(errorMsg);
+            logger.warn(errorMsg);
+          }
+          
+          this.warmupProgress.completed++;
+        }));
+
+        // Small delay between batches to be respectful to the API
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      logger.info(`Comprehensive player data caching completed for ${results.comprehensivePlayerData} players`);
+      
+    } catch (error) {
+      const errorMsg = `Failed to warm up comprehensive player data: ${error instanceof Error ? error.message : 'Unknown error'}`;
       this.warmupProgress.errors.push(errorMsg);
       logger.warn(errorMsg);
     }

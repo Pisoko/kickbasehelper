@@ -28,6 +28,7 @@ interface WarmupResult {
     playerDetails: number;
     teamLogos: number;
     matches: number;
+    comprehensivePlayerData?: number;
   };
   errors: string[];
 }
@@ -79,13 +80,47 @@ export function CacheWarmupIndicator() {
   const startWarmup = async () => {
     setIsLoading(true);
     try {
+      // Get current matchday from workspace rules (season 2025/2026, current_matchday: 5)
+      const currentMatchday = 5;
+      
       const response = await fetch('/api/cache/warmup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           includeAllPlayers: true,
           includePlayerDetails: true,
-          includeTeamLogos: true
+          includeTeamLogos: true,
+          currentSpieltag: currentMatchday
+        })
+      });
+      
+      const result = await response.json();
+      setLastResult(result);
+      
+      // Refresh status after warmup
+      await fetchStatus();
+    } catch (error) {
+      console.error('Failed to start warmup:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const startComprehensiveWarmup = async () => {
+    setIsLoading(true);
+    try {
+      // Get current matchday from workspace rules (season 2025/2026, current_matchday: 5)
+      const currentMatchday = 5;
+      
+      const response = await fetch('/api/cache/warmup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          includeAllPlayers: true,
+          includePlayerDetails: true,
+          includeTeamLogos: true,
+          includeComprehensivePlayerData: true, // Cache all 469 players with complete data
+          currentSpieltag: currentMatchday
         })
       });
       
@@ -170,6 +205,11 @@ export function CacheWarmupIndicator() {
               <div>Spielerdetails: {lastResult.results.playerDetails}</div>
               <div>Team-Logos: {lastResult.results.teamLogos}</div>
               <div>Spiele: {lastResult.results.matches}</div>
+              {lastResult.results.comprehensivePlayerData !== undefined && (
+                <div className="col-span-2 font-medium text-blue-600">
+                  Umfassende Spielerdaten: {lastResult.results.comprehensivePlayerData}
+                </div>
+              )}
             </div>
             <p className="text-sm text-muted-foreground">
               Dauer: {(lastResult.duration / 1000).toFixed(1)}s
@@ -188,26 +228,42 @@ export function CacheWarmupIndicator() {
         )}
 
         {/* Action buttons */}
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2">
+          <div className="flex gap-2">
+            <Button
+              onClick={startWarmup}
+              disabled={progress.isWarming || isLoading}
+              className="flex items-center gap-2"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
+              {progress.isWarming ? 'Läuft...' : 'Standard Warmup'}
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={fetchStatus}
+              disabled={progress.isWarming}
+            >
+              Status aktualisieren
+            </Button>
+          </div>
+          
           <Button
-            onClick={startWarmup}
+            onClick={startComprehensiveWarmup}
             disabled={progress.isWarming || isLoading}
-            className="flex items-center gap-2"
+            variant="secondary"
+            className="flex items-center gap-2 w-full"
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <RefreshCw className="h-4 w-4" />
             )}
-            {progress.isWarming ? 'Läuft...' : 'Cache Warmup starten'}
-          </Button>
-          
-          <Button
-            variant="outline"
-            onClick={fetchStatus}
-            disabled={progress.isWarming}
-          >
-            Status aktualisieren
+            {progress.isWarming ? 'Läuft...' : 'Alle 469 Spieler cachen (umfassend)'}
           </Button>
         </div>
       </CardContent>

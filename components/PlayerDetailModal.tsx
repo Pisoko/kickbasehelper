@@ -271,6 +271,8 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
         <Dialog.Content 
           className={cn(dialogVariants({ size: "xl" }))}
+          aria-labelledby="player-detail-title"
+          aria-describedby="player-detail-description"
         >
           <Dialog.Title id="player-detail-title" className="sr-only">
             Spielerdetails für {player.name}

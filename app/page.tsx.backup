@@ -31,7 +31,6 @@ import { optimizedFetch } from '../lib/requestDeduplication';
 import { cachedFetch } from '../lib/apiCache';
 import { SmartPagination } from '../components/ui/smart-pagination';
 import { cn } from '../lib/utils';
-import { exportPlayersToExcel, getFilteredPlayersCount } from '../lib/excelExport';
 
 
 
@@ -120,12 +119,8 @@ export default function PlayerHubPage() {
 
       // Fetch fresh data with request deduplication and enhanced caching
       const [playersRes, matchesRes] = await Promise.all([
-        forceRefresh 
-          ? fetch(`/api/players?spieltag=${spieltag}&refresh=true`).then(res => res.json())
-          : cachedFetch<{players: Player[], updatedAt: string, cacheAgeDays: number | null}>(`/api/players?spieltag=${spieltag}`, 'players'),
-        forceRefresh
-          ? fetch(`/api/matches?spieltag=${spieltag}&refresh=true`).then(res => res.json())
-          : cachedFetch<{matches: Match[], updatedAt: string}>(`/api/matches?spieltag=${spieltag}`, 'matches')
+        cachedFetch<{players: Player[], updatedAt: string, cacheAgeDays: number | null}>(`/api/players?spieltag=${spieltag}`, 'players'),
+        cachedFetch<{matches: Match[], updatedAt: string}>(`/api/matches?spieltag=${spieltag}`, 'matches')
       ]);
       
       const playerData = (playersRes.players as Player[]) || [];
@@ -291,7 +286,6 @@ export default function PlayerHubPage() {
       <AppHeader 
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        onRefresh={() => loadData(true)}
       />
       <div className="container mx-auto max-w-7xl space-y-6 py-4 px-4 sm:py-8 sm:px-6">
 
@@ -371,27 +365,28 @@ export default function PlayerHubPage() {
                 className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
               >
                 <option value="">Alle Vereine</option>
-                {uniqueClubs.map(club => (
-                  <option key={club} value={club}>{getFullTeamName(club)}</option>
-                ))}
-              </select>
+                  {uniqueClubs.map(club => (
+                    <option key={club} value={club}>{club}</option>
+                  ))}
+                </select>
+              </div>
+              
+              {/* Start 11 Filter */}
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="start11Filter"
+                  checked={showStart11Only}
+                  onChange={(e) => setShowStart11Only(e.target.checked)}
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <label htmlFor="start11Filter" className="text-sm font-medium text-gray-700">
+                  Nur Letztes Spiel Start-11
+                </label>
+              </div>
             </div>
             
-            {/* Start 11 Filter */}
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="start11Filter"
-                checked={showStart11Only}
-                onChange={(e) => setShowStart11Only(e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <label htmlFor="start11Filter" className="text-sm font-medium text-gray-700">
-                Nur Letztes Spiel Start-11
-              </label>
-            </div>
-            
-            <div className="flex items-end space-x-2">
+            <div className="flex items-end">
               <button
                 onClick={() => {
                   setSearchTerm('');
@@ -399,18 +394,9 @@ export default function PlayerHubPage() {
                   setClubFilter('');
                   setCurrentPage(1);
                 }}
-                className="flex-1 rounded bg-slate-700 px-3 py-2 text-sm hover:bg-slate-600"
+                className="w-full rounded bg-slate-700 px-3 py-2 text-sm hover:bg-slate-600"
               >
                 Filter zurücksetzen
-              </button>
-              <button
-                onClick={() => {
-                  exportPlayersToExcel(players, playerLast3GamesData);
-                }}
-                className="flex-1 rounded bg-green-700 px-3 py-2 text-sm hover:bg-green-600 flex items-center justify-center"
-                title={`Excel-Export: ${getFilteredPlayersCount(players, playerLast3GamesData)} Spieler (fit/angeschlagen + Start11)`}
-              >
-                📊 Excel Export
               </button>
             </div>
           </div>
@@ -565,8 +551,7 @@ export default function PlayerHubPage() {
             </div>
           )}
         </div>
-        </section>
-      )}
+      </section>
 
       {/* Matchday Overview Tab */}
       {activeTab === 'matchday' && (
