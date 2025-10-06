@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { readCache, cacheAgeDays, validatePlayerDataWithTeamCheck } from '../../../lib/data';
 import { kickbaseDataCache } from '../../../lib/services/KickbaseDataCacheService';
+import { matchdayService } from '../../../lib/services/MatchdayService';
 import { correctPlayersPositions } from '../../../lib/positionCorrections';
 import type { Player } from '../../../lib/types';
 
@@ -11,6 +12,18 @@ export async function GET(request: Request) {
     const refresh = searchParams.get('refresh') === 'true';
     
     console.log(`[Players API] Fetching players for Spieltag ${spieltag}, refresh: ${refresh}`);
+    
+    // Check for new matchday and invalidate cache if necessary
+    try {
+      const matchdayUpdate = await matchdayService.checkAndUpdateMatchday();
+      if (matchdayUpdate.hasNewMatchday) {
+        console.log(`[Players API] New matchday detected: ${matchdayUpdate.currentMatchday} (previous: ${matchdayUpdate.previousMatchday})`);
+        // Cache has already been invalidated in MatchdayService
+      }
+    } catch (error) {
+      console.warn('[Players API] Failed to check matchday update:', error);
+      // Continue with normal flow even if matchday check fails
+    }
     
     // If refresh is requested, skip cache and force reload
     if (!refresh) {

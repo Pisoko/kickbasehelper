@@ -5,7 +5,7 @@ import { Player } from '@/lib/types';
 import { X, Search, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PlayerImage from '@/components/PlayerImage';
-import { getGermanPosition, getPositionColorClasses, calculatePointsPerMinute, calculatePointsPerMillion, getEnglishPosition, calculateXFactor } from '@/lib/positionUtils';
+import { getGermanPosition, getPositionColorClasses, calculatePointsPerMinute, calculatePointsPerMillion, getEnglishPosition, calculateXFactor, getTeamOdds } from '@/lib/positionUtils';
 import { correctPlayersPositions } from '@/lib/positionCorrections';
 import { getFullTeamName, getBundesligaLogoUrlByDflId } from '@/lib/teamMapping';
 import PlayerStatusTag, { isPlayerFit, getRowTextColor, getStatusInfo } from '@/components/PlayerStatusTag';
@@ -662,7 +662,15 @@ export function PlayerSelectionOverlay({
                         <td className="text-center py-3 px-2 text-sm">
                           {calculatePointsPerMillion(player.punkte_sum || 0, player.marketValue || player.kosten || 0).toFixed(1)}
                         </td>
-                        <td className="text-center py-3 px-2 text-sm font-medium text-yellow-400">
+                        <td 
+                          className="text-center py-3 px-2 text-sm font-medium text-yellow-400 cursor-help"
+                          title={(() => {
+                            const pointsPerMinute = calculatePointsPerMinute(player.punkte_sum || 0, player.totalMinutesPlayed || 0);
+                            const pointsPerMillion = calculatePointsPerMillion(player.punkte_sum || 0, player.marketValue || player.kosten || 0);
+                            const teamOdds = getTeamOdds(player.verein || '');
+                            return `X-Faktor Berechnung: ${pointsPerMinute.toFixed(2)} × ${pointsPerMillion.toFixed(1)} × ${teamOdds.toFixed(2)} = ${(pointsPerMinute * pointsPerMillion * teamOdds).toFixed(2)}`;
+                          })()}
+                        >
                           {calculateXFactor(player.punkte_sum || 0, player.totalMinutesPlayed || 0, player.marketValue || player.kosten || 0, player.verein || '').toFixed(2)}
                         </td>
                         <td className="py-3 px-2 text-center font-medium">

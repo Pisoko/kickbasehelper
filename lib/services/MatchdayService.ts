@@ -2,6 +2,7 @@ import pino from 'pino';
 import fs from 'fs/promises';
 import path from 'path';
 import { enhancedKickbaseClient } from '../adapters/EnhancedKickbaseClient';
+import { kickbaseDataCache } from './KickbaseDataCacheService';
 import type { Player, Match } from '../types';
 
 const logger = pino({ name: 'MatchdayService' });
@@ -108,6 +109,19 @@ export class MatchdayService {
       
       if (detectedMatchday > currentState.currentMatchday) {
         const previousMatchday = currentState.currentMatchday;
+        
+        // Invalidate cache for previous matchday to force fresh data
+        logger.info({
+          previousMatchday,
+          newMatchday: detectedMatchday
+        }, 'New matchday detected - invalidating cache for previous matchday');
+        
+        try {
+          await kickbaseDataCache.invalidateSpieltagCache(previousMatchday);
+          logger.info(`Cache invalidated for completed Spieltag ${previousMatchday}`);
+        } catch (error) {
+          logger.warn({ error, previousMatchday }, 'Failed to invalidate cache for previous matchday');
+        }
         
         // Update state
         const newState: MatchdayState = {

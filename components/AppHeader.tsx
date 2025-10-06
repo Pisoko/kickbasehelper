@@ -3,11 +3,12 @@
 import React from 'react';
 import ClearCache from './ClearCache';
 import BuildInfo from './BuildInfo';
+import { CacheInvalidationButton } from './CacheInvalidationButton';
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
 import { Button } from './ui/button';
-import { Users, Calendar, Trophy, Zap, RefreshCw } from 'lucide-react';
+import { Users, Calendar, Trophy, Zap, RefreshCw, Settings } from 'lucide-react';
 
-type TabType = 'players' | 'matchday' | 'teams' | 'arena';
+type TabType = 'players' | 'matchday' | 'teams' | 'arena' | 'team-odds';
 
 interface TabConfig {
   id: TabType;
@@ -27,7 +28,8 @@ const tabs: TabConfig[] = [
   { id: 'players', label: 'Spieler', icon: Users },
   { id: 'arena', label: 'Arena', icon: Zap },
   { id: 'matchday', label: 'Spieltag', icon: Calendar },
-  { id: 'teams', label: 'Tabelle', icon: Trophy }
+  { id: 'teams', label: 'Tabelle', icon: Trophy },
+  { id: 'team-odds', label: 'Quoten', icon: Settings }
 ];
 
 export default function AppHeader({ 
@@ -58,13 +60,14 @@ export default function AppHeader({
                 Aktualisieren
               </Button>
             )}
+            <CacheInvalidationButton variant="outline" size="sm" />
             {showClearCache && <ClearCache />}
           </div>
         </div>
         
         {/* Tab navigation */}
         <Tabs value={activeTab} onValueChange={(value: string) => onTabChange?.(value as TabType)} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
+          <TabsList className="grid w-full grid-cols-5 lg:w-[600px]">
             {tabs.map((tab) => {
               const IconComponent = tab.icon;
               return (

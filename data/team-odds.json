@@ -1,0 +1,24 @@
+{
+  "teamOdds": {
+    "Bayern": 6.4,
+    "Leverkusen": 5.2,
+    "Dortmund": 4,
+    "Leipzig": 2,
+    "Frankfurt": 1.8,
+    "Stuttgart": 2.2,
+    "Hoffenheim": 2.5,
+    "Wolfsburg": 2.6,
+    "Freiburg": 2.4,
+    "Union Berlin": 2.7,
+    "Gladbach": 2.8,
+    "Mainz": 2.9,
+    "Augsburg": 2.5,
+    "Bremen": 3,
+    "St. Pauli": 3.2,
+    "Heidenheim": 3.5,
+    "Köln": 2,
+    "Hamburg": 2.6
+  },
+  "updatedAt": "2025-10-06T09:17:24.067Z",
+  "version": 2
+}

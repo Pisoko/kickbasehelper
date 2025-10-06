@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Player } from '@/lib/types';
 import { FormationType, ArenaTeam, FORMATIONS, ARENA_BUDGET } from '@/lib/arena-types';
 import { FormationField } from './FormationField';
@@ -11,6 +11,7 @@ import { ArenaHeader } from './ArenaHeader';
 import { TeamStatsCard } from './TeamStatsCard';
 import { FormationChangeConfirmDialog } from './FormationChangeConfirmDialog';
 import { Start11GeneratorButton } from './Start11GeneratorButton';
+import { initializeTeamOdds } from '@/lib/positionUtils';
 
 interface ArenaProps {
   initialPlayers?: Player[];
@@ -30,6 +31,11 @@ export function Arena({ initialPlayers = [] }: ArenaProps) {
   const [showPlayerSelection, setShowPlayerSelection] = useState(false);
   const [showFormationConfirm, setShowFormationConfirm] = useState(false);
   const [pendingFormation, setPendingFormation] = useState<FormationType | null>(null);
+
+  // Initialize team odds on component mount
+  useEffect(() => {
+    initializeTeamOdds();
+  }, []);
 
   // Handle formation change
   const handleFormationChange = (formation: FormationType) => {

@@ -131,18 +131,67 @@ export const teamOddsMapping: Record<string, number> = {
   'SC Freiburg': 2.4
 };
 
+// Cache für dynamisch geladene Team-Quoten
+let dynamicTeamOdds: Record<string, number> | null = null;
+let lastOddsUpdate: number = 0;
+const ODDS_CACHE_TTL = 5 * 60 * 1000; // 5 Minuten Cache
+let isLoadingOdds = false;
+
 /**
- * Get team odds for X-Factor calculation
+ * Lädt die aktuellen Team-Quoten (dynamisch oder Standard)
+ */
+async function loadCurrentTeamOdds(): Promise<Record<string, number>> {
+  // Prüfe Cache-Gültigkeit
+  const now = Date.now();
+  if (dynamicTeamOdds && (now - lastOddsUpdate) < ODDS_CACHE_TTL) {
+    return dynamicTeamOdds;
+  }
+
+  // Verhindere mehrfache gleichzeitige Ladevorgänge
+  if (isLoadingOdds) {
+    return dynamicTeamOdds ?? teamOddsMapping;
+  }
+
+  isLoadingOdds = true;
+
+  try {
+    // Versuche, gespeicherte Quoten zu laden (nur im Browser)
+    if (typeof window !== 'undefined') {
+      const response = await fetch('/api/team-odds');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data) {
+          dynamicTeamOdds = data.data;
+          lastOddsUpdate = now;
+          return dynamicTeamOdds;
+        }
+      }
+    }
+  } catch (error) {
+    console.warn('Fehler beim Laden der dynamischen Team-Quoten:', error);
+  } finally {
+    isLoadingOdds = false;
+  }
+
+  // Fallback auf Standard-Mapping
+  return teamOddsMapping;
+}
+
+/**
+ * Get team odds for X-Factor calculation (synchron mit Cache)
  */
 export function getTeamOdds(teamName: string): number {
+  // Verwende gecachte dynamische Quoten falls verfügbar
+  const currentMapping: Record<string, number> = dynamicTeamOdds || teamOddsMapping;
+  
   // Try exact match first
-  if (teamOddsMapping[teamName]) {
-    return teamOddsMapping[teamName];
+  if (currentMapping[teamName]) {
+    return currentMapping[teamName];
   }
   
   // Try partial match for common variations
   const normalizedTeamName = teamName.toLowerCase();
-  for (const [key, value] of Object.entries(teamOddsMapping)) {
+  for (const [key, value] of Object.entries(currentMapping)) {
     if (key.toLowerCase().includes(normalizedTeamName) || normalizedTeamName.includes(key.toLowerCase())) {
       return value;
     }
@@ -154,11 +203,58 @@ export function getTeamOdds(teamName: string): number {
 }
 
 /**
+ * Get team odds for X-Factor calculation (asynchron mit API-Aufruf)
+ */
+export async function getTeamOddsAsync(teamName: string): Promise<number> {
+  const currentMapping = await loadCurrentTeamOdds();
+  
+  // Try exact match first
+  if (currentMapping[teamName]) {
+    return currentMapping[teamName];
+  }
+  
+  // Try partial match for common variations
+  const normalizedTeamName = teamName.toLowerCase();
+  for (const [key, value] of Object.entries(currentMapping)) {
+    if (key.toLowerCase().includes(normalizedTeamName) || normalizedTeamName.includes(key.toLowerCase())) {
+      return value;
+    }
+  }
+  
+  // Default fallback
+  console.warn(`No odds found for team: ${teamName}`);
+  return 1.0;
+}
+
+/**
+ * Invalidiert den Team-Quoten Cache (nach Änderungen)
+ */
+export function invalidateTeamOddsCache(): void {
+  dynamicTeamOdds = null;
+  lastOddsUpdate = 0;
+}
+
+/**
+ * Initialisiert die Team-Quoten beim App-Start
+ */
+export function initializeTeamOdds(): void {
+  if (typeof window !== 'undefined' && !dynamicTeamOdds && !isLoadingOdds) {
+    loadCurrentTeamOdds().catch(error => {
+      console.warn('Fehler beim Initialisieren der Team-Quoten:', error);
+    });
+  }
+}
+
+/**
  * Calculate X-Factor: (Points per Minute) * (Points per Million €) * Team Odds
  */
 export function calculateXFactor(totalPoints: number, totalMinutes: number, marketValue: number, teamName: string): number {
   const pointsPerMinute = calculatePointsPerMinute(totalPoints, totalMinutes);
   const pointsPerMillion = calculatePointsPerMillion(totalPoints, marketValue);
+  
+  // Stelle sicher, dass die Quoten initialisiert sind
+  initializeTeamOdds();
+  
   const teamOdds = getTeamOdds(teamName);
   
   return pointsPerMinute * pointsPerMillion * teamOdds;

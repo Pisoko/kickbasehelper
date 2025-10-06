@@ -10,6 +10,7 @@ import MatchdayMonitor from '../components/MatchdayMonitor';
 import MatchdayOverview from '../components/MatchdayOverview';
 import TeamOverview from '../components/TeamOverview';
 import { Arena } from '../components/arena/Arena';
+import TeamOddsManager from '../components/TeamOddsManager';
 import { getFullTeamName } from '../lib/teamMapping';
 import type { Player, Match } from '../lib/types';
 import { 
@@ -42,7 +43,7 @@ interface CacheInfo {
 
 const formatter = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
-type TabType = 'players' | 'matchday' | 'teams' | 'arena';
+type TabType = 'players' | 'matchday' | 'teams' | 'arena' | 'team-odds';
 
 export default function PlayerHubPage() {
   const [activeTab, setActiveTab] = useState<TabType>('players');
@@ -581,6 +582,11 @@ export default function PlayerHubPage() {
       {/* Arena Tab */}
       {activeTab === 'arena' && (
         <Arena />
+      )}
+
+      {/* Team Odds Management Tab */}
+      {activeTab === 'team-odds' && (
+        <TeamOddsManager />
       )}
 
       {/* Player Detail Modal */}

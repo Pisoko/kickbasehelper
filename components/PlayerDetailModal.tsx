@@ -153,12 +153,28 @@ export interface PlayerDetailModalProps {
 export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDetailModalProps) {
   const [start11Count, setStart11Count] = useState<number>(0);
   const [actualAppearances, setActualAppearances] = useState<number>(0);
-  const [currentMatchday, setCurrentMatchday] = useState<number>(5); // Aktueller Spieltag
+  const [completedMatchdays, setCompletedMatchdays] = useState<number>(5); // Abgeschlossene Spieltage
   const [apiTotalMinutes, setApiTotalMinutes] = useState<number>(0);
   const [apiTotalPoints, setApiTotalPoints] = useState<number>(0);
 
   useEffect(() => {
     if (player?.id) {
+      const fetchCompletedMatchdays = async () => {
+        try {
+        const response = await fetch('/api/matchday/current');
+        if (response.ok) {
+          const data = await response.json();
+          // Wenn currentMatchday = 6, dann sind 6 Spieltage abgeschlossen
+          const completed = data.currentMatchday || 6;
+          setCompletedMatchdays(completed);
+        }
+      } catch (error) {
+        console.error('Fehler beim Laden der Spieltag-Informationen:', error);
+        // Fallback: 6 abgeschlossene Spieltage
+        setCompletedMatchdays(6);
+      }
+      };
+
       // Fetch performance data with proper typing
       const fetchPerformanceData = async (): Promise<void> => {
         try {
@@ -177,9 +193,10 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
               setApiTotalPoints(data.statistics.totalPoints || 0);
             }
             
-            // Verwende currentMatchday aus API oder hole ihn separat
+            // Verwende currentMatchday aus API für abgeschlossene Spieltage
             if (data.currentMatchday !== undefined) {
-              setCurrentMatchday(data.currentMatchday);
+              // Wenn currentMatchday = 6, dann sind 6 Spieltage abgeschlossen
+              setCompletedMatchdays(data.currentMatchday);
             }
           } else {
             // Fallback zur alten API-Route
@@ -190,10 +207,11 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
             if (data.actualAppearances !== undefined && data.start11Count !== undefined) {
               setActualAppearances(data.actualAppearances);
               setStart11Count(data.start11Count);
-              // Verwende currentMatchday aus API oder hole ihn separat
-              if (data.currentMatchday !== undefined) {
-                setCurrentMatchday(data.currentMatchday);
-              }
+              // Verwende currentMatchday aus API für abgeschlossene Spieltage
+             if (data.currentMatchday !== undefined) {
+               // Wenn currentMatchday = 6, dann sind 6 Spieltage abgeschlossen
+               setCompletedMatchdays(data.currentMatchday);
+             }
               setApiTotalMinutes(data.totalMinutes || 0);
               setApiTotalPoints(data.totalPoints || 0);
             } else if (data.matches && Array.isArray(data.matches)) {
@@ -251,8 +269,9 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
           }
         }
       };
-      
-      fetchPerformanceData();
+
+        fetchCompletedMatchdays();
+        fetchPerformanceData();
     }
   }, [player?.id]);
 
@@ -371,11 +390,11 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
                <StatCard
                  title="Einsätze"
-                 value={`${actualAppearances} von ${currentMatchday}`}
+                 value={`${actualAppearances} von ${completedMatchdays}`}
                />
                <StatCard
                  title="Start-11"
-                 value={`${start11Count} von ${currentMatchday}`}
+                 value={`${start11Count} von ${completedMatchdays}`}
                />
                <StatCard
                  title="Spielzeit"
