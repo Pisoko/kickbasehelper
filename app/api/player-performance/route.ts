@@ -7,7 +7,7 @@ import path from 'path';
 
 const kickbaseAdapter = new KickbaseAdapter(
   process.env.KICKBASE_BASE || 'https://api.kickbase.com',
-  process.env.KICKBASE_KEY || ''
+  '' // KickbaseAdapter will use KickbaseAuthService internally
 );
 
 async function getCurrentMatchday(): Promise<number> {

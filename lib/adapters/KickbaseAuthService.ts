@@ -287,9 +287,46 @@ export class KickbaseAuthService {
    * Store token in environment variables or local storage
    */
   private storeToken(authData: AuthToken): void {
-    // In a real application, you might want to store this securely
-    // For now, we'll just keep it in memory
-    logger.debug('Token stored in memory');
+    // Update .env file with new token
+    this.updateEnvFile(authData.tkn);
+    logger.debug('Token stored in memory and .env file updated');
+  }
+
+  /**
+   * Update .env file with new token
+   */
+  private updateEnvFile(newToken: string): void {
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      
+      const envPath = path.join(process.cwd(), '.env');
+      
+      if (fs.existsSync(envPath)) {
+        let envContent = fs.readFileSync(envPath, 'utf8');
+        
+        // Replace existing KICKBASE_KEY or add it if not present
+        const keyPattern = /^KICKBASE_KEY=.*$/m;
+        const newKeyLine = `KICKBASE_KEY=${newToken}`;
+        
+        if (keyPattern.test(envContent)) {
+          envContent = envContent.replace(keyPattern, newKeyLine);
+        } else {
+          envContent += `\n${newKeyLine}\n`;
+        }
+        
+        fs.writeFileSync(envPath, envContent);
+        
+        // Update process.env for immediate use
+        process.env.KICKBASE_KEY = newToken;
+        
+        logger.info('Successfully updated .env file with new token');
+      } else {
+        logger.warn('.env file not found, token only stored in memory');
+      }
+    } catch (error) {
+      logger.error({ error }, 'Failed to update .env file');
+    }
   }
 
   /**

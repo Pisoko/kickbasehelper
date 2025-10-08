@@ -151,6 +151,14 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
           throw new Error(`Spieltag ${matchday} nicht gefunden. Möglicherweise sind noch keine Daten verfügbar.`);
         } else if (response.status === 500) {
           throw new Error('Serverfehler beim Laden der Spieltag-Daten. Bitte versuchen Sie es später erneut.');
+        } else if (response.status === 503) {
+          // Handle 503 Service Unavailable - try to get error message from response
+          try {
+            const errorData = await response.json();
+            throw new Error(errorData.message || errorData.error || 'Service temporarily unavailable');
+          } catch {
+            throw new Error('Die Kickbase API ist derzeit nicht verfügbar. Bitte versuchen Sie es später erneut.');
+          }
         } else {
           throw new Error(`Fehler beim Laden der Daten (Status: ${response.status})`);
         }

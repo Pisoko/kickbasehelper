@@ -1,16 +1,24 @@
 import { NextResponse } from 'next/server';
+import { kickbaseAuth } from '@/lib/adapters/KickbaseAuthService';
 
 // Function to calculate real goals from all matchday results
-async function calculateRealGoals(apiKey: string, competitionId: string) {
+async function calculateRealGoals(competitionId: string) {
   const teamGoals: { [teamId: string]: { goalsFor: number; goalsAgainst: number } } = {};
   
   try {
+    // Get valid token from KickbaseAuthService
+    const token = await kickbaseAuth.getValidToken();
+    if (!token) {
+      console.warn('No valid token available for calculateRealGoals');
+      return teamGoals;
+    }
+
     // Fetch all matchdays data from Kickbase API
     const response = await fetch(
       `https://api.kickbase.com/v4/competitions/${competitionId}/matchdays`,
       {
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       }
@@ -90,11 +98,12 @@ const teamNameMapping: { [key: string]: string } = {
 
 export async function GET() {
   try {
-    const apiKey = process.env.KICKBASE_KEY;
+    // Get valid token from KickbaseAuthService
+    const token = await kickbaseAuth.getValidToken();
     
-    if (!apiKey) {
+    if (!token) {
       return NextResponse.json(
-        { error: 'Kickbase API Key nicht konfiguriert' },
+        { error: 'Kickbase API Token nicht verfügbar' },
         { status: 500 }
       );
     }
@@ -110,7 +119,7 @@ export async function GET() {
         `https://api.kickbase.com/v4/competitions/${competitionId}/table`,
         {
           headers: {
-            'Authorization': `Bearer ${apiKey}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         }
@@ -151,7 +160,7 @@ export async function GET() {
     }
 
     // Calculate real goals from all matchday results
-    const realGoalsData = await calculateRealGoals(apiKey, competitionId);
+    const realGoalsData = await calculateRealGoals(competitionId);
 
     // Transform Kickbase data to expected format
     const transformedTeams = rawData.it?.map((team: any, index: number) => {

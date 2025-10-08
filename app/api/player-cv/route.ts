@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pino from 'pino';
+import { kickbaseAuth } from '@/lib/adapters/KickbaseAuthService';
 
 const logger = pino({ name: 'PlayerCVAPI' });
 
@@ -24,12 +25,12 @@ export async function GET(request: NextRequest) {
 
     logger.info({ playerId, leagueId }, 'Fetching CV value for player');
 
-    // Get Kickbase API key from environment
-    const kickbaseKey = process.env.KICKBASE_KEY;
-    if (!kickbaseKey) {
-      logger.error('KICKBASE_KEY not found in environment variables');
+    // Get valid token from KickbaseAuthService
+    const token = await kickbaseAuth.getValidToken();
+    if (!token) {
+      logger.error('No valid Kickbase token available');
       return NextResponse.json(
-        { error: 'API configuration error' },
+        { error: 'Authentication error' },
         { status: 500 }
       );
     }
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest) {
 
     const response = await fetch(apiUrl, {
       headers: {
-        'Authorization': `Bearer ${kickbaseKey}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     });
@@ -130,11 +131,11 @@ export async function POST(request: NextRequest) {
 
     logger.info({ playerIds, leagueId }, 'Fetching CV values for multiple players');
 
-    const kickbaseKey = process.env.KICKBASE_KEY;
-    if (!kickbaseKey) {
-      logger.error('KICKBASE_KEY not found in environment variables');
+    const token = await kickbaseAuth.getValidToken();
+    if (!token) {
+      logger.error('No valid Kickbase token available');
       return NextResponse.json(
-        { error: 'API configuration error' },
+        { error: 'Authentication error' },
         { status: 500 }
       );
     }
@@ -147,7 +148,7 @@ export async function POST(request: NextRequest) {
         
         const response = await fetch(apiUrl, {
           headers: {
-            'Authorization': `Bearer ${kickbaseKey}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
         });

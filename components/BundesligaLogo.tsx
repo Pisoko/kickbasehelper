@@ -14,7 +14,7 @@ import {
 
 interface BundesligaLogoProps {
   teamName?: string;
-  kickbaseId?: string;
+  kickbaseId?: string | number;
   size?: 'xs' | 'sm' | 'md' | 'lg';
   className?: string;
 }
@@ -61,7 +61,7 @@ const BundesligaLogo = memo(function BundesligaLogo({ teamName, kickbaseId, size
     logoUrl = getBundesligaLogoUrlByKickbaseId(kickbaseId);
     hasTeamLogo = hasLogoByKickbaseId(kickbaseId);
     displayName = teamInfo?.fullName || `Team ${kickbaseId}`;
-    fallbackText = teamInfo?.shortName || kickbaseId.slice(-2).toUpperCase();
+    fallbackText = teamInfo?.shortName || String(kickbaseId).slice(-2).toUpperCase();
   } else if (teamName) {
     logoUrl = getBundesligaLogoUrlByTeamName(teamName);
     hasTeamLogo = hasLogoByTeamName(teamName);

@@ -101,16 +101,15 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // If still not found, try the current players API data (for newer players)
+    // If still not found, try the current cached players data (for newer players)
     if (!player) {
-      logger.info({ playerId }, 'Player not found in cached data, checking current players API');
+      logger.info({ playerId }, 'Player not found in cached data, checking current cached players');
       
       try {
-        // Make internal API call to get current players data
-        const playersResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/players`);
-        if (playersResponse.ok) {
-          const playersData = await playersResponse.json();
-          const currentPlayer = playersData.players?.find((p: any) => p.id === playerId);
+        // Use direct cache access instead of HTTP call
+        const allPlayersData = await kickbaseDataCacheService.getCachedAllPlayers('bundesliga');
+        if (allPlayersData && allPlayersData.players && allPlayersData.players.length > 0) {
+          const currentPlayer = allPlayersData.players.find((p: any) => p.id === playerId);
           
           if (currentPlayer) {
             player = {
@@ -119,11 +118,11 @@ export async function GET(request: NextRequest) {
               verein: currentPlayer.verein,
               marketValue: currentPlayer.marketValue || currentPlayer.kosten || 0
             };
-            logger.info({ playerId, playerName: player.name }, 'Found player in current players API data');
+            logger.info({ playerId, playerName: player.name }, 'Found player in cached players data');
           }
         }
-      } catch (apiError) {
-        logger.warn({ apiError, playerId }, 'Failed to fetch from current players API');
+      } catch (cacheError) {
+        logger.warn({ cacheError, playerId }, 'Failed to access cached players data');
       }
     }
     

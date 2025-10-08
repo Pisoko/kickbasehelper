@@ -1,6 +1,7 @@
 import { KickbaseAdapter } from '../adapters/KickbaseAdapter';
 import { kickbaseDataCache } from './KickbaseDataCacheService';
 import { createOddsAdapter } from '../adapters/OddsProvider';
+import { kickbaseAuth } from '../adapters/KickbaseAuthService';
 import type { Match, Odds } from '../types';
 import pino from 'pino';
 
@@ -21,8 +22,8 @@ export class DefeatOddsService {
 
   constructor() {
     const baseUrl = process.env.KICKBASE_BASE || '';
-    const apiKey = process.env.KICKBASE_KEY || '';
-    this.kickbaseAdapter = new KickbaseAdapter(baseUrl, apiKey);
+    // KickbaseAdapter will use KickbaseAuthService internally for authentication
+    this.kickbaseAdapter = new KickbaseAdapter(baseUrl, '');
   }
 
   /**

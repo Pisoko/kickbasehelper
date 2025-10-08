@@ -51,14 +51,14 @@ export async function GET(
     logger.info({ matchday }, 'Fetching matchday data');
 
     // Versuche zuerst Cache zu nutzen
-    let cachedMatches = await kickbaseDataCache.getCachedMatches(matchday);
+    let cachedData = await kickbaseDataCache.getCachedMatches(matchday);
     
-    if (cachedMatches) {
+    if (cachedData && cachedData.matches) {
       return NextResponse.json({
         success: true,
         data: {
           matchday,
-          matches: cachedMatches,
+          matches: cachedData.matches,
           startDate: getMatchdayStartDate(matchday),
           endDate: getMatchdayEndDate(matchday),
           dataSource: 'cache'

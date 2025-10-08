@@ -3,37 +3,37 @@
     "odds": [
       {
         "matchId": "8367",
-        "heim": 2.05,
-        "unentschieden": 3.35,
-        "auswaerts": 2.85,
+        "heim": 2,
+        "unentschieden": 3.3,
+        "auswaerts": 2.95,
         "format": "decimal"
       },
       {
         "matchId": "8364",
-        "heim": 2,
-        "unentschieden": 3.7,
-        "auswaerts": 3.45,
+        "heim": 1.98,
+        "unentschieden": 3.75,
+        "auswaerts": 3.4,
         "format": "decimal"
       },
       {
         "matchId": "8365",
-        "heim": 2.6,
+        "heim": 2.65,
         "unentschieden": 3.35,
         "auswaerts": 2.15,
         "format": "decimal"
       },
       {
         "matchId": "8368",
-        "heim": 2.6,
-        "unentschieden": 3.75,
-        "auswaerts": 2.6,
+        "heim": 2.7,
+        "unentschieden": 3.6,
+        "auswaerts": 2.55,
         "format": "decimal"
       },
       {
         "matchId": "8369",
-        "heim": 1.48,
+        "heim": 1.45,
         "unentschieden": 5,
-        "auswaerts": 6.25,
+        "auswaerts": 6.5,
         "format": "decimal"
       },
       {
@@ -45,16 +45,16 @@
       },
       {
         "matchId": "8372",
-        "heim": 1.26,
-        "unentschieden": 5.3,
-        "auswaerts": 6.4,
+        "heim": 1.27,
+        "unentschieden": 5.2,
+        "auswaerts": 6.3,
         "format": "decimal"
       },
       {
         "matchId": "8371",
-        "heim": 2.5,
+        "heim": 2.45,
         "unentschieden": 3.4,
-        "auswaerts": 2.25,
+        "auswaerts": 2.3,
         "format": "decimal"
       },
       {
@@ -66,9 +66,9 @@
       }
     ],
     "spieltag": 7,
-    "updatedAt": "2025-10-06T09:00:58.516Z"
+    "updatedAt": "2025-10-08T20:02:35.480Z"
   },
-  "timestamp": 1759741258516,
+  "timestamp": 1759953755480,
   "ttl": 3600000,
   "key": "odds:7"
 }

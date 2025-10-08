@@ -120,9 +120,9 @@
       }
     ],
     "spieltag": 7,
-    "updatedAt": "2025-10-06T09:03:39.972Z"
+    "updatedAt": "2025-10-08T20:02:35.035Z"
   },
-  "timestamp": 1759741419972,
+  "timestamp": 1759953755035,
   "ttl": 1800000,
   "key": "matches_spieltag_7"
 }
