@@ -287,18 +287,27 @@ export default function TeamOddsManager({ onOddsChange }: TeamOddsManagerProps) 
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(oddsToSave),
+        body: JSON.stringify({ teamOdds: oddsToSave }),
       });
 
       if (response.ok) {
         setTeamOddsData(prev => prev.map(team => ({ ...team, isModified: false })));
         setHasChanges(false);
+        console.log('Team-Quoten erfolgreich gespeichert');
+        
+        // Sende Event für Cache-Invalidierung an andere Komponenten
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('teamOddsUpdated', { 
+            detail: { timestamp: Date.now() } 
+          }));
+        }
       } else {
-        throw new Error('Fehler beim Speichern');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Fehler beim Speichern');
       }
     } catch (error) {
       console.error('Fehler beim Speichern der Team-Quoten:', error);
-      setError('Fehler beim Speichern der Änderungen');
+      setError(`Fehler beim Speichern: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
     }
   };
 

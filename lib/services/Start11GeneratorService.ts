@@ -6,7 +6,7 @@
 
 import { Player } from '@/lib/types';
 import { FormationType, Formation, FORMATIONS, ArenaTeam, ARENA_BUDGET } from '@/lib/arena-types';
-import { calculateXFactor } from '@/lib/positionUtils';
+import { calculateXFactor, calculateXFactorAsync } from '@/lib/positionUtils';
 
 // DP Algorithm Configuration
 const DEFAULT_STEP = 100000; // Budget discretization step (100k €)
@@ -290,8 +290,8 @@ export class Start11GeneratorService {
     // Filter available players
     const availablePlayers = this.filterAvailablePlayers(onlyStart11Players, existingPlayers);
     
-    // Calculate X-Factor for all players
-    this.calculateXFactorsForPlayers(availablePlayers);
+    // Calculate X-Factor for all players using current odds from Quoten-Tab
+    await this.calculateXFactorsForPlayers(availablePlayers);
 
     let formationsToEvaluate: FormationType[];
     
@@ -676,18 +676,22 @@ export class Start11GeneratorService {
   }
 
   /**
-   * Calculate X-Factor for all players
+   * Calculate X-Factor for all players using current odds from Quoten-Tab
    */
-  private calculateXFactorsForPlayers(players: Player[]): void {
-    players.forEach(player => {
-      const xFactor = calculateXFactor(
+  private async calculateXFactorsForPlayers(players: Player[]): Promise<void> {
+    // Berechne X-Faktoren parallel für bessere Performance
+    const xFactorPromises = players.map(async (player) => {
+      const xFactor = await calculateXFactorAsync(
         player.punkte_sum || 0,
         player.totalMinutesPlayed || 0,
         player.marketValue || player.kosten || 0,
         player.verein || ''
       );
       (player as any).xFactor = xFactor;
+      return { player, xFactor };
     });
+
+    await Promise.all(xFactorPromises);
   }
 
   /**

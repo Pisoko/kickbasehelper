@@ -146,7 +146,7 @@ export default function MatchdayMonitor({ onMatchdayUpdate }: MatchdayMonitorPro
               )}
               <div>
                 <div className="text-sm font-medium text-white">
-                  Spieltag {matchdayState?.currentMatchday || '?'} / {matchdayState?.totalMatchdays || '?'}
+                  Spieltag {matchdayState?.currentMatchday ? matchdayState.currentMatchday + 1 : '?'} / {matchdayState?.totalMatchdays || '?'}
                 </div>
                 <div className="text-xs text-slate-400">
                   {matchdayState?.isNewMatchdayDetected 

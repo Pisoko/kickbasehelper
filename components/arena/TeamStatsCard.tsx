@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Player } from '@/lib/types';
-import { calculatePointsPerMinute, calculateXFactor } from '@/lib/positionUtils';
+import { calculatePointsPerMinute, calculateXFactor, calculateXFactorAsync } from '@/lib/positionUtils';
 
 interface TeamStatsCardProps {
   selectedPlayers: { [positionId: string]: Player };
@@ -10,6 +10,86 @@ interface TeamStatsCardProps {
 
 export function TeamStatsCard({ selectedPlayers }: TeamStatsCardProps) {
   const players = Object.values(selectedPlayers);
+  const [playerXFactors, setPlayerXFactors] = useState<Map<string, number>>(new Map());
+  const [isLoadingXFactors, setIsLoadingXFactors] = useState(false);
+  
+  // Load X-factors with current odds from Quoten-Tab when players change
+  useEffect(() => {
+    const loadXFactors = async () => {
+      if (players.length === 0) {
+        setPlayerXFactors(new Map());
+        return;
+      }
+
+      setIsLoadingXFactors(true);
+      const xFactorMap = new Map<string, number>();
+
+      try {
+        await Promise.all(
+          players.map(async (player) => {
+            try {
+              const xFactor = await calculateXFactorAsync(
+                player.punkte_sum || 0,
+                player.totalMinutesPlayed || 0,
+                player.marketValue || player.kosten || 0,
+                player.verein || ''
+              );
+              xFactorMap.set(player.id, xFactor);
+            } catch (error) {
+              console.warn(`Failed to calculate X-Factor for player ${player.id}:`, error);
+              // Fallback auf alte Berechnung
+              const fallbackXFactor = calculateXFactor(
+                player.punkte_sum || 0,
+                player.totalMinutesPlayed || 0,
+                player.marketValue || player.kosten || 0,
+                player.verein || ''
+              );
+              xFactorMap.set(player.id, fallbackXFactor);
+            }
+          })
+        );
+        setPlayerXFactors(xFactorMap);
+      } catch (error) {
+        console.error('Failed to load X-factors:', error);
+        // Fallback: Use synchronous calculation
+        players.forEach(player => {
+          const fallbackXFactor = calculateXFactor(
+            player.punkte_sum || 0,
+            player.totalMinutesPlayed || 0,
+            player.marketValue || player.kosten || 0,
+            player.verein || ''
+          );
+          xFactorMap.set(player.id, fallbackXFactor);
+        });
+        setPlayerXFactors(xFactorMap);
+      } finally {
+        setIsLoadingXFactors(false);
+      }
+    };
+
+    loadXFactors();
+  }, [players]);
+
+  // Listen for team odds updates and recalculate X-factors
+  useEffect(() => {
+    const handleTeamOddsUpdate = () => {
+      console.log('Team-Quoten wurden aktualisiert, X-Faktoren in TeamStatsCard werden neu berechnet...');
+      if (players.length > 0) {
+        // Kleine Verzögerung, damit die neuen Quoten geladen werden können
+        setTimeout(() => {
+          loadXFactors();
+        }, 100);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('teamOddsUpdated', handleTeamOddsUpdate);
+      
+      return () => {
+        window.removeEventListener('teamOddsUpdated', handleTeamOddsUpdate);
+      };
+    }
+  }, [players, loadXFactors]);
   
   // Calculate total points per minute
   const totalPointsPerMinute = players.reduce((sum, player) => {
@@ -25,14 +105,9 @@ export function TeamStatsCard({ selectedPlayers }: TeamStatsCardProps) {
     return sum + (player.punkte_avg || 0);
   }, 0);
 
-  // Calculate total X-Factor
+  // Calculate total X-Factor using cached values with current odds
   const totalXFactor = players.reduce((sum, player) => {
-    const xFactor = calculateXFactor(
-      player.punkte_sum || 0,
-      player.totalMinutesPlayed || 0,
-      player.marketValue || player.kosten || 0,
-      player.verein || ''
-    );
+    const xFactor = playerXFactors.get(player.id) || 0;
     return sum + xFactor;
   }, 0);
 
@@ -59,8 +134,14 @@ export function TeamStatsCard({ selectedPlayers }: TeamStatsCardProps) {
         </div>
         
         <div className="flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">X-Werte (gesamt):</span>
-          <span className="font-medium">{totalXFactor.toFixed(1)}</span>
+          <span className="text-sm text-muted-foreground">
+            X-Werte (gesamt):
+            {isLoadingXFactors && <span className="ml-1 text-xs text-blue-400">Lädt...</span>}
+          </span>
+          <span className="font-medium" title={isLoadingXFactors ? "X-Faktoren werden mit aktuellen Quoten berechnet..." : "X-Faktoren basieren auf aktuellen Quoten aus dem Quoten-Tab"}>
+            {totalXFactor.toFixed(1)}
+            {!isLoadingXFactors && playerXFactors.size > 0 && <span className="ml-1 text-xs text-green-400">✓</span>}
+          </span>
         </div>
 
         {playerCount > 0 && (

@@ -173,9 +173,14 @@ export async function PUT() {
  */
 async function updateRuntimeTeamOdds(newOdds: Record<string, number>) {
   try {
-    // Hier könnten wir das Runtime-Mapping aktualisieren
-    // Für jetzt loggen wir nur die Änderung
-    console.log('Runtime Team-Quoten aktualisiert:', Object.keys(newOdds).length, 'Teams');
+    // Importiere die Cache-Invalidierung und Force-Reload Funktionen
+    const { invalidateTeamOddsCache, forceReloadTeamOdds } = await import('../../../lib/positionUtils');
+    
+    // Invalidiere den Cache und lade neue Daten sofort
+    invalidateTeamOddsCache();
+    await forceReloadTeamOdds();
+    
+    console.log('Runtime Team-Quoten aktualisiert und neu geladen:', Object.keys(newOdds).length, 'Teams');
   } catch (error) {
     console.error('Fehler beim Aktualisieren der Runtime Team-Quoten:', error);
   }

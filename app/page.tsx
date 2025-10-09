@@ -20,6 +20,7 @@ import {
   calculatePointsPerMinute,
   calculatePointsPerMillion,
   calculateXFactor,
+  calculateXFactorAsync,
   type GermanPosition 
 } from '../lib/positionUtils';
 import { 
@@ -33,6 +34,11 @@ import { cachedFetch } from '../lib/apiCache';
 import { SmartPagination } from '../components/ui/smart-pagination';
 import { cn } from '../lib/utils';
 import { exportPlayersToExcel, getFilteredPlayersCount } from '../lib/excelExport';
+import { XFactorTooltip } from '../components/XFactorTooltip';
+import { SearchInput } from '../components/ui/search-input';
+import { SimpleSelect } from '../components/ui/simple-select';
+import { Button } from '../components/ui/button';
+import { FilterSection, FilterGroup } from '../components/ui/filter-section';
 
 
 
@@ -56,6 +62,7 @@ export default function PlayerHubPage() {
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
   const [playerLast3GamesData, setPlayerLast3GamesData] = useState<Map<string, PlayerLast3GamesData>>(new Map());
   const [isLoadingMatchday, setIsLoadingMatchday] = useState(false);
+  const [playerXFactors, setPlayerXFactors] = useState<Map<string, number>>(new Map());
   
   // Spieler Hub Filter-Zustände
   const [searchTerm, setSearchTerm] = useState('');
@@ -155,6 +162,56 @@ export default function PlayerHubPage() {
     }
   }, [spieltag]);
 
+  // Function to load X-factors with current odds from Quoten-Tab
+  const loadXFactors = useCallback(async (playerList: Player[]) => {
+    if (playerList.length === 0) {
+      setPlayerXFactors(new Map());
+      return;
+    }
+
+    const xFactorMap = new Map<string, number>();
+
+    try {
+      await Promise.all(
+        playerList.map(async (player) => {
+          try {
+            const xFactor = await calculateXFactorAsync(
+              player.punkte_sum || 0,
+              player.totalMinutesPlayed || 0,
+              player.marketValue || player.kosten || 0,
+              player.verein || ''
+            );
+            xFactorMap.set(player.id, xFactor);
+          } catch (error) {
+            console.warn(`Failed to calculate X-Factor for player ${player.id}:`, error);
+            // Fallback auf alte Berechnung
+            const fallbackXFactor = calculateXFactor(
+              player.punkte_sum || 0,
+              player.totalMinutesPlayed || 0,
+              player.marketValue || player.kosten || 0,
+              player.verein || ''
+            );
+            xFactorMap.set(player.id, fallbackXFactor);
+          }
+        })
+      );
+      setPlayerXFactors(xFactorMap);
+    } catch (error) {
+      console.error('Failed to load X-factors:', error);
+      // Fallback: Use synchronous calculation
+      playerList.forEach(player => {
+        const fallbackXFactor = calculateXFactor(
+          player.punkte_sum || 0,
+          player.totalMinutesPlayed || 0,
+          player.marketValue || player.kosten || 0,
+          player.verein || ''
+        );
+        xFactorMap.set(player.id, fallbackXFactor);
+      });
+      setPlayerXFactors(xFactorMap);
+    }
+  }, []);
+
   // Get current matchday on component mount
   useEffect(() => {
     getCurrentMatchday();
@@ -163,6 +220,34 @@ export default function PlayerHubPage() {
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Load X-factors when players change
+  useEffect(() => {
+    if (players.length > 0) {
+      loadXFactors(players);
+    }
+  }, [players, loadXFactors]);
+
+  // Listen for team odds updates and recalculate X-factors
+  useEffect(() => {
+    const handleTeamOddsUpdate = () => {
+      console.log('Team-Quoten wurden aktualisiert, X-Faktoren werden neu berechnet...');
+      if (players.length > 0) {
+        // Kleine Verzögerung, damit die neuen Quoten geladen werden können
+        setTimeout(() => {
+          loadXFactors(players);
+        }, 100);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('teamOddsUpdated', handleTeamOddsUpdate);
+      
+      return () => {
+        window.removeEventListener('teamOddsUpdated', handleTeamOddsUpdate);
+      };
+    }
+  }, [players, loadXFactors]);
 
   // Modal handlers
   const handlePlayerClick = (player: Player) => {
@@ -217,8 +302,8 @@ export default function PlayerHubPage() {
         aValue = calculatePointsPerMillion(a.punkte_sum || 0, a.marketValue || 0);
         bValue = calculatePointsPerMillion(b.punkte_sum || 0, b.marketValue || 0);
       } else if (sortColumn === 'xFactor') {
-        aValue = calculateXFactor(a.punkte_sum || 0, a.totalMinutesPlayed || 0, a.marketValue || a.kosten || 0, a.verein || '');
-        bValue = calculateXFactor(b.punkte_sum || 0, b.totalMinutesPlayed || 0, b.marketValue || b.kosten || 0, b.verein || '');
+        aValue = playerXFactors.get(a.id) || calculateXFactor(a.punkte_sum || 0, a.totalMinutesPlayed || 0, a.marketValue || a.kosten || 0, a.verein || '');
+        bValue = playerXFactors.get(b.id) || calculateXFactor(b.punkte_sum || 0, b.totalMinutesPlayed || 0, b.marketValue || b.kosten || 0, b.verein || '');
       } else if (sortColumn === 'position') {
         // Use position order for sorting (TW, ABW, MF, ANG)
         const positionOrder = getOrderedGermanPositions();
@@ -317,36 +402,33 @@ export default function PlayerHubPage() {
               {isLoadingMatchday ? (
                 <span>Spieltag wird ermittelt...</span>
               ) : (
-                <span>Spieltag {spieltag}</span>
+                <span>Abgeschlossene Spieltage: {spieltag}</span>
               )}
             </div>
           </div>
           
           {/* Filters */}
-          <div className="grid gap-4 md:grid-cols-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Suche</label>
-              <input
-                type="text"
+          <FilterSection title="Filter & Suche" description="Spieler nach verschiedenen Kriterien filtern">
+            <FilterGroup label="Suche">
+              <SearchInput
                 placeholder="Name oder Verein..."
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
+                variant="outline"
               />
-            </div>
+            </FilterGroup>
             
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Position</label>
-              <select
+            <FilterGroup label="Position">
+              <SimpleSelect
                 value={positionFilter}
                 onChange={(e) => {
                   setPositionFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
+                variant="outline"
               >
                 <option value="">Alle Positionen</option>
                 {uniquePositions.map(pos => (
@@ -358,63 +440,69 @@ export default function PlayerHubPage() {
                     {pos}
                   </option>
                 ))}
-              </select>
-            </div>
+              </SimpleSelect>
+            </FilterGroup>
             
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Verein</label>
-              <select
+            <FilterGroup label="Verein">
+              <SimpleSelect
                 value={clubFilter}
                 onChange={(e) => {
                   setClubFilter(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2"
+                variant="outline"
               >
                 <option value="">Alle Vereine</option>
                 {uniqueClubs.map(club => (
                   <option key={club} value={club}>{getFullTeamName(club)}</option>
                 ))}
-              </select>
-            </div>
+              </SimpleSelect>
+            </FilterGroup>
             
-            {/* Start 11 Filter */}
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                id="start11Filter"
-                checked={showStart11Only}
-                onChange={(e) => setShowStart11Only(e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <label htmlFor="start11Filter" className="text-sm font-medium text-gray-700">
-                Nur Letztes Spiel Start-11
-              </label>
-            </div>
-            
-            <div className="flex items-end space-x-2">
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setPositionFilter('');
-                  setClubFilter('');
-                  setCurrentPage(1);
-                }}
-                className="flex-1 rounded bg-slate-700 px-3 py-2 text-sm hover:bg-slate-600"
-              >
-                Filter zurücksetzen
-              </button>
-              <button
-                onClick={() => {
-                  exportPlayersToExcel(players, playerLast3GamesData);
-                }}
-                className="flex-1 rounded bg-green-700 px-3 py-2 text-sm hover:bg-green-600 flex items-center justify-center"
-                title={`Excel-Export: ${getFilteredPlayersCount(players, playerLast3GamesData)} Spieler (fit/angeschlagen + Start11)`}
-              >
-                📊 Excel Export
-              </button>
-            </div>
-          </div>
+            <FilterGroup label="Optionen">
+              <div className="space-y-3">
+                {/* Start 11 Filter */}
+                <label className="flex items-center space-x-2 text-sm text-slate-300">
+                  <input
+                    type="checkbox"
+                    checked={showStart11Only}
+                    onChange={(e) => setShowStart11Only(e.target.checked)}
+                    className="rounded border-slate-600 bg-slate-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-slate-900"
+                  />
+                  <span>Nur Letztes Spiel Start-11</span>
+                </label>
+                
+                {/* Action Buttons */}
+                <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSearchTerm('');
+                      setPositionFilter('');
+                      setClubFilter('');
+                      setShowStart11Only(false);
+                      setCurrentPage(1);
+                    }}
+                    className="flex-1"
+                  >
+                    Zurücksetzen
+                  </Button>
+                  <Button
+                     variant="default"
+                     size="sm"
+                    onClick={() => {
+                      exportPlayersToExcel(players, playerLast3GamesData);
+                    }}
+                    className="flex-1"
+                    title={`Excel-Export: ${getFilteredPlayersCount(players, playerLast3GamesData)} Spieler (fit/angeschlagen + Start11)`}
+                  >
+                    📊 Export
+                  </Button>
+                </div>
+              </div>
+            </FilterGroup>
+          </FilterSection>
 
           {/* Results Summary */}
           <div className="mb-4 text-sm text-slate-400">
@@ -539,7 +627,19 @@ export default function PlayerHubPage() {
                         {calculatePointsPerMillion(player.punkte_sum || 0, player.marketValue || 0).toFixed(1)}
                       </td>
                       <td className="py-3 px-2 text-center font-medium">
-                        {calculateXFactor(player.punkte_sum || 0, player.totalMinutesPlayed || 0, player.marketValue || player.kosten || 0, player.verein || '').toFixed(1)}
+                        <XFactorTooltip
+                          totalPoints={player.punkte_sum || 0}
+                          totalMinutes={player.totalMinutesPlayed || 0}
+                          marketValue={player.marketValue || player.kosten || 0}
+                          teamName={player.verein || ''}
+                          xFactorValue={playerXFactors.get(player.id) || calculateXFactor(player.punkte_sum || 0, player.totalMinutesPlayed || 0, player.marketValue || player.kosten || 0, player.verein || '')}
+                          isFromCache={playerXFactors.has(player.id)}
+                        >
+                          <span className="cursor-help">
+                            {(playerXFactors.get(player.id) || calculateXFactor(player.punkte_sum || 0, player.totalMinutesPlayed || 0, player.marketValue || player.kosten || 0, player.verein || '')).toFixed(1)}
+                            {playerXFactors.has(player.id) && <span className="ml-1 text-xs text-green-400">✓</span>}
+                          </span>
+                        </XFactorTooltip>
                       </td>
                       <td className="py-3 px-2 text-center font-medium">
                         {playerLast3GamesData.has(player.id) ? (

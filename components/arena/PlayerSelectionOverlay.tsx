@@ -5,12 +5,16 @@ import { Player } from '@/lib/types';
 import { X, Search, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PlayerImage from '@/components/PlayerImage';
-import { getGermanPosition, getPositionColorClasses, calculatePointsPerMinute, calculatePointsPerMillion, getEnglishPosition, calculateXFactor, getTeamOdds } from '@/lib/positionUtils';
+import { getGermanPosition, getPositionColorClasses, calculatePointsPerMinute, calculatePointsPerMillion, getEnglishPosition, calculateXFactor, calculateXFactorAsync, getTeamOdds } from '@/lib/positionUtils';
 import { correctPlayersPositions } from '@/lib/positionCorrections';
 import { getFullTeamName, getBundesligaLogoUrlByDflId } from '@/lib/teamMapping';
 import PlayerStatusTag, { isPlayerFit, getRowTextColor, getStatusInfo } from '@/components/PlayerStatusTag';
 import { optimizedFetch } from '@/lib/requestDeduplication';
 import BundesligaLogo from '@/components/BundesligaLogo';
+import { XFactorTooltip } from '@/components/XFactorTooltip';
+import { SearchInput } from '@/components/ui/search-input';
+import { SimpleSelect } from '@/components/ui/simple-select';
+import { FilterSection, FilterGroup } from '@/components/ui/filter-section';
 
 // Interface für die Spieldaten der letzten 3 Spiele
 interface PlayerLast3GamesData {
@@ -38,6 +42,36 @@ const last3GamesDataCache = new Map<string, PlayerLast3GamesData>();
 const opponentDataCache = new Map<string, OpponentData>();
 let opponentDataCacheTime = 0;
 const OPPONENT_CACHE_DURATION = 5 * 60 * 1000; // 5 Minuten
+
+// Cache für X-Faktoren mit aktuellen Quoten
+const xFactorCache = new Map<string, number>();
+let xFactorCacheTime = 0;
+const XFACTOR_CACHE_DURATION = 5 * 60 * 1000; // 5 Minuten
+
+// Funktion zum Berechnen und Cachen der X-Faktoren mit aktuellen Quoten
+async function getXFactorForPlayer(player: Player): Promise<number> {
+  const cacheKey = `${player.id}_${player.punkte_sum}_${player.totalMinutesPlayed}_${player.marketValue || player.kosten}_${player.verein}`;
+  const now = Date.now();
+  
+  // Cache prüfen
+  if (xFactorCache.has(cacheKey) && (now - xFactorCacheTime) < XFACTOR_CACHE_DURATION) {
+    return xFactorCache.get(cacheKey)!;
+  }
+  
+  // X-Faktor mit aktuellen Quoten berechnen
+  const xFactor = await calculateXFactorAsync(
+    player.punkte_sum || 0,
+    player.totalMinutesPlayed || 0,
+    player.marketValue || player.kosten || 0,
+    player.verein || ''
+  );
+  
+  // Cache aktualisieren
+  xFactorCache.set(cacheKey, xFactor);
+  xFactorCacheTime = now;
+  
+  return xFactor;
+}
 
 // Funktion zum Abrufen der Gegner-Daten
 async function getOpponentData(): Promise<Map<string, OpponentData>> {
@@ -200,6 +234,9 @@ export function PlayerSelectionOverlay({
   // Start11 data state
   const [playerLast3GamesData, setPlayerLast3GamesData] = useState<Map<string, PlayerLast3GamesData>>(new Map());
   const [opponentData, setOpponentData] = useState<Map<string, OpponentData>>(new Map());
+  
+  // X-Factor data state (mit aktuellen Quoten)
+  const [playerXFactors, setPlayerXFactors] = useState<Map<string, number>>(new Map());
 
   // Load players when overlay opens
   useEffect(() => {
@@ -234,6 +271,28 @@ export function PlayerSelectionOverlay({
         
         setPlayers(positionPlayers);
         setOpponentData(opponentDataMap);
+        
+        // Load X-Factors mit aktuellen Quoten
+        const xFactorMap = new Map<string, number>();
+        await Promise.all(
+          positionPlayers.map(async (player: Player) => {
+            try {
+              const xFactor = await getXFactorForPlayer(player);
+              xFactorMap.set(player.id, xFactor);
+            } catch (error) {
+              console.warn(`Failed to calculate X-Factor for player ${player.id}:`, error);
+              // Fallback auf alte Berechnung
+              const fallbackXFactor = calculateXFactor(
+                player.punkte_sum || 0,
+                player.totalMinutesPlayed || 0,
+                player.marketValue || player.kosten || 0,
+                player.verein || ''
+              );
+              xFactorMap.set(player.id, fallbackXFactor);
+            }
+          })
+        );
+        setPlayerXFactors(xFactorMap);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load players');
       } finally {
@@ -266,6 +325,56 @@ export function PlayerSelectionOverlay({
     };
     
     loadStart11Data();
+  }, [players]);
+
+  // Listen for team odds updates and recalculate X-factors
+  useEffect(() => {
+    const handleTeamOddsUpdate = () => {
+      console.log('Team-Quoten wurden aktualisiert, X-Faktoren in PlayerSelectionOverlay werden neu berechnet...');
+      // Cache invalidieren
+      xFactorCache.clear();
+      xFactorCacheTime = 0;
+      
+      // X-Faktoren für alle aktuellen Spieler neu laden
+      if (players.length > 0) {
+        // Kleine Verzögerung, damit die neuen Quoten geladen werden können
+        setTimeout(() => {
+          const loadXFactors = async () => {
+            const newXFactorMap = new Map<string, number>();
+            
+            await Promise.all(
+              players.map(async (player) => {
+                try {
+                  const xFactor = await getXFactorForPlayer(player);
+                  newXFactorMap.set(player.id, xFactor);
+                } catch (error) {
+                  console.warn(`Failed to calculate X-Factor for player ${player.id}:`, error);
+                  const fallbackXFactor = calculateXFactor(
+                    player.punkte_sum || 0,
+                    player.totalMinutesPlayed || 0,
+                    player.marketValue || player.kosten || 0,
+                    player.verein || ''
+                  );
+                  newXFactorMap.set(player.id, fallbackXFactor);
+                }
+              })
+            );
+            
+            setPlayerXFactors(newXFactorMap);
+          };
+          
+          loadXFactors();
+        }, 100);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('teamOddsUpdated', handleTeamOddsUpdate);
+      
+      return () => {
+        window.removeEventListener('teamOddsUpdated', handleTeamOddsUpdate);
+      };
+    }
   }, [players]);
 
   // Filter and sort players
@@ -324,8 +433,10 @@ export function PlayerSelectionOverlay({
                       calculatePointsPerMillion(b.punkte_sum || 0, b.marketValue || b.kosten || 0);
           break;
         case 'xFactor':
-          comparison = calculateXFactor(a.punkte_sum || 0, a.totalMinutesPlayed || 0, a.marketValue || a.kosten || 0, a.verein || '') - 
-                      calculateXFactor(b.punkte_sum || 0, b.totalMinutesPlayed || 0, b.marketValue || b.kosten || 0, b.verein || '');
+          // Verwende gecachte X-Faktoren mit aktuellen Quoten
+          const xFactorA = playerXFactors.get(a.id) || 0;
+          const xFactorB = playerXFactors.get(b.id) || 0;
+          comparison = xFactorA - xFactorB;
           break;
         case 'name':
           comparison = a.name.localeCompare(b.name);
@@ -394,27 +505,23 @@ export function PlayerSelectionOverlay({
         </div>
 
         {/* Filters */}
-        <div className="p-6 border-b border-slate-700 space-y-4">
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <input
-              type="text"
+        <FilterSection className="border-b border-slate-700 bg-slate-900/60">
+          <FilterGroup label="Suche">
+            <SearchInput
               placeholder="Spieler oder Verein suchen..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              variant="default"
             />
-          </div>
+          </FilterGroup>
 
-          {/* Sort and Filter Options */}
-          <div className="flex flex-wrap gap-4">
-            <div className="flex items-center gap-2">
-              <label className="text-sm text-slate-300">Sortieren:</label>
-              <select
+          <FilterGroup label="Sortierung">
+            <div className="flex gap-2">
+              <SimpleSelect
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                className="bg-slate-800 border border-slate-600 rounded px-3 py-1 text-sm text-white"
+                variant="default"
+                className="flex-1"
               >
                 <option value="xFactor">X-Faktor</option>
                 <option value="marketValue">Marktwert</option>
@@ -424,36 +531,60 @@ export function PlayerSelectionOverlay({
                 <option value="pointsPerMillion">Punkte/Mio€</option>
                 <option value="name">Name</option>
                 <option value="verein">Verein</option>
-              </select>
-              <button
+              </SimpleSelect>
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-sm text-white"
+                className="px-3"
               >
                 {sortOrder === 'asc' ? '↑' : '↓'}
-              </button>
+              </Button>
             </div>
+          </FilterGroup>
 
-            <label className="flex items-center gap-2 text-sm text-slate-300">
-              <input
-                type="checkbox"
-                checked={showAffordableOnly}
-                onChange={(e) => setShowAffordableOnly(e.target.checked)}
-                className="rounded"
-              />
-              Nur erschwingliche Spieler
-            </label>
+          <FilterGroup label="Filter">
+            <div className="space-y-3">
+              <label className="flex items-center gap-2 text-sm text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={showAffordableOnly}
+                  onChange={(e) => setShowAffordableOnly(e.target.checked)}
+                  className="rounded border-slate-600 bg-slate-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-slate-900"
+                />
+                <span>Nur erschwingliche Spieler</span>
+              </label>
 
-            <label className="flex items-center gap-2 text-sm text-slate-300">
-              <input
-                type="checkbox"
-                checked={showStart11Only}
-                onChange={(e) => setShowStart11Only(e.target.checked)}
-                className="rounded"
-              />
-              Letztes Spiel Start 11
-            </label>
-          </div>
-        </div>
+              <label className="flex items-center gap-2 text-sm text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={showStart11Only}
+                  onChange={(e) => setShowStart11Only(e.target.checked)}
+                  className="rounded border-slate-600 bg-slate-800 text-blue-600 focus:ring-blue-500 focus:ring-offset-slate-900"
+                />
+                <span>Letztes Spiel Start 11</span>
+              </label>
+            </div>
+          </FilterGroup>
+
+          <FilterGroup>
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSearchTerm('');
+                  setSortBy('xFactor');
+                  setSortOrder('desc');
+                  setShowAffordableOnly(false);
+                  setShowStart11Only(false);
+                }}
+              >
+                Filter zurücksetzen
+              </Button>
+            </div>
+          </FilterGroup>
+        </FilterSection>
 
         {/* Player List - Table View Only */}
         <div className="flex-1 overflow-hidden min-h-0">
@@ -662,16 +793,26 @@ export function PlayerSelectionOverlay({
                         <td className="text-center py-3 px-2 text-sm">
                           {calculatePointsPerMillion(player.punkte_sum || 0, player.marketValue || player.kosten || 0).toFixed(1)}
                         </td>
-                        <td 
-                          className="text-center py-3 px-2 text-sm font-medium text-yellow-400 cursor-help"
-                          title={(() => {
-                            const pointsPerMinute = calculatePointsPerMinute(player.punkte_sum || 0, player.totalMinutesPlayed || 0);
-                            const pointsPerMillion = calculatePointsPerMillion(player.punkte_sum || 0, player.marketValue || player.kosten || 0);
-                            const teamOdds = getTeamOdds(player.verein || '');
-                            return `X-Faktor Berechnung: ${pointsPerMinute.toFixed(2)} × ${pointsPerMillion.toFixed(1)} × ${teamOdds.toFixed(2)} = ${(pointsPerMinute * pointsPerMillion * teamOdds).toFixed(2)}`;
-                          })()}
-                        >
-                          {calculateXFactor(player.punkte_sum || 0, player.totalMinutesPlayed || 0, player.marketValue || player.kosten || 0, player.verein || '').toFixed(2)}
+                        <td className="text-center py-3 px-2 text-sm font-medium text-yellow-400">
+                          <XFactorTooltip
+                            totalPoints={player.punkte_sum || 0}
+                            totalMinutes={player.totalMinutesPlayed || 0}
+                            marketValue={player.marketValue || player.kosten || 0}
+                            teamName={player.verein || ''}
+                            xFactorValue={playerXFactors.get(player.id) || calculateXFactor(player.punkte_sum || 0, player.totalMinutesPlayed || 0, player.marketValue || player.kosten || 0, player.verein || '')}
+                            isFromCache={playerXFactors.has(player.id)}
+                          >
+                            <span className="cursor-help">
+                              {(() => {
+                                const cachedXFactor = playerXFactors.get(player.id);
+                                if (cachedXFactor !== undefined) {
+                                  return cachedXFactor.toFixed(2);
+                                }
+                                // Fallback auf alte Berechnung
+                                return calculateXFactor(player.punkte_sum || 0, player.totalMinutesPlayed || 0, player.marketValue || player.kosten || 0, player.verein || '').toFixed(2);
+                              })()}
+                            </span>
+                          </XFactorTooltip>
                         </td>
                         <td className="py-3 px-2 text-center font-medium">
                           {playerLast3GamesData.has(player.id) ? (

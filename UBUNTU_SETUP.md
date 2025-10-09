@@ -109,7 +109,10 @@ Füge folgende Inhalte in die `.env` Datei ein:
 
 ```env
 # Kickbase API Configuration
-KICKBASE_API_KEY=dein_kickbase_api_key_hier
+KICKBASE_BASE=https://api.kickbase.com
+KICKBASE_KEY=dein_kickbase_api_key_hier
+KICKBASE_EMAIL=deine-email@example.com
+KICKBASE_PASSWORD=dein-passwort
 
 # Next.js Configuration
 NEXT_PUBLIC_API_URL=http://localhost:3000
@@ -119,7 +122,10 @@ NODE_ENV=production
 PORT=3000
 ```
 
-**Wichtig:** Ersetze `dein_kickbase_api_key_hier` mit deinem echten Kickbase API Key.
+**Wichtig:** 
+- Ersetze `dein_kickbase_api_key_hier` mit deinem echten Kickbase API Key
+- Ersetze `deine-email@example.com` und `dein-passwort` mit deinen Kickbase Login-Daten
+- Die Login-Daten werden für automatische Token-Erneuerung benötigt
 
 ### 7. Anwendung bauen
 
@@ -155,6 +161,72 @@ pm2 start npm --name "kickbase-helper" -- start
 # PM2 Auto-Start beim Systemstart aktivieren
 pm2 startup
 pm2 save
+```
+
+## 🔐 Automatische Token-Validierung (Deployment)
+
+**Wichtig für Deployments:** Das System validiert automatisch den Token beim Server-Start und erneuert ihn bei Bedarf.
+
+### Server-Initialisierung nach Deployment
+
+Nach dem Start des Servers solltest du die automatische Initialisierung ausführen:
+
+```bash
+# Basis-Initialisierung (nur Token-Validierung)
+node scripts/startup-init.js
+
+# Mit Cache-Warmup (empfohlen)
+node scripts/startup-init.js --warmup
+
+# Vollständige Initialisierung (alle Daten)
+node scripts/startup-init.js --warmup --comprehensive
+```
+
+### Manueller API-Aufruf
+
+Alternativ kannst du die Initialisierung auch direkt über die API aufrufen:
+
+```bash
+# Basis-Initialisierung
+curl http://localhost:3000/api/server/initialize
+
+# Mit Cache-Warmup
+curl "http://localhost:3000/api/server/initialize?warmup=true"
+
+# Vollständige Initialisierung
+curl "http://localhost:3000/api/server/initialize?warmup=true&comprehensive=true"
+```
+
+### Was passiert bei der Initialisierung?
+
+1. **Token-Validierung**: Prüft ob der aktuelle Token gültig ist
+2. **Automatische Erneuerung**: Erneuert den Token falls abgelaufen
+3. **Cache-Warmup**: Lädt wichtige Daten vor (optional)
+4. **Fehlerbehandlung**: Informiert über Probleme
+
+### Deployment-Workflow
+
+```bash
+# 1. Repository klonen/aktualisieren
+git pull origin main
+
+# 2. Dependencies installieren
+npm install
+
+# 3. Anwendung bauen
+npm run build
+
+# 4. Server starten
+npm start &
+
+# 5. Warten bis Server bereit ist (ca. 10-30 Sekunden)
+sleep 30
+
+# 6. Server initialisieren
+node scripts/startup-init.js --warmup
+
+# 7. Status prüfen
+curl http://localhost:3000/api/auth/status
 ```
 
 ## 🔧 Systemd Service (Alternative zu PM2)

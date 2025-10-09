@@ -153,7 +153,7 @@ export interface PlayerDetailModalProps {
 export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDetailModalProps) {
   const [start11Count, setStart11Count] = useState<number>(0);
   const [actualAppearances, setActualAppearances] = useState<number>(0);
-  const [completedMatchdays, setCompletedMatchdays] = useState<number>(5); // Abgeschlossene Spieltage
+  const [completedMatchdays, setCompletedMatchdays] = useState<number>(6); // Abgeschlossene Spieltage
   const [apiTotalMinutes, setApiTotalMinutes] = useState<number>(0);
   const [apiTotalPoints, setApiTotalPoints] = useState<number>(0);
 
@@ -164,7 +164,7 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
         const response = await fetch('/api/matchday/current');
         if (response.ok) {
           const data = await response.json();
-          // Wenn currentMatchday = 6, dann sind 6 Spieltage abgeschlossen
+          // currentMatchday repräsentiert die abgeschlossenen Spieltage
           const completed = data.currentMatchday || 6;
           setCompletedMatchdays(completed);
         }
@@ -209,7 +209,7 @@ export default function PlayerDetailModal({ player, isOpen, onClose }: PlayerDet
               setStart11Count(data.start11Count);
               // Verwende currentMatchday aus API für abgeschlossene Spieltage
              if (data.currentMatchday !== undefined) {
-               // Wenn currentMatchday = 6, dann sind 6 Spieltage abgeschlossen
+               // currentMatchday repräsentiert die abgeschlossenen Spieltage
                setCompletedMatchdays(data.currentMatchday);
              }
               setApiTotalMinutes(data.totalMinutes || 0);

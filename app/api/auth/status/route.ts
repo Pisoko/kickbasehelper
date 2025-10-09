@@ -10,8 +10,9 @@ export async function GET() {
     if (isTokenValid) {
         try {
           const tokenClaims = await kickbaseAuth.getTokenClaims();
+          const leagueIds = await kickbaseAuth.getLeagueIds();
           userInfo = {
-            leagues: kickbaseAuth.getLeagueIds()
+            leagues: leagueIds
           };
           expiresAt = tokenClaims?.exp ? new Date(tokenClaims.exp * 1000).toISOString() : null;
         } catch (error) {

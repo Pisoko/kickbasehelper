@@ -30,17 +30,21 @@ export class KickbaseAuthService {
   private token: string | null = null;
   private tokenExpiry: Date | null = null;
   private refreshPromise: Promise<boolean> | null = null;
-  private readonly apiKey: string | null;
 
   constructor() {
-    // Initialize with API key from environment
-    this.apiKey = process.env.KICKBASE_KEY || null;
-    console.log('🔧 KickbaseAuthService initialized with API key:', this.apiKey ? 'YES' : 'NO');
-    if (this.apiKey) {
-      console.log('🔑 API key (first 20 chars):', this.apiKey.substring(0, 20) + '...');
-    }
     // Initialize with any existing token from environment or storage
     this.loadStoredToken();
+  }
+
+  /**
+   * Get current API key from environment (dynamically loaded)
+   */
+  private get apiKey(): string | null {
+    const key = process.env.KICKBASE_KEY || null;
+    if (key) {
+      console.log('🔑 API key loaded from environment (first 20 chars):', key.substring(0, 20) + '...');
+    }
+    return key;
   }
 
   /**
@@ -107,17 +111,15 @@ export class KickbaseAuthService {
    * Get a valid authentication token, refreshing if necessary
    */
   async getValidToken(): Promise<string | null> {
-    // If we have an API key from environment, use it directly
-    if (this.apiKey) {
-      console.log('🔑 Using API key from environment (first 20 chars):', this.apiKey.substring(0, 20) + '...');
-      return this.apiKey;
-    }
-
-    console.log('⚠️ No API key found in environment, checking stored token...');
-
+    // Check if we have a valid token (including API key validation)
     if (this.isTokenValid()) {
-      console.log('✅ Stored token is valid');
-      return this.token;
+      if (this.apiKey) {
+        console.log('✅ Using valid API key from environment (first 20 chars):', this.apiKey.substring(0, 20) + '...');
+        return this.apiKey;
+      } else if (this.token) {
+        console.log('✅ Using valid stored token');
+        return this.token;
+      }
     }
 
     console.log('❌ No valid token available, attempting refresh...');
@@ -125,7 +127,7 @@ export class KickbaseAuthService {
     // If a refresh is already in progress, wait for it
     if (this.refreshPromise) {
       await this.refreshPromise;
-      return this.token;
+      return this.isTokenValid() ? (this.apiKey || this.token) : null;
     }
 
     // Start a new refresh
@@ -133,7 +135,7 @@ export class KickbaseAuthService {
     const success = await this.refreshPromise;
     this.refreshPromise = null;
 
-    return success ? this.token : null;
+    return success ? (this.apiKey || this.token) : null;
   }
 
   /**
@@ -143,42 +145,48 @@ export class KickbaseAuthService {
     try {
       logger.info('Refreshing Kickbase authentication token');
       
-      const response = await fetch(`${this.baseUrl}/v4/chat/refreshtoken`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      // Check if we have a current token to use for refresh
+      if (this.token && this.tokenExpiry && this.tokenExpiry > new Date()) {
+        // Try to refresh with current token
+        const response = await fetch(`${this.baseUrl}/v4/chat/refreshtoken`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.token}`
+          },
+        });
 
-      if (!response.ok) {
-        logger.warn({ status: response.status }, 'Token refresh failed, attempting new authentication');
-        
-        // If refresh fails, try to authenticate with stored credentials
-        const email = process.env.KICKBASE_EMAIL;
-        const password = process.env.KICKBASE_PASSWORD;
-        
-        if (email && password) {
-          logger.info('Attempting automatic re-authentication with stored credentials');
-          return await this.authenticate(email, password);
-        } else {
-          logger.error('No stored credentials available for automatic re-authentication');
-          return false;
+        if (response.ok) {
+          const authData: AuthToken = await response.json();
+          
+          this.token = authData.tkn;
+          this.tokenExpiry = new Date(authData.tknex);
+          
+          // Store token for persistence
+          this.storeToken(authData);
+          
+          logger.info({ 
+            expiresAt: this.tokenExpiry.toISOString() 
+          }, 'Token refreshed successfully');
+          
+          return true;
         }
       }
 
-      const authData: AuthToken = await response.json();
+      // If refresh fails or no valid token, try to authenticate with stored credentials
+      logger.warn('Token refresh failed or no valid token, attempting new authentication');
       
-      this.token = authData.tkn;
-      this.tokenExpiry = new Date(authData.tknex);
+      const email = process.env.KICKBASE_EMAIL;
+      const password = process.env.KICKBASE_PASSWORD;
       
-      // Store token for persistence
-      this.storeToken(authData);
+      if (email && password) {
+        logger.info('Attempting automatic re-authentication with stored credentials');
+        return await this.authenticate(email, password);
+      } else {
+        logger.error('No stored credentials available for automatic re-authentication');
+        return false;
+      }
       
-      logger.info({ 
-        expiresAt: this.tokenExpiry.toISOString() 
-      }, 'Token refreshed successfully');
-      
-      return true;
     } catch (error) {
       logger.error({ error }, 'Error refreshing token, attempting fallback authentication');
       
@@ -196,21 +204,46 @@ export class KickbaseAuthService {
   }
 
   /**
-   * Check if current token is valid and not expired, or if API key is available
+   * Check if current token is valid and not expired
    */
   isTokenValid(): boolean {
-    // If we have an API key from environment, consider it valid
+    console.log('🔍 isTokenValid called');
+    // Check API key from environment first
     if (this.apiKey) {
-      return true;
+      console.log('🔑 Checking API key validity');
+      try {
+        const claims = this.decodeToken(this.apiKey);
+        console.log('🔍 Claims decoded:', !!claims);
+        if (claims && claims.exp) {
+          const expiryDate = new Date(claims.exp * 1000);
+          const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
+          const isValid = expiryDate > fiveMinutesFromNow;
+          console.log('🔍 Token expiry:', expiryDate.toISOString());
+          console.log('🔍 Five minutes from now:', fiveMinutesFromNow.toISOString());
+          console.log('🔍 Is valid:', isValid);
+          return isValid;
+        } else {
+          console.log('❌ No claims or exp found');
+        }
+      } catch (error) {
+        console.log('❌ Error decoding API key:', error);
+        logger.warn('Failed to decode API key from environment, treating as invalid');
+      }
+      console.log('❌ API key validation failed, returning false');
+      return false;
     }
 
+    console.log('⚠️ No API key, checking stored token');
     if (!this.token || !this.tokenExpiry) {
+      console.log('❌ No stored token or expiry');
       return false;
     }
 
     // Check if token expires within the next 5 minutes
     const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
-    return this.tokenExpiry > fiveMinutesFromNow;
+    const isValid = this.tokenExpiry > fiveMinutesFromNow;
+    console.log('🔍 Stored token valid:', isValid);
+    return isValid;
   }
 
   /**

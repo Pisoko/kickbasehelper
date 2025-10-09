@@ -90,10 +90,10 @@ export default function MatchdayOverview({ className }: MatchdayOverviewProps) {
       }
     } catch (err) {
       console.error('Error fetching current matchday:', err);
-      // Fallback: Nehme an, dass Spieltag 5 der aktuelle ist
-      setActualCurrentMatchday(5);
+      // Fallback: Nehme an, dass 6 Spieltage abgeschlossen sind
+      setActualCurrentMatchday(6);
       if (currentMatchday === null) {
-        setCurrentMatchday(6); // Nächster Spieltag als Fallback
+        setCurrentMatchday(7); // Nächster Spieltag als Fallback
       }
     }
   };

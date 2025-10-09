@@ -11,8 +11,8 @@ season_config:
   season_end: "2026-05-31"
   total_matchdays: 34
   matches_per_matchday: 9
-  current_matchday: 5
-  completed_matchdays: 5
+  current_matchday: 7
+  completed_matchdays: 6
   display_rules:
     - "MatchdayOverview zeigt immer den kommenden Spieltag (aktueller + 1)"
     - "Alle 9 Spiele eines Spieltags müssen angezeigt werden"

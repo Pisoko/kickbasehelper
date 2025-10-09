@@ -4,6 +4,9 @@ import React, { useState, useMemo } from 'react';
 import { Player } from '@/lib/types';
 import { getPositionColorClasses } from '@/lib/positionUtils';
 import { X, Search, TrendingUp, Clock, Target } from 'lucide-react';
+import { SearchInput } from '../ui/search-input';
+import { Button } from '../ui/button';
+import { FilterSection, FilterGroup } from '../ui/filter-section';
 
 interface PlayerPoolPanelProps {
   players: Player[];
@@ -70,53 +73,42 @@ export function PlayerPoolPanel({
       </div>
 
       {/* Search and Sort */}
-      <div className="p-4 border-b space-y-3">
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
-            type="text"
+      <FilterSection className="border-b">
+        <FilterGroup label="Suche">
+          <SearchInput
             placeholder="Spieler oder Verein suchen..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-background border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            variant="default"
           />
-        </div>
+        </FilterGroup>
 
-        {/* Sort */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setSortBy('value')}
-            className={`px-3 py-1 rounded-md text-sm transition-colors ${
-              sortBy === 'value' 
-                ? 'bg-primary text-primary-foreground' 
-                : 'bg-muted hover:bg-muted/80'
-            }`}
-          >
-            Marktwert
-          </button>
-          <button
-            onClick={() => setSortBy('points')}
-            className={`px-3 py-1 rounded-md text-sm transition-colors ${
-              sortBy === 'points' 
-                ? 'bg-primary text-primary-foreground' 
-                : 'bg-muted hover:bg-muted/80'
-            }`}
-          >
-            Punkte
-          </button>
-          <button
-            onClick={() => setSortBy('name')}
-            className={`px-3 py-1 rounded-md text-sm transition-colors ${
-              sortBy === 'name' 
-                ? 'bg-primary text-primary-foreground' 
-                : 'bg-muted hover:bg-muted/80'
-            }`}
-          >
-            Name
-          </button>
-        </div>
-      </div>
+        <FilterGroup label="Sortierung">
+          <div className="flex gap-2">
+            <Button
+              variant={sortBy === 'value' ? 'default' : 'secondary'}
+              size="sm"
+              onClick={() => setSortBy('value')}
+            >
+              Marktwert
+            </Button>
+            <Button
+              variant={sortBy === 'points' ? 'default' : 'secondary'}
+              size="sm"
+              onClick={() => setSortBy('points')}
+            >
+              Punkte
+            </Button>
+            <Button
+              variant={sortBy === 'name' ? 'default' : 'secondary'}
+              size="sm"
+              onClick={() => setSortBy('name')}
+            >
+              Name
+            </Button>
+          </div>
+        </FilterGroup>
+      </FilterSection>
 
       {/* Player List */}
       <div className="max-h-96 overflow-y-auto">

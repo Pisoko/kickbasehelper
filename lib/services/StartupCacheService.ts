@@ -2,6 +2,7 @@ import { kickbaseDataCache } from './KickbaseDataCacheService';
 import { ImageCacheService } from './ImageCacheService';
 import { TeamLogoCacheService } from './TeamLogoCacheService';
 import { KickbaseAdapter } from '../adapters/KickbaseAdapter';
+import { kickbaseAuth } from '../adapters/KickbaseAuthService';
 import pino from 'pino';
 
 // Minimized log level for better performance
@@ -13,6 +14,7 @@ const logger = pino({
 /**
  * Service for warming up caches on server startup
  * Preloads essential data to ensure optimal performance
+ * Includes automatic token validation and renewal
  */
 export class StartupCacheService {
   private imageCache: ImageCacheService;
@@ -34,6 +36,149 @@ export class StartupCacheService {
       process.env.KICKBASE_API_URL || 'https://api.kickbase.com',
       process.env.KICKBASE_API_KEY || ''
     );
+  }
+
+  /**
+   * Validate and ensure valid authentication token on startup
+   * This is crucial for deployments to ensure the server starts with a valid token
+   */
+  async validateAndEnsureToken(): Promise<{
+    success: boolean;
+    tokenValid: boolean;
+    tokenRenewed: boolean;
+    expiresAt: string | null;
+    error?: string;
+  }> {
+    try {
+      logger.info('🔐 Starting token validation on server startup...');
+      
+      // Check if current token is valid
+      const isCurrentTokenValid = kickbaseAuth.isTokenValid();
+      logger.info(`Current token valid: ${isCurrentTokenValid}`);
+      
+      if (isCurrentTokenValid) {
+        const claims = await kickbaseAuth.getTokenClaims();
+        const expiresAt = claims ? new Date(claims.exp * 1000).toISOString() : null;
+        
+        logger.info(`✅ Token is valid until: ${expiresAt}`);
+        return {
+          success: true,
+          tokenValid: true,
+          tokenRenewed: false,
+          expiresAt
+        };
+      }
+      
+      // Token is invalid or expired, attempt renewal
+      logger.warn('⚠️ Token is invalid or expired, attempting automatic renewal...');
+      
+      const validToken = await kickbaseAuth.getValidToken();
+      
+      if (validToken) {
+        const claims = await kickbaseAuth.getTokenClaims();
+        const expiresAt = claims ? new Date(claims.exp * 1000).toISOString() : null;
+        
+        logger.info(`✅ Token successfully renewed, valid until: ${expiresAt}`);
+        return {
+          success: true,
+          tokenValid: true,
+          tokenRenewed: true,
+          expiresAt
+        };
+      } else {
+        const error = 'Failed to obtain valid token after renewal attempt';
+        logger.error(`❌ ${error}`);
+        return {
+          success: false,
+          tokenValid: false,
+          tokenRenewed: false,
+          expiresAt: null,
+          error
+        };
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error during token validation';
+      logger.error(`❌ Token validation failed: ${errorMessage}`);
+      
+      return {
+        success: false,
+        tokenValid: false,
+        tokenRenewed: false,
+        expiresAt: null,
+        error: errorMessage
+      };
+    }
+  }
+
+  /**
+   * Initialize server with token validation and optional cache warmup
+   * This should be called on server startup for deployments
+   */
+  async initializeServer(options: {
+    validateToken?: boolean;
+    warmupCache?: boolean;
+    warmupConfig?: {
+      includeAllPlayers?: boolean;
+      includePlayerDetails?: boolean;
+      includeTeamLogos?: boolean;
+      includeComprehensivePlayerData?: boolean;
+      currentSpieltag?: number;
+    };
+  } = {}): Promise<{
+    success: boolean;
+    tokenValidation?: any;
+    cacheWarmup?: any;
+    errors: string[];
+  }> {
+    const results: any = {
+      success: true,
+      errors: []
+    };
+
+    // Step 1: Token validation (always recommended for deployments)
+    if (options.validateToken !== false) {
+      try {
+        logger.info('🚀 Initializing server - Step 1: Token validation');
+        results.tokenValidation = await this.validateAndEnsureToken();
+        
+        if (!results.tokenValidation.success) {
+          results.success = false;
+          results.errors.push(`Token validation failed: ${results.tokenValidation.error}`);
+          logger.error('❌ Server initialization failed due to token validation error');
+          return results;
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown token validation error';
+        results.success = false;
+        results.errors.push(`Token validation error: ${errorMessage}`);
+        logger.error(`❌ Server initialization failed: ${errorMessage}`);
+        return results;
+      }
+    }
+
+    // Step 2: Cache warmup (optional)
+    if (options.warmupCache) {
+      try {
+        logger.info('🚀 Initializing server - Step 2: Cache warmup');
+        results.cacheWarmup = await this.startWarmup(options.warmupConfig || {});
+        
+        if (!results.cacheWarmup.success) {
+          // Cache warmup failure is not critical for server startup
+          results.errors.push('Cache warmup completed with errors');
+          logger.warn('⚠️ Cache warmup completed with errors, but server initialization continues');
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown cache warmup error';
+        results.errors.push(`Cache warmup error: ${errorMessage}`);
+        logger.warn(`⚠️ Cache warmup failed: ${errorMessage}, but server initialization continues`);
+      }
+    }
+
+    if (results.success) {
+      logger.info('✅ Server initialization completed successfully');
+    }
+
+    return results;
   }
 
   /**

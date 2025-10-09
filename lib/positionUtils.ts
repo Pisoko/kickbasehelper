@@ -181,7 +181,15 @@ async function loadCurrentTeamOdds(): Promise<Record<string, number>> {
  * Get team odds for X-Factor calculation (synchron mit Cache)
  */
 export function getTeamOdds(teamName: string): number {
-  // Verwende gecachte dynamische Quoten falls verfügbar
+  // Wenn dynamische Quoten nicht verfügbar sind, versuche sie zu laden
+  if (!dynamicTeamOdds && typeof window !== 'undefined' && !isLoadingOdds) {
+    // Trigger async load but don't wait for it
+    loadCurrentTeamOdds().catch(error => {
+      console.warn('Fehler beim Laden der Team-Quoten in getTeamOdds:', error);
+    });
+  }
+  
+  // Verwende gecachte dynamische Quoten falls verfügbar, sonst Standard-Mapping
   const currentMapping: Record<string, number> = dynamicTeamOdds || teamOddsMapping;
   
   // Try exact match first
@@ -227,11 +235,31 @@ export async function getTeamOddsAsync(teamName: string): Promise<number> {
 }
 
 /**
- * Invalidiert den Team-Quoten Cache (nach Änderungen)
+ * Invalidiert den Team-Quoten Cache und lädt neue Daten
  */
 export function invalidateTeamOddsCache(): void {
   dynamicTeamOdds = null;
   lastOddsUpdate = 0;
+  
+  // Lade sofort neue Daten im Browser-Kontext
+  if (typeof window !== 'undefined') {
+    loadCurrentTeamOdds().catch(error => {
+      console.warn('Fehler beim Neuladen der Team-Quoten nach Cache-Invalidierung:', error);
+    });
+  }
+}
+
+/**
+ * Forciert das Neuladen der Team-Quoten (für sofortige Aktualisierung)
+ */
+export async function forceReloadTeamOdds(): Promise<void> {
+  dynamicTeamOdds = null;
+  lastOddsUpdate = 0;
+  isLoadingOdds = false; // Reset loading flag
+  
+  if (typeof window !== 'undefined') {
+    await loadCurrentTeamOdds();
+  }
 }
 
 /**
@@ -247,6 +275,7 @@ export function initializeTeamOdds(): void {
 
 /**
  * Calculate X-Factor: (Points per Minute) * (Points per Million €) * Team Odds
+ * @deprecated Use calculateXFactorAsync for accurate odds from Quoten-Tab
  */
 export function calculateXFactor(totalPoints: number, totalMinutes: number, marketValue: number, teamName: string): number {
   const pointsPerMinute = calculatePointsPerMinute(totalPoints, totalMinutes);
@@ -256,6 +285,20 @@ export function calculateXFactor(totalPoints: number, totalMinutes: number, mark
   initializeTeamOdds();
   
   const teamOdds = getTeamOdds(teamName);
+  
+  return pointsPerMinute * pointsPerMillion * teamOdds;
+}
+
+/**
+ * Calculate X-Factor asynchronously using current odds from Quoten-Tab
+ * (Points per Minute) * (Points per Million €) * Team Odds from API
+ */
+export async function calculateXFactorAsync(totalPoints: number, totalMinutes: number, marketValue: number, teamName: string): Promise<number> {
+  const pointsPerMinute = calculatePointsPerMinute(totalPoints, totalMinutes);
+  const pointsPerMillion = calculatePointsPerMillion(totalPoints, marketValue);
+  
+  // Verwende aktuelle Quoten aus dem Quoten-Tab
+  const teamOdds = await getTeamOddsAsync(teamName);
   
   return pointsPerMinute * pointsPerMillion * teamOdds;
 }
